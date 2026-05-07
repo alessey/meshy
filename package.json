@@ -1,0 +1,17 @@
+{
+  "name": "meshy",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@meshtastic/core": "^2.6.7",
+    "@meshtastic/transport-node-serial": "^0.0.2",
+    "lodash": "^4.18.1"
+  }
+}
