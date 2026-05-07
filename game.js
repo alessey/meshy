@@ -87,7 +87,7 @@ export class Game {
 
     player.location = nextLoc;
     player.encounter = null;
-    await save(this.playerStates);
+    save(this.playerStates);
     return this.enterLocation(senderId, player);
   }
 
@@ -133,7 +133,7 @@ export class Game {
     const event = player.encounter;
     const handler = EVENT_HANDLERS[event.type];
     if (handler) {
-      return handler.call(this, senderId, player, command, event);
+      return handler.call(this, senderId, player, command, event, room);
     }
     return this.sendUnknownCommand(senderId, player, room);
   }
@@ -155,7 +155,7 @@ export class Game {
     }
 
     const stat = event.item.attack ? `${event.item.attack} ATK` : `${event.item.hp} HP`;
-    return this.sendGameText(senderId, player, `Found ${event.item.name} (${stat}). Take (T) or Discard (D)?`, EVENT_ACTIONS.item);
+    return this.sendGameText(senderId, player, `Found ${event.item.name} (${stat}). (T)ake or (D)iscard?`, EVENT_ACTIONS.item);
   }
 
   async handleMonsterEvent(senderId, player, command, event, room) {
@@ -172,7 +172,7 @@ export class Game {
       return this.resolveSaveAndDisplay(senderId, player, room);
     }
 
-    return this.sendGameText(senderId, player, `A ${event.monster.name} appears! Fight (F) or Run (R)?`, EVENT_ACTIONS.monster);
+    return this.sendGameText(senderId, player, `A ${event.monster.name} appears! (F)ight or (R)un?`, EVENT_ACTIONS.monster);
   }
 
   async resolveCombatRound(senderId, player, event) {
@@ -187,7 +187,7 @@ export class Game {
       player.hp = MAX_HP;
       player.weapon = { ...INITIAL_PLAYER.weapon };
       player.encounter = null;
-      await save(this.playerStates);
+      save(this.playerStates);
       const respawnRoom = this.getRoom(player);
       return this.sendGameText(senderId, player, `${combatMsg}You died! Respawning in the woods...`, Object.keys(respawnRoom.actions));
     }
@@ -195,7 +195,7 @@ export class Game {
     if (monster.hp <= 0) {
       const room = this.getRoom(player);
       player.encounter = null;
-      await save(this.playerStates);
+      save(this.playerStates);
       return this.sendGameText(
         senderId,
         player,
@@ -204,8 +204,8 @@ export class Game {
       );
     }
 
-    await save(this.playerStates);
-    return this.sendGameText(senderId, player, `${combatMsg}Your HP: ${player.hp}. Monster HP: ${monster.hp}. Fight (F) or Run (R)?`, EVENT_ACTIONS.monster);
+    save(this.playerStates);
+    return this.sendGameText(senderId, player, `${combatMsg}Your HP: ${player.hp}. Monster HP: ${monster.hp}. (F)ight or (R)un?`, EVENT_ACTIONS.monster);
   }
 
   findRetreatLocation(room) {
@@ -225,7 +225,7 @@ export class Game {
       return this.resolveSaveAndDisplay(senderId, player, room);
     }
 
-    return this.sendGameText(senderId, player, `You found a ${event.potion.name}. Use (U) or Discard (D)?`, EVENT_ACTIONS.potion);
+    return this.sendGameText(senderId, player, `You found a ${event.potion.name}. (U)se or (D)iscard?`, EVENT_ACTIONS.potion);
   }
 
   async sendLocationSummary(senderId, player, room) {
@@ -239,13 +239,13 @@ export class Game {
     const actions = EVENT_ACTIONS[event.type];
     if (event.type === "item") {
       const stat = event.item.attack ? `${event.item.attack} ATK` : `${event.item.hp} HP`;
-      return this.sendGameText(senderId, player, `Found ${event.item.name} (${stat}). Take (T) or Discard (D)?`, actions);
+      return this.sendGameText(senderId, player, `Found ${event.item.name} (${stat}). (T)ake or (D)iscard?`, actions);
     }
     if (event.type === "monster") {
-      return this.sendGameText(senderId, player, `A ${event.monster.name} appears! Fight (F) or Run (R)?`, actions);
+      return this.sendGameText(senderId, player, `A ${event.monster.name} appears! (F)ight or (R)un?`, actions);
     }
     if (event.type === "potion") {
-      return this.sendGameText(senderId, player, `You found a ${event.potion.name}. Use (U) or Discard (D)?`, actions);
+      return this.sendGameText(senderId, player, `You found a ${event.potion.name}. (U)se or (D)iscard?`, actions);
     }
     return this.sendGameText(senderId, player, "An event is waiting.", Object.keys(worldMap[player.location].actions));
   }

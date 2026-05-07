@@ -1,1 +1,1 @@
-{"MOCK_USER":{"location":"path","hp":15,"weapon":{"name":"Fists","attack":2},"inventory":[],"encounter":{"type":"monster","monster":{"name":"Wolf","hp":10,"attack":5}}}}
+{"MOCK_USER":{"location":"tower","hp":14,"weapon":{"name":"Mace","attack":9},"inventory":[],"encounter":null}}
