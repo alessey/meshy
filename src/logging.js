@@ -1,4 +1,4 @@
-import { USE_MOCK } from "./constants.js";
+import { USE_MOCK } from "./config/constants.js";
 
 export async function log(...args) {
     if (USE_MOCK) {

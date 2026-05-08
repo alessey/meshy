@@ -1,4 +1,4 @@
-export const MOVEMENT_COMMANDS = ["M", "S", "E", "W"];
+export const MOVEMENT_COMMANDS = ["N", "S", "E", "W"];
 
 export const EVENT_ACTIONS = {
   item: ["T", "D"],

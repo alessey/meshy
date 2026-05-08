@@ -1,22 +1,10 @@
 import { MeshDevice } from "@meshtastic/core";
 import { TransportNodeSerial } from "@meshtastic/transport-node-serial";
-import { EventEmitter } from "events";
-import { log, logError } from "./logging.js";
-import { USE_MOCK, SERIAL_PORT } from "./constants.js";
-import { loadPlayerData } from "./data.js";
-import { Game } from "./game.js";
-
-// --- MOCK TRANSPORT ---
-class MockTransport extends EventEmitter {
-    constructor() {
-        super();
-        this.fromDevice = new ReadableStream({ start() {} });
-        this.toDevice = new WritableStream({ write() {} });
-    }
-    async connect() { 
-        log("--- SIMULATOR ONLINE ---"); 
-    }
-}
+import { USE_MOCK, SERIAL_PORT } from "./src/config/constants.js";
+import { Game } from "./src/app/Game.js";
+import { log, logError } from "./src/logging.js";
+import { loadPlayerData } from "./src/storage/playerStore.js";
+import { MockTransport } from "./src/transport/mockTransport.js";
 
 // initialize
 const transport = USE_MOCK ? new MockTransport() : new TransportNodeSerial(SERIAL_PORT);

@@ -1,5 +1,5 @@
-import { CHAR_LIMIT, USE_MOCK } from "../../constants.js";
-import { logError } from "../../logging.js";
+import { CHAR_LIMIT, USE_MOCK } from "../config/constants.js";
+import { logError } from "../logging.js";
 
 export function formatResponse(player, text, actions = []) {
   const status = `[HP: ${player.hp}, ATK: ${player.weapon.attack}]`;

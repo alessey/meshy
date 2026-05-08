@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
-import { log, logError } from "./logging.js";
-import { DB_PATH, SAVE_DEBOUNCE_MS } from "./constants.js";
-import { hydratePlayer } from "./src/game/player.js";
+import { log, logError } from "../logging.js";
+import { DB_PATH, SAVE_DEBOUNCE_MS } from "../config/constants.js";
+import { hydratePlayer } from "../game/player.js";
 
 const SAVE_BATCH_SIZE = 5;
 let pendingSaveCount = 0;
