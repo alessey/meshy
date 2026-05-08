@@ -9,15 +9,15 @@ const INITIAL_PLAYER = {
   hp: MAX_HP,
   weapon: { name: "Fists", attack: 2 },
   armor: { name: "Cloth", hp: 0 },
-  inventory: [],
   encounter: null,
 };
 
-const MOVEMENT_COMMANDS = ["n", "s", "e", "w"];
+const MOVEMENT_COMMANDS = ["M", "S", "E", "W"];
 const EVENT_ACTIONS = {
   item: ["T", "D"],
   monster: ["F", "R"],
   potion: ["U", "D"],
+  inventory: ["I"],
 };
 
 function roll(chance = 1) {
@@ -26,6 +26,28 @@ function roll(chance = 1) {
 
 function randomFrom(array) {
   return array.length ? array[Math.floor(Math.random() * array.length)] : null;
+}
+
+class Player {
+  constructor() {
+    this.location = "woods";
+    this._hp = MAX_HP;
+    this.weapon = { name: "Fists", attack: 2 };
+    this.armor = { name: "Cloth", hp: 0 };
+    this.encounter = null;
+  }
+
+  get hp() {
+    return this._hp + this.armor.hp;
+  }
+
+  set hp(value) {
+    this._hp = Math.min(value, MAX_HP);
+  }
+
+  get inventory() {
+    return [this.weapon, this.armor];
+  }
 }
 
 export class Game {
@@ -38,51 +60,55 @@ export class Game {
     const idString = senderId.toString();
     let player = this.playerStates.get(idString);
     if (!player) {
-      player = { ...INITIAL_PLAYER, encounter: null };
+      player = new Player();
       this.playerStates.set(idString, player);
     }
     return player;
   }
 
-  getRoom(player) {
+  getLocation(player) {
     return worldMap[player.location];
   }
 
-  async resolveSaveAndDisplay(senderId, player, room) {
+  async resolveSaveAndDisplay(senderId, player, location) {
     player.encounter = null;
     save(this.playerStates);
-    return this.sendLocationSummary(senderId, player, room);
+    return this.sendLocationSummary(senderId, player, location);
   }
 
   async handleGameLogic(senderId, input) {
     const command = input.toString().toLowerCase().trim();
     const player = this.getPlayer(senderId);
-    const room = this.getRoom(player);
+    const location = this.getLocation(player);
 
     if (player.encounter) {
-      return this.handleEventInput(senderId, player, command, room);
+      return this.handleEventInput(senderId, player, command, location);
     }
 
     if (!command) {
-      return this.sendLocationSummary(senderId, player, room);
+      return this.sendLocationSummary(senderId, player, location);
     }
 
     if (this.isMovementCommand(command)) {
       return this.handleMovement(senderId, player, command);
     }
 
-    return this.sendUnknownCommand(senderId, player, room);
+    if (command === "i") {
+      return this.handleStatusEvent(senderId, player, command, null);
+    }
+
+    return this.sendUnknownCommand(senderId, player, location);
   }
 
   isMovementCommand(command) {
-    return MOVEMENT_COMMANDS.includes(command);
+    return MOVEMENT_COMMANDS.includes(command.toUpperCase());
   }
 
   async handleMovement(senderId, player, command) {
-    const currentRoom = this.getRoom(player);
-    const nextLoc = currentRoom.actions[command];
+    const location = this.getLocation(player);
+    const nextLoc = location.actions[command];
     if (!nextLoc) {
-      return this.sendUnknownCommand(senderId, player, currentRoom);
+      return this.sendUnknownCommand(senderId, player, location);
     }
 
     player.location = nextLoc;
@@ -92,31 +118,31 @@ export class Game {
   }
 
   async enterLocation(senderId, player) {
-    const room = this.getRoom(player);
-    const event = this.resolveRoomEvent(room);
+    const location = this.getLocation(player);
+    const event = this.resolveLocationEvent(location);
     if (event) {
       player.encounter = event;
       return this.sendEventPrompt(senderId, player);
     }
 
-    return this.sendLocationSummary(senderId, player, room);
+    return this.sendLocationSummary(senderId, player, location);
   }
 
-  resolveRoomEvent(room) {
+  resolveLocationEvent(location) {
     const eventTypes = [
       {
-        pool: room.itemPool,
-        chance: room.itemChance ?? 0,
-        build: () => ({ type: "item", item: { ...randomFrom(room.itemPool) } }),
+        pool: location.itemPool,
+        chance: location.itemChance ?? 0,
+        build: () => ({ type: "item", item: { ...randomFrom(location.itemPool) } }),
       },
       {
-        pool: room.monsterPool,
-        chance: room.monsterChance ?? 0,
-        build: () => ({ type: "monster", monster: { ...randomFrom(room.monsterPool) } }),
+        pool: location.monsterPool,
+        chance: location.monsterChance ?? 0,
+        build: () => ({ type: "monster", monster: { ...randomFrom(location.monsterPool) } }),
       },
       {
-        chance: room.potionChance ?? 0,
-        build: () => ({ type: "potion", potion: { name: "Health Potion", heal: room.potionHeal ?? 10 } }),
+        chance: location.potionChance ?? 0,
+        build: () => ({ type: "potion", potion: { name: "Health Potion", heal: location.potionHeal ?? 10 } }),
       },
     ];
 
@@ -129,47 +155,47 @@ export class Game {
     return null;
   }
 
-  async handleEventInput(senderId, player, command, room) {
+  async handleEventInput(senderId, player, command, location) {
     const event = player.encounter;
     const handler = EVENT_HANDLERS[event.type];
     if (handler) {
-      return handler.call(this, senderId, player, command, event, room);
+      return handler.call(this, senderId, player, command, event, location);
     }
-    return this.sendUnknownCommand(senderId, player, room);
+    return this.sendUnknownCommand(senderId, player, location);
   }
 
   async handleItemEvent(senderId, player, command, event) {
-    const room = this.getRoom(player);
+    const location = this.getLocation(player);
 
     if (command === "t") {
       if (event.item.attack) {
         player.weapon = event.item;
       } else if (event.item.hp) {
-        player.hp += event.item.hp;
+        player.armor = event.item;
       }
-      return this.resolveSaveAndDisplay(senderId, player, room);
+      return this.resolveSaveAndDisplay(senderId, player, location);
     }
 
     if (command === "d") {
-      return this.resolveSaveAndDisplay(senderId, player, room);
+      return this.resolveSaveAndDisplay(senderId, player, location);
     }
 
     const stat = event.item.attack ? `${event.item.attack} ATK` : `${event.item.hp} HP`;
     return this.sendGameText(senderId, player, `Found ${event.item.name} (${stat}). (T)ake or (D)iscard?`, EVENT_ACTIONS.item);
   }
 
-  async handleMonsterEvent(senderId, player, command, event, room) {
+  async handleMonsterEvent(senderId, player, command, event, location) {
     if (command === "f") {
       return this.resolveCombatRound(senderId, player, event);
     }
 
     if (command === "r") {
-      const retreat = this.findRetreatLocation(room);
+      const retreat = this.findRetreatLocation(location);
       if (retreat) {
         player.location = retreat;
-        return this.resolveSaveAndDisplay(senderId, player, this.getRoom(player));
+        return this.resolveSaveAndDisplay(senderId, player, this.getLocation(player));
       }
-      return this.resolveSaveAndDisplay(senderId, player, room);
+      return this.resolveSaveAndDisplay(senderId, player, location);
     }
 
     return this.sendGameText(senderId, player, `A ${event.monster.name} appears! (F)ight or (R)un?`, EVENT_ACTIONS.monster);
@@ -183,24 +209,21 @@ export class Game {
     let combatMsg = `You hit ${monster.name} for ${player.weapon.attack}. ${monster.name} hits you for ${monster.attack}. `;
 
     if (player.hp <= 0) {
-      player.location = INITIAL_PLAYER.location;
-      player.hp = MAX_HP;
-      player.weapon = { ...INITIAL_PLAYER.weapon };
-      player.encounter = null;
+      player = new Player();
       save(this.playerStates);
-      const respawnRoom = this.getRoom(player);
-      return this.sendGameText(senderId, player, `${combatMsg}You died! Respawning in the woods...`, Object.keys(respawnRoom.actions));
+      const respawnLocation = this.getLocation(player);
+      return this.sendGameText(senderId, player, `${combatMsg}You died! Respawning in the woods...`, Object.keys(respawnLocation.actions));
     }
 
     if (monster.hp <= 0) {
-      const room = this.getRoom(player);
+      const location = this.getLocation(player);
       player.encounter = null;
       save(this.playerStates);
       return this.sendGameText(
         senderId,
         player,
-        `${combatMsg}${monster.name} is defeated! ${room.desc}`,
-        Object.keys(room.actions)
+        `${combatMsg}${monster.name} is defeated! ${location.desc}`,
+        Object.keys(location.actions)
       );
     }
 
@@ -208,29 +231,38 @@ export class Game {
     return this.sendGameText(senderId, player, `${combatMsg}Your HP: ${player.hp}. Monster HP: ${monster.hp}. (F)ight or (R)un?`, EVENT_ACTIONS.monster);
   }
 
-  findRetreatLocation(room) {
-    const exits = Object.values(room.actions);
+  findRetreatLocation(location) {
+    const exits = Object.values(location.actions);
     return randomFrom(exits);
   }
 
   async handlePotionEvent(senderId, player, command, event) {
-    const room = this.getRoom(player);
+    const location = this.getLocation(player);
 
     if (command === "u") {
       player.hp = Math.min(player.hp + event.potion.heal, MAX_HP);
-      return this.resolveSaveAndDisplay(senderId, player, room);
+      return this.resolveSaveAndDisplay(senderId, player, location);
     }
 
     if (command === "d") {
-      return this.resolveSaveAndDisplay(senderId, player, room);
+      return this.resolveSaveAndDisplay(senderId, player, location);
     }
 
     return this.sendGameText(senderId, player, `You found a ${event.potion.name}. (U)se or (D)iscard?`, EVENT_ACTIONS.potion);
   }
 
-  async sendLocationSummary(senderId, player, room) {
-    const message = `${room.desc}`;
-    const actions = Object.keys(room.actions);
+  async handleStatusEvent(senderId, player, command, event) {
+    if (command === "i") {
+      const inventory = player.getInventory();
+      return this.sendGameText(senderId, player, `Inventory:\n${inventory}`, Object.keys(this.getLocation(player).actions));
+    }
+
+    return this.sendUnknownCommand(senderId, player, this.getLocation(player));
+  }
+
+  async sendLocationSummary(senderId, player, location) {
+    const message = `${location.desc}`;
+    const actions = Object.keys(location.actions);
     await this.sendGameText(senderId, player, message, actions);
   }
 
@@ -250,8 +282,8 @@ export class Game {
     return this.sendGameText(senderId, player, "An event is waiting.", Object.keys(worldMap[player.location].actions));
   }
 
-  async sendUnknownCommand(senderId, player, room) {
-    let actions = Object.keys(room.actions);
+  async sendUnknownCommand(senderId, player, location) {
+    let actions = Object.keys(location.actions);
     if (player.encounter) {
       actions = EVENT_ACTIONS[player.encounter.type];
     }
@@ -283,4 +315,5 @@ const EVENT_HANDLERS = {
   item: Game.prototype.handleItemEvent,
   monster: Game.prototype.handleMonsterEvent,
   potion: Game.prototype.handlePotionEvent,
+  status: Game.prototype.handleStatusEvent,
 };
