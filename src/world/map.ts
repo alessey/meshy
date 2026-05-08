@@ -14,11 +14,14 @@ const worldMap: Record<string, Location> = {
     itemChance: 1,
     itemPool: [{ name: "Lens of Truth", hp: 5 }],
   },
-  "1-3": { desc: "Northern Pass. A snowy trail leading east.", actions: { w: "1-2", e: "1-4" } },
+  "1-3": {
+    desc: "Northern Pass. A snowy trail leading east.",
+    actions: { w: "1-2", e: "1-4" },
+  },
   "1-4": {
     desc: "Dragon's Nest. Charred bones litter the ground.",
     actions: { w: "1-3", s: "2-4" },
-    monsterChance: 0.9,
+    monsterChance: 1,
     monsterPool: [
       {
         name: "Dragon",
@@ -29,7 +32,10 @@ const worldMap: Record<string, Location> = {
       },
     ],
   },
-  "1-5": { desc: "Desert Lookout. You can see the heat haze to the south.", actions: { e: "1-6" } },
+  "1-5": {
+    desc: "Desert Lookout. You can see the heat haze to the south.",
+    actions: { e: "1-6" },
+  },
   "1-6": {
     desc: "Hidden Oasis. A rare spot of water in the high desert.",
     actions: { w: "1-5", s: "2-6" },
@@ -44,7 +50,10 @@ const worldMap: Record<string, Location> = {
     monsterChance: 0.3,
     monsterPool: [{ name: "Goat", hp: 5, attack: 2 }],
   },
-  "2-2": { desc: "Old Stone Bridge. It spans a deep gorge.", actions: { e: "2-3", s: "3-2" } },
+  "2-2": {
+    desc: "Old Stone Bridge. It spans a deep gorge.",
+    actions: { e: "2-3", s: "3-2" },
+  },
   "2-3": {
     desc: "The Great Gate. Massive oak doors, barred from the other side.",
     actions: { w: "2-2" },
@@ -105,9 +114,15 @@ const worldMap: Record<string, Location> = {
     itemChance: 0.4,
     itemPool: [{ name: "Machete", attack: 9 }],
   },
-  "4-2": { desc: "The Great Lake (West). The water is crystal clear.", actions: { s: "5-2" } }, // Limited access
-  "4-3": { desc: "The Great Lake (East). You see fish jumping.", actions: { n: "3-3", s: "5-3" } },
-  "4-4": { desc: "RESERVED: Deep Water. You cannot swim here.", actions: {} }, // Obstacle
+  "4-2": {
+    desc: "The Great Lake (West). The water is crystal clear.",
+    actions: { s: "5-2" },
+  },
+  "4-3": {
+    desc: "The Great Lake (East). You see fish jumping.",
+    actions: { n: "3-3", s: "5-3" },
+  },
+  "4-4": { desc: "EMPTY", actions: {} },
   "4-5": {
     desc: "Red Canyon. High walls of crimson stone.",
     actions: { n: "3-5", s: "5-5", e: "4-6" },
@@ -136,8 +151,14 @@ const worldMap: Record<string, Location> = {
     potionChance: 0.4,
     potionHeal: 15,
   },
-  "5-4": { desc: "Jungle Fringe. Tropical birds chirp loudly.", actions: { e: "5-5", s: "6-4" } },
-  "5-5": { desc: "The Muddy Trail. Watch your step.", actions: { n: "4-5", w: "5-4", e: "5-6" } },
+  "5-4": {
+    desc: "Jungle Fringe. Tropical birds chirp loudly.",
+    actions: { e: "5-5", s: "6-4" },
+  },
+  "5-5": {
+    desc: "The Muddy Trail. Watch your step.",
+    actions: { n: "4-5", w: "5-4", e: "5-6" },
+  },
   "5-6": {
     desc: "Trading Post. An old man sells wares.",
     actions: { w: "5-5", s: "6-6" },
