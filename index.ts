@@ -26,10 +26,7 @@ let transport: any;
 try {
   transport = isMock ? new MockTransport() : new TransportNodeSerial(SERIAL_PORT as any);
 } catch (e) {
-  logError(
-    "Failed to initialize Transport. Ensure SERIAL_PORT is correct and Node.js version is stable.",
-    e,
-  );
+  logError("Failed to initialize Transport. Ensure SERIAL_PORT is correct.", e);
   process.exit(1);
 }
 
