@@ -143,7 +143,11 @@ const worldMap: Record<string, Location> = {
     actions: { n: "3-3", s: "5-3" },
     cellType: "lake",
   },
-  "4-4": { desc: "EMPTY", actions: {} },
+  "4-4": {
+    desc: "EMPTY",
+    actions: {},
+    cellType: "grass",
+  },
   "4-5": {
     desc: "Red Canyon. High walls of crimson stone.",
     actions: { n: "3-5", s: "5-5", e: "4-6" },
@@ -216,24 +220,19 @@ const worldMap: Record<string, Location> = {
     cellType: "swamp",
   },
   "6-4": {
-    desc: "Deep Jungle. You need a machete to go further south.",
-    actions: { w: "6-3", n: "5-4", e: "6-5", s: "7-4" },
+    desc: "Deep Jungle. You need a machete to go further east.",
+    actions: { w: "6-3", n: "5-4", e: "6-5" },
     monsterChance: 0.8,
     monsterPool: [{ name: "Tiger", hp: 30, attack: 12 }],
     cellType: "jungle",
   },
-  "7-4": {
+  "6-5": {
     desc: "The Hidden Temple. You hacked your way through the vines!",
     actions: { n: "6-4" },
     requiredItem: "Machete",
     cellType: "temple",
-  },
-  "6-5": {
-    desc: "Hidden Waterfall. The mist is refreshing.",
-    actions: { w: "6-4", e: "6-6" },
-    potionChance: 0.6,
-    potionHeal: 20,
-    cellType: "waterfall",
+    itemChance: 1.0,
+    itemPool: [{ name: "Ring of Power", attack: 20 }],
   },
   "6-6": {
     desc: "South East Cape. The end of the world. You see the ocean.",

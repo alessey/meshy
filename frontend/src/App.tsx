@@ -75,7 +75,7 @@ export default function App() {
         <div className={styles.mapSection}>
           <div
             className={styles.mapContainer}
-            style={{ gridTemplateColumns: `repeat(${gridDims.c}, 1fr)` }}
+            style={{ gridTemplateColumns: `repeat(${gridDims.c}, 90px)` }}
           >
             {Array.from({ length: gridDims.r * gridDims.c }).map((_, index) => {
               const rowIndex = Math.floor(index / gridDims.c) + 1;
