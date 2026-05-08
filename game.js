@@ -212,7 +212,7 @@ export class Game {
       player = new Player();
       save(this.playerStates);
       const respawnLocation = this.getLocation(player);
-      return this.sendGameText(senderId, player, `${combatMsg}You died! Respawning in the woods...`, Object.keys(respawnLocation.actions));
+      return this.sendGameText(senderId, player, `${combatMsg}You died! Respawning in the ${respawnLocation}...`, Object.keys(respawnLocation.actions));
     }
 
     if (monster.hp <= 0) {
@@ -223,7 +223,7 @@ export class Game {
         senderId,
         player,
         `${combatMsg}${monster.name} is defeated! ${location.desc}`,
-        Object.keys(location.actions)
+        Object.keys(location.actions).map((dir) => dir.toUpperCase())
       );
     }
 
@@ -262,7 +262,7 @@ export class Game {
 
   async sendLocationSummary(senderId, player, location) {
     const message = `${location.desc}`;
-    const actions = Object.keys(location.actions);
+    const actions = Object.keys(location.actions).map((dir) => dir.toUpperCase());
     await this.sendGameText(senderId, player, message, actions);
   }
 
@@ -283,7 +283,7 @@ export class Game {
   }
 
   async sendUnknownCommand(senderId, player, location) {
-    let actions = Object.keys(location.actions);
+    let actions = Object.keys(location.actions).map((dir) => dir.toUpperCase());
     if (player.encounter) {
       actions = EVENT_ACTIONS[player.encounter.type];
     }
