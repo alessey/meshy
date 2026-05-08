@@ -18,8 +18,8 @@ export async function loadPlayerData(): Promise<Map<string, Player>> {
     const playerStates = new Map(savedPlayers.map(([id, player]) => [id, hydratePlayer(player)]));
     log(`Loaded ${playerStates.size} players.`);
     return playerStates;
-  } catch (err) {
-    log("Starting fresh database.", err);
+  } catch {
+    log("DB Not found, starting fresh database.");
     return new Map();
   }
 }

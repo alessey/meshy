@@ -29,7 +29,7 @@ export default {
     itemChance: 0.7,
     itemPool: [
       { name: "Mace", attack: 12 },
-      { name: "Shield", attack: 6 },
+      { name: "Shield", hp: 6 },
     ],
     monsterChance: 0.5,
     monsterPool: [{ name: "Bear", hp: 20, attack: 6 }],
