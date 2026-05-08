@@ -12,6 +12,8 @@ type MeshDevice = {
   sendText(text: string, recipientId: unknown): Promise<number>;
 };
 
+const GAME_PREFIX = "/";
+
 export class Game {
   device: MeshDevice;
   playerStates: Map<string, Player>;
@@ -32,24 +34,26 @@ export class Game {
 
     // ensure saved location matches current world map
     if (!worldMap[player.location]) {
-      Object.entries(worldMap).some(([key, location]) => {
-        if (location.isStart) {
-          player.location = key;
-          return true;
-        }
-      });
+      const startEntry = Object.entries(worldMap).find(([, loc]) => loc.isStart);
+      player.location = startEntry ? startEntry[0] : Object.keys(worldMap)[0];
     }
 
     return player;
   }
 
   async handleGameLogic(senderId: string | number, input: string | number | any): Promise<void> {
-    const command = input.toString().toLowerCase().trim();
+    const rawInput = input.toString().trim();
+
+    if (!rawInput || !rawInput.startsWith(GAME_PREFIX)) {
+      return;
+    }
+
+    const command = rawInput.slice(GAME_PREFIX.length).toLowerCase().trim();
     const player = this.getPlayer(senderId);
 
     let outcome;
 
-    if (isCommand(command)) {
+    if (!command || isCommand(command)) {
       outcome = player.encounter
         ? handleEncounter(player, command)
         : handleExploring(player, command);
@@ -61,6 +65,7 @@ export class Game {
       save(this.playerStates);
     }
 
+    // Always respond directly to the sender to keep the game private and save airtime
     return dispatchMessages(this.device, senderId, player, outcome.messages);
   }
 }

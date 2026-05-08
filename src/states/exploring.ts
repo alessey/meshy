@@ -13,7 +13,7 @@ import type { Player } from "../game/player.js";
 import type { Command, Direction, GameOutcome } from "../types.js";
 
 export function handleExploring(player: Player, command: Command): GameOutcome {
-  if (!command) {
+  if (!command || command === COMMANDS.PLAY) {
     return result([locationSummaryMessage(getLocation(player))]);
   }
 

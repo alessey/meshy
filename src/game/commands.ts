@@ -5,6 +5,7 @@ import {
   PotionCommand,
   InventoryCommand,
   Command,
+  PlayCommand,
 } from "../types.js";
 
 export const COMMANDS = {
@@ -18,6 +19,7 @@ export const COMMANDS = {
   FIGHT: "f",
   RUN: "r",
   USE: "u",
+  PLAY: "play",
 } as const;
 
 export const MOVEMENT_COMMANDS = [
@@ -26,6 +28,8 @@ export const MOVEMENT_COMMANDS = [
   COMMANDS.MOVE_EAST,
   COMMANDS.MOVE_WEST,
 ];
+
+export const GAME_ACTIONS = [COMMANDS.PLAY];
 
 export const EVENT_ACTIONS = {
   item: [COMMANDS.TAKE, COMMANDS.DISCARD],
@@ -36,6 +40,10 @@ export const EVENT_ACTIONS = {
 
 export function isMovementCommand(command: string): command is Direction {
   return MOVEMENT_COMMANDS.includes(command as Direction);
+}
+
+export function isGameCommand(command: string): command is PlayCommand {
+  return (GAME_ACTIONS as readonly string[]).includes(command);
 }
 
 export function isItemCommand(command: string): command is ItemCommand {
@@ -56,6 +64,7 @@ export function isInventoryCommand(command: string): command is InventoryCommand
 
 export function isCommand(command: string): command is Command {
   return (
+    isGameCommand(command) ||
     isMovementCommand(command) ||
     isItemCommand(command) ||
     isMonsterCommand(command) ||
