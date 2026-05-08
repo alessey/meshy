@@ -14,11 +14,11 @@ import {
   TEXT,
 } from "../game/text.js";
 import { getLocation, locationSummaryMessage } from "./presenters.js";
-import type { MonsterEncounter, Location, GameOutcome } from "../types.js";
+import type { MonsterEncounter, Location, GameOutcome, MonsterCommand } from "../types.js";
 
 export function handleMonsterEncounter(
   player: Player,
-  command: string,
+  command: MonsterCommand,
   event: MonsterEncounter,
 ): GameOutcome {
   const location = getLocation(player);

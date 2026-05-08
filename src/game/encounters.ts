@@ -5,19 +5,25 @@ import type { Location, Encounter } from "../types.js";
 import type { Player } from "./player.js";
 
 export function resolveLocationEvent(location: Location, player: Player): Encounter | null {
-  const eventTypes = [
+  const eventConfigs: { chance: number; build: () => Encounter | null }[] = [
     {
-      pool: location.itemPool,
       chance: location.itemChance ?? 0,
-      build: () => ({ type: "item", item: { ...randomFrom(location.itemPool) } }),
+      build: () => {
+        const item = randomFrom(location.itemPool ?? []);
+        return item ? { type: "item", item: { ...item } } : null;
+      },
     },
     {
-      pool: location.monsterPool,
       chance: location.monsterChance ?? 0,
-      build: () => ({
-        type: "monster",
-        monster: scaleMonster(randomFrom(location.monsterPool), player),
-      }),
+      build: () => {
+        const monster = randomFrom(location.monsterPool ?? []);
+        return monster
+          ? {
+              type: "monster",
+              monster: scaleMonster(monster, player),
+            }
+          : null;
+      },
     },
     {
       chance: location.potionChance ?? 0,
@@ -28,9 +34,10 @@ export function resolveLocationEvent(location: Location, player: Player): Encoun
     },
   ];
 
-  for (const { pool, chance, build } of eventTypes) {
-    if (pool?.length && roll(chance)) {
-      return build() as Encounter;
+  for (const { chance, build } of eventConfigs) {
+    if (roll(chance)) {
+      const event = build();
+      if (event) return event;
     }
   }
 

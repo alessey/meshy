@@ -25,13 +25,13 @@ async function start(): Promise<void> {
       });
     }
 
-    // 1. Connect the hardware/transport
+    // connect the hardware/transport
     await transport.connect();
 
-    // 2. Hardware Listener (Using the new .events.onMessagePacket pattern)
+    // hardware Listener
     if (!USE_MOCK) {
       device.events.onMessagePacket.subscribe((packet: any) => {
-        // Ensure we don't respond to our own automated messages
+        // don't respond to our own messages
         const myNodeNum = (device as any).myNodeInfo?.myNodeNum;
         if (packet.from !== myNodeNum) {
           game.handleGameLogic(packet.from, packet.data);
@@ -39,7 +39,7 @@ async function start(): Promise<void> {
       });
     }
 
-    // 3. CRITICAL: Start the internal packet processing loop
+    // start the internal packet processing loop
     await device.configure();
 
     log(USE_MOCK ? "Simulator ready." : `Mesh Connected: ${SERIAL_PORT}`);

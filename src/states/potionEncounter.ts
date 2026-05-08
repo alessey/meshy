@@ -4,11 +4,11 @@ import { gameMessage, result } from "../game/results.js";
 import { potionPrompt } from "../game/text.js";
 import { getLocation, locationSummaryMessage } from "./presenters.js";
 import type { Player } from "../game/player.js";
-import type { PotionEncounter, GameOutcome } from "../types.js";
+import type { PotionEncounter, GameOutcome, PotionCommand } from "../types.js";
 
 export function handlePotionEncounter(
   player: Player,
-  command: string,
+  command: PotionCommand,
   event: PotionEncounter,
 ): GameOutcome {
   const location = getLocation(player);

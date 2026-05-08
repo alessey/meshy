@@ -1,3 +1,12 @@
+import {
+  Direction,
+  ItemCommand,
+  MonsterCommand,
+  PotionCommand,
+  InventoryCommand,
+  Command,
+} from "../types.js";
+
 export const COMMANDS = {
   MOVE_NORTH: "n",
   MOVE_SOUTH: "s",
@@ -9,7 +18,7 @@ export const COMMANDS = {
   FIGHT: "f",
   RUN: "r",
   USE: "u",
-};
+} as const;
 
 export const MOVEMENT_COMMANDS = [
   COMMANDS.MOVE_NORTH,
@@ -25,8 +34,34 @@ export const EVENT_ACTIONS = {
   inventory: [COMMANDS.INVENTORY],
 };
 
-export function isMovementCommand(command: string): boolean {
-  return MOVEMENT_COMMANDS.includes(command);
+export function isMovementCommand(command: string): command is Direction {
+  return MOVEMENT_COMMANDS.includes(command as Direction);
+}
+
+export function isItemCommand(command: string): command is ItemCommand {
+  return (EVENT_ACTIONS.item as readonly string[]).includes(command);
+}
+
+export function isMonsterCommand(command: string): command is MonsterCommand {
+  return (EVENT_ACTIONS.monster as readonly string[]).includes(command);
+}
+
+export function isPotionCommand(command: string): command is PotionCommand {
+  return (EVENT_ACTIONS.potion as readonly string[]).includes(command);
+}
+
+export function isInventoryCommand(command: string): command is InventoryCommand {
+  return (EVENT_ACTIONS.inventory as readonly string[]).includes(command);
+}
+
+export function isCommand(command: string): command is Command {
+  return (
+    isMovementCommand(command) ||
+    isItemCommand(command) ||
+    isMonsterCommand(command) ||
+    isPotionCommand(command) ||
+    isInventoryCommand(command)
+  );
 }
 
 export function getDisplayActions(actions: Record<string, string>): string[] {

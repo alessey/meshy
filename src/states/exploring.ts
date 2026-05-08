@@ -10,9 +10,9 @@ import {
   unknownCommandMessage,
 } from "./presenters.js";
 import type { Player } from "../game/player.js";
-import type { GameOutcome } from "../types.js";
+import type { Command, Direction, GameOutcome } from "../types.js";
 
-export function handleExploring(player: Player, command: string): GameOutcome {
+export function handleExploring(player: Player, command: Command): GameOutcome {
   if (!command) {
     return result([locationSummaryMessage(getLocation(player))]);
   }
@@ -30,7 +30,7 @@ export function handleExploring(player: Player, command: string): GameOutcome {
   return result([unknownCommandMessage(player)]);
 }
 
-function handleMovement(player: Player, command: string): GameOutcome {
+function handleMovement(player: Player, command: Direction): GameOutcome {
   const location = getLocation(player);
   const nextLocation = location.actions[command];
 

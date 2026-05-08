@@ -1,64 +1,87 @@
+import { COMMANDS, EVENT_ACTIONS } from "./game/commands.js";
+
 /**
  * Equipment and Inventory Types
  */
-export interface Equipment {
+export type Equipment = {
   name: string;
   attack?: number;
   hp?: number;
-}
+};
 
-export interface Weapon extends Equipment {
+export type Weapon = Equipment & {
   attack: number;
-}
+};
 
-export interface Armor extends Equipment {
+export type Armor = Equipment & {
   hp: number;
-}
+};
 
 /**
  * Encounter Types
  */
-export interface BaseEncounter {
+export type BaseEncounter = {
   type: string;
-}
+};
 
-export interface ItemEncounter extends BaseEncounter {
+export type ItemEncounter = BaseEncounter & {
   type: "item";
   item: Equipment;
-}
+};
 
-export interface Monster {
+export type Monster = {
   name: string;
   hp: number;
   attack: number;
   xp?: number;
-}
+};
 
-export interface MonsterEncounter extends BaseEncounter {
+export type MonsterEncounter = BaseEncounter & {
   type: "monster";
   monster: Monster;
-}
+};
 
-export interface Potion {
+export type Potion = {
   name: string;
   heal: number;
-}
+};
 
-export interface PotionEncounter extends BaseEncounter {
+export type PotionEncounter = BaseEncounter & {
   type: "potion";
   potion: Potion;
-}
+};
 
 export type Encounter = ItemEncounter | MonsterEncounter | PotionEncounter;
 
 /**
+ * Event Types
+ */
+type EventActionsConfig = typeof EVENT_ACTIONS;
+
+export type ItemCommand = EventActionsConfig["item"][number];
+export type MonsterCommand = EventActionsConfig["monster"][number];
+export type PotionCommand = EventActionsConfig["potion"][number];
+export type InventoryCommand = EventActionsConfig["inventory"][number];
+
+/**
+ * Command Unions
+ */
+export type Command = Direction | ItemCommand | MonsterCommand | PotionCommand | InventoryCommand;
+
+/**
  * Location Types
  */
-export interface LocationActions {
-  [direction: string]: string;
-}
+export type Direction =
+  | typeof COMMANDS.MOVE_NORTH
+  | typeof COMMANDS.MOVE_SOUTH
+  | typeof COMMANDS.MOVE_EAST
+  | typeof COMMANDS.MOVE_WEST;
 
-export interface Location {
+export type LocationActions = {
+  [direction in Direction]?: string;
+};
+
+export type Location = {
   desc: string;
   actions: LocationActions;
   itemChance?: number;
@@ -67,52 +90,53 @@ export interface Location {
   monsterPool?: Monster[];
   potionChance?: number;
   potionHeal?: number;
-}
+  isStart?: boolean;
+};
 
 /**
  * Message Types
  */
-export interface GameMessage {
+export type GameMessage = {
   type: "game";
   text: string;
   actions: string[];
-}
+};
 
-export interface PlainMessage {
+export type PlainMessage = {
   type: "plain";
   text: string;
-}
+};
 
 export type Message = GameMessage | PlainMessage;
 
 /**
  * Result/Outcome Types
  */
-export interface GameOutcome {
+export type GameOutcome = {
   messages: Message[];
   shouldSave: boolean;
-}
+};
 
 /**
  * Reward Types
  */
-export interface MonsterReward {
+export type MonsterReward = {
   xp: number;
   didLevelUp: boolean;
   level: number;
-}
+};
 
 /**
  * Player-related Types
  */
-export interface PlainPlayer {
+export type PlainPlayer = {
   location: string;
   _hp: number;
   weapon: Equipment;
   armor: Equipment;
   xp: number;
   encounter: Encounter | null;
-}
+};
 
 /**
  * Player Store Types

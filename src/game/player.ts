@@ -12,7 +12,7 @@ export class Player {
   encounter: Encounter | null;
 
   constructor() {
-    this.location = "woods";
+    this.location = "";
     this._hp = MAX_HP;
     this.weapon = { name: "Fists", attack: 2 };
     this.armor = { name: "Cloth", hp: 0 };

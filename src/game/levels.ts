@@ -7,11 +7,11 @@ export const LEVELS = [
   { level: 6, minXp: 140, multiplier: 2 },
 ];
 
-interface LevelInfo {
+type LevelInfo = {
   level: number;
   minXp: number;
   multiplier: number;
-}
+};
 
 export function getLevelForXp(xp: number): LevelInfo {
   return LEVELS.reduce((currentLevel: LevelInfo, level: LevelInfo) => {

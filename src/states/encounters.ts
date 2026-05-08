@@ -3,25 +3,34 @@ import { unknownCommandMessage } from "./presenters.js";
 import { handleItemEncounter } from "./itemEncounter.js";
 import { handleMonsterEncounter } from "./monsterEncounter.js";
 import { handlePotionEncounter } from "./potionEncounter.js";
+import { isItemCommand, isMonsterCommand, isPotionCommand } from "../game/commands.js";
 import type { Player } from "../game/player.js";
-import type { GameOutcome } from "../types.js";
+import type { Command, GameOutcome } from "../types.js";
 
-const ENCOUNTER_HANDLERS: Record<
-  string,
-  (player: Player, command: string, event: any) => GameOutcome
-> = {
-  item: handleItemEncounter,
-  monster: handleMonsterEncounter,
-  potion: handlePotionEncounter,
-};
-
-export function handleEncounter(player: Player, command: string): GameOutcome {
+export function handleEncounter(player: Player, command: Command): GameOutcome {
   const event = player.encounter;
-  const handler = ENCOUNTER_HANDLERS[event?.type ?? ""];
 
-  if (!handler) {
-    return result([unknownCommandMessage(player)]);
+  switch (event?.type) {
+    case "item":
+      if (isItemCommand(command)) {
+        return handleItemEncounter(player, command, event);
+      }
+      break;
+    case "monster":
+      if (isMonsterCommand(command)) {
+        return handleMonsterEncounter(player, command, event);
+      }
+      break;
+    case "potion":
+      if (isPotionCommand(command)) {
+        return handlePotionEncounter(player, command, event);
+      }
+      break;
+    default:
+      // Unhandled encounter type
+      return result([unknownCommandMessage(player)]);
   }
 
-  return handler(player, command, event);
+  // If the command doesn't match the encounter type or the type is unhandled
+  return result([unknownCommandMessage(player)]);
 }

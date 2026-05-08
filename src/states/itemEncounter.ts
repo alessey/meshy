@@ -3,11 +3,11 @@ import { gameMessage, result } from "../game/results.js";
 import { itemPrompt } from "../game/text.js";
 import { getLocation, locationSummaryMessage } from "./presenters.js";
 import type { Player } from "../game/player.js";
-import type { ItemEncounter, GameOutcome } from "../types.js";
+import type { ItemEncounter, GameOutcome, ItemCommand } from "../types.js";
 
 export function handleItemEncounter(
   player: Player,
-  command: string,
+  command: ItemCommand,
   event: ItemEncounter,
 ): GameOutcome {
   const location = getLocation(player);
