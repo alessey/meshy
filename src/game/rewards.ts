@@ -51,5 +51,5 @@ export function rollLootDrop(
 }
 
 function getMonsterXp(monster: Monster): number {
-  return Math.floor((monster.xp ?? monster.hp + monster.attack) * Math.random());
+  return Math.floor((monster.xp ?? monster.hp + monster.attack) * Math.random()) + 1;
 }
