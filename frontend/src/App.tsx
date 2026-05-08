@@ -68,7 +68,7 @@ export default function App() {
   }, [selectedId, players]);
 
   return (
-    <main className="container">
+    <main className={styles.container}>
       <Header setSelectedId={setSelectedId} players={players} selectedId={selectedId} />
 
       <section className={styles.dashboardLayout}>

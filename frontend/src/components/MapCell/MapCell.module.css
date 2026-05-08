@@ -1,8 +1,31 @@
-.mapCell { background: var(--pico-background-color); width: 90px; height: 90px; position: relative; border: 2px solid transparent; border-radius: 4px; overflow: hidden; }
-.mapCell.active { border-color: var(--pico-border-color); }
-.mapCell.selected { border-color: #facc15; box-shadow: inset 0 0 10px rgba(250, 204, 21, 0.3); }
+.mapCell {
+  background: var(--pico-background-color);
+  width: 90px;
+  height: 90px;
+  position: relative;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.mapCell.active {
+  border-color: var(--pico-border-color);
+}
+.mapCell.selected {
+  border-color: #facc15;
+  box-shadow: inset 0 0 10px rgba(250, 204, 21, 0.3);
+}
 
-.cellLabel { position: absolute; bottom: 4px; right: 6px; font-family: monospace; opacity: 0.6; font-size: 0.7rem; color: var(--pico-color); z-index: 5; text-shadow: 1px 1px 2px black; }
+.cellLabel {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font-family: monospace;
+  opacity: 0.6;
+  font-size: 0.7rem;
+  color: var(--pico-color);
+  z-index: 5;
+  text-shadow: 1px 1px 2px black;
+}
 
 .mapIcons {
   position: absolute;
@@ -21,13 +44,36 @@
   align-items: center;
   justify-content: center;
   font-size: 0.8rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
-.markerTray { position: relative; z-index: 2; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; height: 100%; padding-top: 15px; }
-.playerMarker {
-  width: 24px; height: 24px; background: var(--pico-primary-background); color: var(--pico-primary-inverse);
-  border-radius: 50%; font-weight: bold; font-size: 0.65rem; display: flex; align-items: center; justify-content: center;
-  margin: 2px; border: 2px solid var(--pico-background-color);
+.markerTray {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding-top: 15px;
 }
-.playerMarker.activePlayer { background: #facc15; transform: scale(1.2); z-index: 10; border-color: white; }
+.playerMarker {
+  width: 24px;
+  height: 24px;
+  background: var(--pico-primary-background);
+  color: var(--pico-primary-inverse);
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2px;
+  border: 2px solid var(--pico-background-color);
+}
+.playerMarker.activePlayer {
+  background: #facc15;
+  transform: scale(1.2);
+  z-index: 10;
+  border-color: white;
+}

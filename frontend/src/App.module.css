@@ -1,12 +1,44 @@
-.mapContainer { display: grid; gap: 6px; background: var(--pico-card-background-color); width: fit-content; padding: 20px; border-radius: 12px; }
-.dashboardLayout { display: flex; flex-direction: column; gap: 30px; }
-@media (min-width: 1024px) {
-  .dashboardLayout { flex-direction: row; align-items: flex-start; }
-  .mapSection { flex: 1; }
-  .detailsSection { width: 400px; position: sticky; top: 20px; }
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.equipSection { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-.section { margin-top: 24px; }
+.mapContainer {
+  display: grid;
+  gap: 6px;
+  background: var(--pico-card-background-color);
+  width: fit-content;
+  padding: 20px;
+  border-radius: 12px;
+}
+.dashboardLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+@media (min-width: 1024px) {
+  .dashboardLayout {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  .mapSection {
+    flex: 1;
+  }
+  .detailsSection {
+    width: 400px;
+    position: sticky;
+    top: 20px;
+  }
+}
+.equipSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+.section {
+  margin-top: 24px;
+}
 .encounterBanner {
   background: #991b1b;
   color: white;

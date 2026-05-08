@@ -1,9 +1,10 @@
-.container { 
-    display: "flex";
-    justify-content: "space-between";
-    align-items: "center";
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
 }
 
 .item {
-    width: "auto";    
+  width: auto;
 }
