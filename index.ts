@@ -1,7 +1,7 @@
 import path from "path";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportNodeSerial } from "@meshtastic/transport-node-serial";
-import { USE_MOCK, SERIAL_PORT } from "./src/config/constants.js";
+import { SERIAL_PORT } from "./src/config/constants.js";
 import express from "express";
 import { Game } from "./src/app/Game.js";
 import worldMap from "./src/world/map.js";
@@ -10,8 +10,11 @@ import { loadPlayerData } from "./src/storage/playerStore.js";
 import { MockTransport } from "./src/transport/mockTransport.js";
 import type { Player } from "./src/game/player.js";
 
+// Derive mode from environment variables
+const isMock = process.env.USE_MOCK === "true";
+
 // initialize
-const transport: any = USE_MOCK ? new MockTransport() : new TransportNodeSerial(SERIAL_PORT as any);
+const transport: any = isMock ? new MockTransport() : new TransportNodeSerial(SERIAL_PORT as any);
 const device = new MeshDevice(transport);
 
 // Web server setup
@@ -74,7 +77,7 @@ async function start(): Promise<void> {
     playerStates = await loadPlayerData();
     const game = new Game(device as any, playerStates);
 
-    if (USE_MOCK) {
+    if (isMock) {
       process.stdin.on("data", (data: any) => {
         game.handleGameLogic("MOCK_USER", data);
       });
@@ -84,7 +87,7 @@ async function start(): Promise<void> {
     await transport.connect();
 
     // hardware Listener
-    if (!USE_MOCK) {
+    if (!isMock) {
       device.events.onMessagePacket.subscribe((packet: any) => {
         // don't respond to our own messages
         const myNodeNum = (device as any).myNodeInfo?.myNodeNum;
@@ -97,7 +100,7 @@ async function start(): Promise<void> {
     // start the internal packet processing loop
     await device.configure();
 
-    log(USE_MOCK ? "Simulator ready." : `Mesh Connected: ${SERIAL_PORT}`);
+    log(isMock ? "Simulator ready." : `Mesh Connected: ${SERIAL_PORT}`);
   } catch (error) {
     logError("Critical Failure:", error);
   }

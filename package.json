@@ -11,7 +11,7 @@
     "build": "tsc",
     "build:web": "cd frontend && vite build",
     "dev:web": "cd frontend && vite",
-    "dev:server": "tsx watch index.ts",
+    "dev:server": "USE_MOCK=true tsx watch index.ts",
     "dev": "concurrently -n \"server,client\" -c \"magenta,cyan\" \"pnpm dev:server\" \"pnpm dev:web\"",
     "start": "pnpm run build && pnpm run build:web && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
