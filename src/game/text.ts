@@ -16,7 +16,7 @@ export function itemPrompt(item: Equipment): string {
 }
 
 export function monsterPrompt(monster: Monster): string {
-  return `A ${monster.name}, HP: ${monster.hp} appears! (F)ight or (R)un?`;
+  return `A ${monster.name}, HP: ${monster.hp}, ATK: ${monster.attack}, appears! (F)ight or (R)un?`;
 }
 
 export function potionPrompt(potion: Potion): string {
