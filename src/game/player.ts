@@ -1,5 +1,5 @@
 import { getLevel, getLevelMultiplier } from "./levels.js";
-import type { Encounter, Armor, Weapon } from "../types.js";
+import type { Encounter, Armor, Weapon, Item, Equipment } from "../types.js";
 
 export const MAX_HP = 20;
 
@@ -8,6 +8,7 @@ export class Player {
   _hp: number;
   weapon: Weapon;
   armor: Armor;
+  items: Item[];
   xp: number;
   encounter: Encounter | null;
 
@@ -16,6 +17,7 @@ export class Player {
     this._hp = MAX_HP;
     this.weapon = { name: "Fists", attack: 2 };
     this.armor = { name: "Cloth", hp: 0 };
+    this.items = [];
     this.xp = 0;
     this.encounter = null;
   }
@@ -41,12 +43,16 @@ export class Player {
     return Math.ceil(this.weapon.attack * getLevelMultiplier(this));
   }
 
-  get inventory() {
-    return [this.weapon, this.armor];
+  get inventory(): Equipment[] {
+    return [this.weapon, this.armor, ...this.items];
   }
 
   healToFull() {
     this._hp = MAX_HP;
+  }
+
+  hasItem(itemName: string): boolean {
+    return this.items.some((item) => item.name.toLowerCase() === itemName.toLowerCase());
   }
 }
 
@@ -59,6 +65,7 @@ export function hydratePlayer(savedPlayer: Partial<Player> = {}) {
   player.armor = savedPlayer.armor ?? player.armor;
   player.xp = savedPlayer.xp ?? player.xp;
   player.encounter = savedPlayer.encounter ?? player.encounter;
+  player.items = savedPlayer.items ?? player.items;
 
   return player;
 }

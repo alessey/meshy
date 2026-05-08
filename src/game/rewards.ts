@@ -1,6 +1,6 @@
 import { getLevelMultiplier } from "./levels.js";
 import { randomFrom, roll } from "./random.js";
-import type { Monster, Location, MonsterReward } from "../types.js";
+import type { Monster, Location, MonsterReward, Equipment } from "../types.js";
 import { Player } from "./player.js";
 
 export const LOOT_DROP_CHANCE = 0.2;
@@ -38,10 +38,12 @@ export function grantMonsterXp(player: Player, monster: Monster): MonsterReward 
   };
 }
 
-export function rollLootDrop(
-  location: Location,
-): { name: string; attack?: number; hp?: number } | null {
-  const lootPool = location.itemPool?.length ? location.itemPool : DEFAULT_LOOT_POOL;
+export function rollLootDrop(location: Location, monster?: Monster): Equipment | null {
+  const lootPool = monster?.itemPool?.length
+    ? monster.itemPool
+    : location.itemPool?.length
+      ? location.itemPool
+      : DEFAULT_LOOT_POOL;
 
   if (!roll(LOOT_DROP_CHANCE)) {
     return null;

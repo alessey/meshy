@@ -3,10 +3,13 @@ import { COMMANDS, EVENT_ACTIONS, GAME_ACTIONS } from "./game/commands.js";
 /**
  * Equipment and Inventory Types
  */
+export type ItemType = "key";
+
 export type Equipment = {
   name: string;
   attack?: number;
   hp?: number;
+  type?: ItemType;
 };
 
 export type Weapon = Equipment & {
@@ -15,6 +18,10 @@ export type Weapon = Equipment & {
 
 export type Armor = Equipment & {
   hp: number;
+};
+
+export type Item = Equipment & {
+  type: ItemType;
 };
 
 /**
@@ -34,6 +41,7 @@ export type Monster = {
   hp: number;
   attack: number;
   xp?: number;
+  itemPool?: Equipment[];
 };
 
 export type MonsterEncounter = BaseEncounter & {
@@ -146,6 +154,7 @@ export type PlainPlayer = {
   _hp: number;
   weapon: Equipment;
   armor: Equipment;
+  items: Item[];
   xp: number;
   encounter: Encounter | null;
 };

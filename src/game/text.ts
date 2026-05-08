@@ -50,7 +50,9 @@ export function combatStatusText(combatMessage: string, player: Player, monster:
 }
 
 function itemStat(item: Equipment): string {
-  return "attack" in item ? `${item.attack} ATK` : `${item.hp} HP`;
+  if (item.attack !== undefined) return `${item.attack} ATK`;
+  if (item.hp !== undefined) return `${item.hp} HP`;
+  return item.type ?? ""; // For items like "key"
 }
 
 export function requirementText(itemName: string): string {

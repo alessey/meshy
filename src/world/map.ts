@@ -19,7 +19,15 @@ const worldMap: Record<string, Location> = {
     desc: "Dragon's Nest. Charred bones litter the ground.",
     actions: { w: "1-3", s: "2-4" },
     monsterChance: 0.9,
-    monsterPool: [{ name: "Drake", hp: 35, attack: 15 }],
+    monsterPool: [
+      {
+        name: "Dragon",
+        hp: 50,
+        attack: 20,
+        xp: 100,
+        itemPool: [{ name: "Small Key", type: "key" }],
+      },
+    ],
   },
   "1-5": { desc: "Desert Lookout. You can see the heat haze to the south.", actions: { e: "1-6" } },
   "1-6": {
@@ -40,7 +48,8 @@ const worldMap: Record<string, Location> = {
   "2-3": {
     desc: "The Great Gate. Massive oak doors, barred from the other side.",
     actions: { w: "2-2" },
-  }, // Dead end / Shortcut to unlock later?
+    requiredItem: "Small Key",
+  },
   "2-4": {
     desc: "Upper Forest. The pines are thick here.",
     actions: { n: "1-4", s: "3-4", e: "2-5" },

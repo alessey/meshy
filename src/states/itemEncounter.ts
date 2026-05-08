@@ -3,7 +3,7 @@ import { gameMessage, result } from "../game/results.js";
 import { itemPrompt } from "../game/text.js";
 import { getLocation, locationSummaryMessage } from "./presenters.js";
 import type { Player } from "../game/player.js";
-import type { ItemEncounter, GameOutcome, ItemCommand } from "../types.js";
+import type { ItemEncounter, GameOutcome, ItemCommand, Weapon, Armor, Item } from "../types.js";
 
 export function handleItemEncounter(
   player: Player,
@@ -14,9 +14,11 @@ export function handleItemEncounter(
 
   if (command === COMMANDS.TAKE) {
     if (event.item.attack !== undefined) {
-      player.weapon = event.item as any;
+      player.weapon = event.item as Weapon;
     } else if (event.item.hp !== undefined) {
-      player.armor = event.item as any;
+      player.armor = event.item as Armor;
+    } else if (event.item.type !== undefined) {
+      player.items.push(event.item as Item);
     }
 
     player.encounter = null;

@@ -43,9 +43,7 @@ function handleMovement(player: Player, command: Direction): GameOutcome {
   const requirement = nextLocation?.requiredItem;
 
   if (requirement) {
-    const hasItem = player.inventory.some(
-      (i) => i.name.toLowerCase() === requirement.toLowerCase(),
-    );
+    const hasItem = player.hasItem(requirement);
     if (!hasItem) {
       const message = gameMessage(
         requirementText(requirement),

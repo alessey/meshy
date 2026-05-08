@@ -1,12 +1,16 @@
 import type { Equipment } from "../types.js";
 
 export function formatInventoryItem(item: Equipment): string {
-  if ("attack" in item) {
+  if (item.attack !== undefined) {
     return `${item.name} (${item.attack} ATK)`;
   }
 
-  if ("hp" in item) {
+  if (item.hp !== undefined) {
     return `${item.name} (${item.hp} HP)`;
+  }
+
+  if (item.type !== undefined) {
+    return `${item.name} (${item.type})`;
   }
 
   return item.name;
