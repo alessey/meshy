@@ -209,10 +209,12 @@ export class Game {
     let combatMsg = `You hit ${monster.name} for ${player.weapon.attack}. ${monster.name} hits you for ${monster.attack}. `;
 
     if (player.hp <= 0) {
-      player = new Player();
+      const newPlayer = new Player();
+      const respawnLocation = this.getLocation(newPlayer);
+      await this.sendGameText(senderId, player, `${combatMsg}You died! Respawning in the ${newPlayer.location}...`, Object.keys(respawnLocation.actions).map((dir) => dir.toUpperCase()));
+      Object.assign(player, newPlayer);
       save(this.playerStates);
-      const respawnLocation = this.getLocation(player);
-      return this.sendGameText(senderId, player, `${combatMsg}You died! Respawning in the ${respawnLocation}...`, Object.keys(respawnLocation.actions));
+      return;
     }
 
     if (monster.hp <= 0) {
