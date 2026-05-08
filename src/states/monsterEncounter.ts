@@ -4,11 +4,23 @@ import { Player } from "../game/player.js";
 import { randomFrom } from "../game/random.js";
 import { grantMonsterXp, rollLootDrop } from "../game/rewards.js";
 import { gameMessage, plainMessage, result } from "../game/results.js";
-import { combatRoundText, combatStatusText, lootDropText, monsterDefeatedText, monsterPrompt, monsterRewardText, TEXT } from "../game/text.js";
+import {
+  combatRoundText,
+  combatStatusText,
+  lootDropText,
+  monsterDefeatedText,
+  monsterPrompt,
+  monsterRewardText,
+  TEXT,
+} from "../game/text.js";
 import { getLocation, locationSummaryMessage } from "./presenters.js";
 import type { MonsterEncounter, Location, GameOutcome } from "../types.js";
 
-export function handleMonsterEncounter(player: Player, command: string, event: MonsterEncounter): GameOutcome {
+export function handleMonsterEncounter(
+  player: Player,
+  command: string,
+  event: MonsterEncounter,
+): GameOutcome {
   const location = getLocation(player);
 
   if (command === COMMANDS.FIGHT) {
@@ -25,7 +37,9 @@ export function handleMonsterEncounter(player: Player, command: string, event: M
     return result([locationSummaryMessage(getLocation(player))], { shouldSave: true });
   }
 
-  return result([gameMessage(monsterPrompt(event.monster), getCommandLabels(EVENT_ACTIONS.monster))]);
+  return result([
+    gameMessage(monsterPrompt(event.monster), getCommandLabels(EVENT_ACTIONS.monster)),
+  ]);
 }
 
 function resolveCombatRound(player: Player, event: MonsterEncounter): GameOutcome {
@@ -40,13 +54,9 @@ function resolveCombatRound(player: Player, event: MonsterEncounter): GameOutcom
 
   if (player.hp <= 0) {
     Object.assign(player, new Player());
-    return result(
-      [
-        plainMessage(TEXT.YOU_DIED),
-        locationSummaryMessage(getLocation(player)),
-      ],
-      { shouldSave: true }
-    );
+    return result([plainMessage(TEXT.YOU_DIED), locationSummaryMessage(getLocation(player))], {
+      shouldSave: true,
+    });
   }
 
   if (monster.hp <= 0) {
@@ -59,10 +69,13 @@ function resolveCombatRound(player: Player, event: MonsterEncounter): GameOutcom
       player.encounter = { type: "item", item: loot };
       return result(
         [
-          gameMessage(`${combatMessage}${monster.name} is defeated! ${monsterRewardText(reward)}`, []),
+          gameMessage(
+            `${combatMessage}${monster.name} is defeated! ${monsterRewardText(reward)}`,
+            [],
+          ),
           gameMessage(lootDropText(loot), getCommandLabels(EVENT_ACTIONS.item)),
         ],
-        { shouldSave: true }
+        { shouldSave: true },
       );
     }
 
@@ -70,10 +83,10 @@ function resolveCombatRound(player: Player, event: MonsterEncounter): GameOutcom
       [
         gameMessage(
           `${monsterDefeatedText(combatMessage, monster)} ${monsterRewardText(reward)} ${location.desc}`,
-          getDisplayActions(location.actions)
+          getDisplayActions(location.actions),
         ),
       ],
-      { shouldSave: true }
+      { shouldSave: true },
     );
   }
 
@@ -81,10 +94,10 @@ function resolveCombatRound(player: Player, event: MonsterEncounter): GameOutcom
     [
       gameMessage(
         combatStatusText(combatMessage, player, monster),
-        getCommandLabels(EVENT_ACTIONS.monster)
+        getCommandLabels(EVENT_ACTIONS.monster),
       ),
     ],
-    { shouldSave: true }
+    { shouldSave: true },
   );
 }
 

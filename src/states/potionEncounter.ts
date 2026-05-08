@@ -6,7 +6,11 @@ import { getLocation, locationSummaryMessage } from "./presenters.js";
 import type { Player } from "../game/player.js";
 import type { PotionEncounter, GameOutcome } from "../types.js";
 
-export function handlePotionEncounter(player: Player, command: string, event: PotionEncounter): GameOutcome {
+export function handlePotionEncounter(
+  player: Player,
+  command: string,
+  event: PotionEncounter,
+): GameOutcome {
   const location = getLocation(player);
 
   if (command === COMMANDS.USE) {

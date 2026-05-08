@@ -14,11 +14,17 @@ export function resolveLocationEvent(location: Location, player: Player): Encoun
     {
       pool: location.monsterPool,
       chance: location.monsterChance ?? 0,
-      build: () => ({ type: "monster", monster: scaleMonster(randomFrom(location.monsterPool), player) }),
+      build: () => ({
+        type: "monster",
+        monster: scaleMonster(randomFrom(location.monsterPool), player),
+      }),
     },
     {
       chance: location.potionChance ?? 0,
-      build: () => ({ type: "potion", potion: { name: "Health Potion", heal: location.potionHeal ?? 10 } }),
+      build: () => ({
+        type: "potion",
+        potion: { name: "Health Potion", heal: location.potionHeal ?? 10 },
+      }),
     },
   ];
 

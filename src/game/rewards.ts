@@ -38,7 +38,9 @@ export function grantMonsterXp(player: Player, monster: Monster): MonsterReward 
   };
 }
 
-export function rollLootDrop(location: Location): { name: string; attack?: number; hp?: number } | null {
+export function rollLootDrop(
+  location: Location,
+): { name: string; attack?: number; hp?: number } | null {
   const lootPool = location.itemPool?.length ? location.itemPool : DEFAULT_LOOT_POOL;
 
   if (!roll(LOOT_DROP_CHANCE)) {

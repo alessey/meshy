@@ -1,4 +1,4 @@
 allowBuilds:
-  '@meshtastic/core': true
-  '@meshtastic/transport-node-serial': true
-  '@serialport/bindings-cpp': true
+  "@meshtastic/core": true
+  "@meshtastic/transport-node-serial": true
+  "@serialport/bindings-cpp": true

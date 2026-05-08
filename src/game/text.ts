@@ -23,7 +23,11 @@ export function potionPrompt(potion: Potion): string {
   return `You found a ${potion.name}. (U)se or (D)iscard?`;
 }
 
-export function combatRoundText(monster: Monster, playerDamage: number, monsterDamage: number): string {
+export function combatRoundText(
+  monster: Monster,
+  playerDamage: number,
+  monsterDamage: number,
+): string {
   return `You hit ${monster.name} for ${playerDamage}. ${monster.name} hits you for ${monsterDamage}. `;
 }
 

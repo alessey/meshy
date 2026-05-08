@@ -32,9 +32,7 @@ export default {
       { name: "Shield", attack: 6 },
     ],
     monsterChance: 0.5,
-    monsterPool: [
-      { name: "Bear", hp: 20, attack: 6 },
-    ],
+    monsterPool: [{ name: "Bear", hp: 20, attack: 6 }],
   },
   river: {
     desc: "A rushing river with a small bridge. The water looks refreshing.",
@@ -46,9 +44,7 @@ export default {
     desc: "A quiet village with a few houses. People are going about their day.",
     actions: { w: "river", n: "forest", e: "shop" },
     itemChance: 0.3,
-    itemPool: [
-      { name: "Mace", attack: 9 },
-    ],
+    itemPool: [{ name: "Mace", attack: 9 }],
   },
   forest: {
     desc: "A dense forest with tall trees. Sunlight filters through the leaves.",

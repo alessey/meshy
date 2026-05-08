@@ -3,7 +3,12 @@ import { resolveLocationEvent } from "../game/encounters.js";
 import { formatInventory } from "../game/inventory.js";
 import { gameMessage, result } from "../game/results.js";
 import { inventoryText } from "../game/text.js";
-import { eventPromptMessage, getLocation, locationSummaryMessage, unknownCommandMessage } from "./presenters.js";
+import {
+  eventPromptMessage,
+  getLocation,
+  locationSummaryMessage,
+  unknownCommandMessage,
+} from "./presenters.js";
 import type { Player } from "../game/player.js";
 import type { GameOutcome } from "../types.js";
 

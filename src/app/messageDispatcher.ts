@@ -6,7 +6,12 @@ interface MeshDevice {
   sendText(text: string, recipientId: unknown): Promise<number | void>;
 }
 
-export async function dispatchMessages(device: MeshDevice, recipientId: unknown, player: Player, messages: Message[]): Promise<void> {
+export async function dispatchMessages(
+  device: MeshDevice,
+  recipientId: unknown,
+  player: Player,
+  messages: Message[],
+): Promise<void> {
   for (const message of messages) {
     if (message.type === "plain") {
       await sendPlainText(device, recipientId, message.text);

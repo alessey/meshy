@@ -94,7 +94,7 @@ export interface GameOutcome {
 }
 
 /**
- * Reward Types  
+ * Reward Types
  */
 export interface MonsterReward {
   xp: number;
@@ -118,4 +118,3 @@ export interface PlainPlayer {
  * Player Store Types
  */
 export type PlayerStateMap = Map<string, PlainPlayer>;
-

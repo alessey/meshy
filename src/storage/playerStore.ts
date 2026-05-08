@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import fs from "fs/promises";
 import { log, logError } from "../logging.js";
 import { DB_PATH, SAVE_DEBOUNCE_MS } from "../config/constants.js";
 import { hydratePlayer } from "../game/player.js";
@@ -13,13 +13,13 @@ let pendingReject: ((err: unknown) => void) | null = null;
 
 export async function loadPlayerData(): Promise<Map<string, Player>> {
   try {
-    const data = await fs.readFile(DB_PATH, 'utf-8');
+    const data = await fs.readFile(DB_PATH, "utf-8");
     const savedPlayers = Object.entries(JSON.parse(data));
     const playerStates = new Map(savedPlayers.map(([id, player]) => [id, hydratePlayer(player)]));
     log(`Loaded ${playerStates.size} players.`);
     return playerStates;
   } catch (err) {
-    log("Starting fresh database.");
+    log("Starting fresh database.", err);
     return new Map();
   }
 }
@@ -27,7 +27,7 @@ export async function loadPlayerData(): Promise<Map<string, Player>> {
 async function performSave(playerStates: Map<string, Player>): Promise<void> {
   try {
     const data = JSON.stringify(Object.fromEntries(playerStates));
-    await fs.writeFile(DB_PATH, data, 'utf-8');
+    await fs.writeFile(DB_PATH, data, "utf-8");
     // log("Disk Sync: Player states saved.");
   } catch (err) {
     logError("Save Error:", err);
@@ -46,7 +46,6 @@ function flush(playerStates: Map<string, Player>): Promise<void> {
     return pendingPromise;
   }
 
-  const promise = pendingPromise;
   const resolve = pendingResolve!;
   const reject = pendingReject!;
 

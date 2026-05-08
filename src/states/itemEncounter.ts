@@ -5,7 +5,11 @@ import { getLocation, locationSummaryMessage } from "./presenters.js";
 import type { Player } from "../game/player.js";
 import type { ItemEncounter, GameOutcome } from "../types.js";
 
-export function handleItemEncounter(player: Player, command: string, event: ItemEncounter): GameOutcome {
+export function handleItemEncounter(
+  player: Player,
+  command: string,
+  event: ItemEncounter,
+): GameOutcome {
   const location = getLocation(player);
 
   if (command === COMMANDS.TAKE) {

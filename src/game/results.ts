@@ -8,7 +8,10 @@ export function plainMessage(text: string): PlainMessage {
   return { type: "plain", text };
 }
 
-export function result(messages: Message[] = [], options: { shouldSave?: boolean } = {}): GameOutcome {
+export function result(
+  messages: Message[] = [],
+  options: { shouldSave?: boolean } = {},
+): GameOutcome {
   return {
     messages,
     shouldSave: options.shouldSave ?? false,

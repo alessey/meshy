@@ -4,9 +4,12 @@ import { handleItemEncounter } from "./itemEncounter.js";
 import { handleMonsterEncounter } from "./monsterEncounter.js";
 import { handlePotionEncounter } from "./potionEncounter.js";
 import type { Player } from "../game/player.js";
-import type { Encounter, GameOutcome } from "../types.js";
+import type { GameOutcome } from "../types.js";
 
-const ENCOUNTER_HANDLERS: Record<string, (player: Player, command: string, event: any) => GameOutcome> = {
+const ENCOUNTER_HANDLERS: Record<
+  string,
+  (player: Player, command: string, event: any) => GameOutcome
+> = {
   item: handleItemEncounter,
   monster: handleMonsterEncounter,
   potion: handlePotionEncounter,
@@ -14,7 +17,7 @@ const ENCOUNTER_HANDLERS: Record<string, (player: Player, command: string, event
 
 export function handleEncounter(player: Player, command: string): GameOutcome {
   const event = player.encounter;
-  const handler = ENCOUNTER_HANDLERS[event?.type ?? ''];
+  const handler = ENCOUNTER_HANDLERS[event?.type ?? ""];
 
   if (!handler) {
     return result([unknownCommandMessage(player)]);

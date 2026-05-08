@@ -12,12 +12,22 @@ export function truncateMessage(text: string): string {
   return text.length > CHAR_LIMIT ? text.substring(0, CHAR_LIMIT - 3) + "..." : text;
 }
 
-export async function sendGameText(device: any, recipientId: unknown, player: Player, text: string, actions: string[] = []): Promise<void> {
+export async function sendGameText(
+  device: any,
+  recipientId: unknown,
+  player: Player,
+  text: string,
+  actions: string[] = [],
+): Promise<void> {
   const safeText = truncateMessage(formatResponse(player, text, actions));
   return sendText(device, recipientId, safeText);
 }
 
-export async function sendPlainText(device: any, recipientId: unknown, text: string): Promise<void> {
+export async function sendPlainText(
+  device: any,
+  recipientId: unknown,
+  text: string,
+): Promise<void> {
   return sendText(device, recipientId, truncateMessage(text));
 }
 
