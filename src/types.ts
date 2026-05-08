@@ -111,6 +111,26 @@ export type Location = {
   potionHeal?: number;
   isStart?: boolean;
   requiredItem?: string;
+  cellType?:
+    | "desert"
+    | "forest"
+    | "grass"
+    | "hills"
+    | "lake"
+    | "mountain-road"
+    | "mountains"
+    | "pyramid"
+    | "river"
+    | "temple"
+    | "waterfall"
+    | "mine"
+    | "mountain-peaks"
+    | "stone-bridge"
+    | "doors"
+    | "road"
+    | "forest-camp"
+    | "jungle"
+    | "swamp";
 };
 
 /**

@@ -1,0 +1,27 @@
+body { font-family: -apple-system, sans-serif; margin: 40px; background-color: #0f172a; color: #f8fafc; }
+h1 { color: #38bdf8; border-bottom: 2px solid #1e293b; padding-bottom: 10px; }
+.controls { margin-bottom: 20px; }
+select { padding: 10px; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 6px; width: 300px; }
+
+.map-container { display: grid; gap: 8px; background: #1e293b; padding: 20px; border-radius: 12px; }
+.map-cell { background: #0f172a; border: 1px solid #334155; border-radius: 4px; min-height: 80px; padding: 8px; position: relative; color: #475569; }
+.map-cell.active { border-color: #38bdf8; }
+.cell-label { position: absolute; bottom: 4px; right: 6px; font-family: monospace; opacity: 0.5; font-size: 0.7rem; }
+.map-icons { position: absolute; top: 4px; left: 6px; display: flex; gap: 4px; font-size: 0.8rem; }
+
+.player-marker { 
+  display: inline-flex; align-items: center; justify-content: center; 
+  width: 24px; height: 24px; background: #38bdf8; color: #0f172a; 
+  border-radius: 50%; font-weight: bold; font-size: 0.6rem; margin: 2px; border: 2px solid #0f172a; 
+}
+
+.player-card { background-color: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 24px; }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
+.stat-item { background: #0f172a; padding: 12px; border-radius: 8px; border-left: 4px solid #38bdf8; }
+.stat-label { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; }
+.stat-value { font-size: 1.25rem; font-weight: bold; }
+
+.section { margin-top: 24px; }
+.section h3 { color: #38bdf8; margin-bottom: 8px; }
+ul { list-style: none; padding: 0; }
+li { background: #334155; margin: 4px 0; padding: 8px; border-radius: 4px; font-size: 0.9rem; }

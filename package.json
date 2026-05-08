@@ -9,7 +9,11 @@
   "scripts": {
     "check-types": "tsc --noEmit",
     "build": "tsc",
-    "start": "pnpm run build && node dist/index.js",
+    "build:web": "cd frontend && vite build",
+    "dev:web": "cd frontend && vite",
+    "dev:server": "tsx watch index.ts",
+    "dev": "concurrently -n \"server,client\" -c \"magenta,cyan\" \"pnpm dev:server\" \"pnpm dev:web\"",
+    "start": "pnpm run build && pnpm run build:web && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
@@ -20,11 +24,19 @@
   "dependencies": {
     "@meshtastic/core": "^2.6.7",
     "@meshtastic/transport-node-serial": "^0.0.2",
-    "@types/express": "^5.0.6",
     "express": "^5.2.1",
-    "lodash": "^4.18.1"
+    "lodash": "^4.18.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "concurrently": "^9.1.0",
+    "tsx": "^4.19.2",
+    "@types/express": "^5.0.6",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "vite": "^5.4.10",
     "@types/node": "^20.19.40",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.2",

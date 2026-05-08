@@ -4,6 +4,7 @@ import { TransportNodeSerial } from "@meshtastic/transport-node-serial";
 import { USE_MOCK, SERIAL_PORT } from "./src/config/constants.js";
 import express from "express";
 import { Game } from "./src/app/Game.js";
+import worldMap from "./src/world/map.js";
 import { log, logError } from "./src/logging.js";
 import { loadPlayerData } from "./src/storage/playerStore.js";
 import { MockTransport } from "./src/transport/mockTransport.js";
@@ -21,11 +22,22 @@ let playerStates: Map<string, Player> = new Map();
 // --- WEB SERVER SETUP ---
 app.use(express.json());
 // Use an absolute path to the public directory to ensure it works regardless of where node is called from
-app.use(express.static(path.join(process.cwd(), "public")));
+const distPath = path.resolve(process.cwd(), "frontend", "dist");
+app.use(express.static(distPath));
 
 // API to get all player IDs
 app.get("/api/players", (req, res) => {
-  res.json(Array.from(playerStates.keys()));
+  const players = Array.from(playerStates).map(([id, p]) => ({
+    id,
+    location: p.location,
+    level: p.level,
+  }));
+  res.json(players);
+});
+
+// API to get the world map structure
+app.get("/api/map", (req, res) => {
+  res.json(worldMap);
 });
 
 // API to get a specific player's stats
