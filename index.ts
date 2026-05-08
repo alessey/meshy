@@ -1,6 +1,8 @@
+import path from "path";
 import { MeshDevice } from "@meshtastic/core";
 import { TransportNodeSerial } from "@meshtastic/transport-node-serial";
 import { USE_MOCK, SERIAL_PORT } from "./src/config/constants.js";
+import express from "express";
 import { Game } from "./src/app/Game.js";
 import { log, logError } from "./src/logging.js";
 import { loadPlayerData } from "./src/storage/playerStore.js";
@@ -11,7 +13,48 @@ import type { Player } from "./src/game/player.js";
 const transport: any = USE_MOCK ? new MockTransport() : new TransportNodeSerial(SERIAL_PORT as any);
 const device = new MeshDevice(transport);
 
+// Web server setup
+const app = express();
+const WEB_PORT = process.env.WEB_PORT ?? 3000;
 let playerStates: Map<string, Player> = new Map();
+
+// --- WEB SERVER SETUP ---
+app.use(express.json());
+// Use an absolute path to the public directory to ensure it works regardless of where node is called from
+app.use(express.static(path.join(process.cwd(), "public")));
+
+// API to get all player IDs
+app.get("/api/players", (req, res) => {
+  res.json(Array.from(playerStates.keys()));
+});
+
+// API to get a specific player's stats
+app.get("/api/player/:id", (req, res) => {
+  const playerId = req.params.id;
+  const player = playerStates.get(playerId);
+  if (player) {
+    // Convert Player class instance to a plain object for JSON serialization
+    res.json({
+      location: player.location,
+      hp: player.hp,
+      maxHp: player.maxHp,
+      attack: player.attack,
+      level: player.level,
+      xp: player.xp,
+      weapon: player.weapon,
+      armor: player.armor,
+      items: player.items,
+      encounter: player.encounter,
+    });
+  } else {
+    res.status(404).send("Player not found");
+  }
+});
+
+// Start the web server immediately so the dashboard is available during hardware boot
+app.listen(WEB_PORT, () => {
+  log(`Web dashboard available at http://localhost:${WEB_PORT}`);
+});
 
 // --- BOOT ---
 async function start(): Promise<void> {

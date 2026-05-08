@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meshy Game Dashboard</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        margin: 40px;
+        background-color: #0f172a;
+        color: #f8fafc;
+      }
+      h1 {
+        color: #38bdf8;
+        border-bottom: 2px solid #1e293b;
+        padding-bottom: 10px;
+      }
+      .controls {
+        margin-bottom: 20px;
+      }
+      select {
+        padding: 10px;
+        background: #1e293b;
+        color: white;
+        border: 1px solid #334155;
+        border-radius: 6px;
+        font-size: 1rem;
+        width: 300px;
+      }
+      .player-card {
+        background-color: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      }
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+      }
+      .stat-item {
+        background: #0f172a;
+        padding: 12px;
+        border-radius: 8px;
+        border-left: 4px solid #38bdf8;
+      }
+      .stat-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #94a3b8;
+        margin-bottom: 4px;
+      }
+      .stat-value {
+        font-size: 1.25rem;
+        font-weight: bold;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      li {
+        background: #334155;
+        margin: 4px 0;
+        padding: 8px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Meshy Dashboard</h1>
+
+    <div class="controls">
+      <select id="player-select">
+        <option value="">Select an active player...</option>
+      </select>
+    </div>
+
+    <div id="player-details"></div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
