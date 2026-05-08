@@ -1,4 +1,4 @@
-import { EVENT_ACTIONS, getDisplayActions } from "../game/commands.js";
+import { COMMANDS, EVENT_ACTIONS, getCommandLabels, getDisplayActions } from "../game/commands.js";
 import { rollCombatDamage } from "../game/combat.js";
 import { Player } from "../game/player.js";
 import { randomFrom } from "../game/random.js";
@@ -8,11 +8,11 @@ import { getLocation, locationSummaryMessage } from "./presenters.js";
 export function handleMonsterEncounter(player, command, event) {
   const location = getLocation(player);
 
-  if (command === "f") {
+  if (command === COMMANDS.FIGHT) {
     return resolveCombatRound(player, event);
   }
 
-  if (command === "r") {
+  if (command === COMMANDS.RUN) {
     const retreat = findRetreatLocation(location);
     if (retreat) {
       player.location = retreat;
@@ -22,7 +22,7 @@ export function handleMonsterEncounter(player, command, event) {
     return result([locationSummaryMessage(getLocation(player))], { shouldSave: true });
   }
 
-  return result([gameMessage(`A ${event.monster.name} appears! (F)ight or (R)un?`, EVENT_ACTIONS.monster)]);
+  return result([gameMessage(`A ${event.monster.name} appears! (F)ight or (R)un?`, getCommandLabels(EVENT_ACTIONS.monster))]);
 }
 
 function resolveCombatRound(player, event) {
@@ -64,7 +64,7 @@ function resolveCombatRound(player, event) {
     [
       gameMessage(
         `${combatMessage}Your HP: ${player.hp}. Monster HP: ${monster.hp}. (F)ight or (R)un?`,
-        EVENT_ACTIONS.monster
+        getCommandLabels(EVENT_ACTIONS.monster)
       ),
     ],
     { shouldSave: true }

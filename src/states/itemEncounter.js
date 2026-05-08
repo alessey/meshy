@@ -1,11 +1,11 @@
-import { EVENT_ACTIONS } from "../game/commands.js";
+import { COMMANDS, EVENT_ACTIONS, getCommandLabels } from "../game/commands.js";
 import { gameMessage, result } from "../game/results.js";
 import { getLocation, locationSummaryMessage } from "./presenters.js";
 
 export function handleItemEncounter(player, command, event) {
   const location = getLocation(player);
 
-  if (command === "t") {
+  if (command === COMMANDS.TAKE) {
     if (event.item.attack) {
       player.weapon = event.item;
     } else if (event.item.hp) {
@@ -16,11 +16,11 @@ export function handleItemEncounter(player, command, event) {
     return result([locationSummaryMessage(location)], { shouldSave: true });
   }
 
-  if (command === "d") {
+  if (command === COMMANDS.DISCARD) {
     player.encounter = null;
     return result([locationSummaryMessage(location)], { shouldSave: true });
   }
 
   const stat = event.item.attack ? `${event.item.attack} ATK` : `${event.item.hp} HP`;
-  return result([gameMessage(`Found ${event.item.name} (${stat}). (T)ake or (D)iscard?`, EVENT_ACTIONS.item)]);
+  return result([gameMessage(`Found ${event.item.name} (${stat}). (T)ake or (D)iscard?`, getCommandLabels(EVENT_ACTIONS.item))]);
 }

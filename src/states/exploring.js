@@ -1,4 +1,4 @@
-import { getDisplayActions, isMovementCommand } from "../game/commands.js";
+import { COMMANDS, getDisplayActions, isMovementCommand } from "../game/commands.js";
 import { resolveLocationEvent } from "../game/encounters.js";
 import { formatInventory } from "../game/inventory.js";
 import { gameMessage, result } from "../game/results.js";
@@ -13,7 +13,7 @@ export function handleExploring(player, command) {
     return handleMovement(player, command);
   }
 
-  if (command === "i") {
+  if (command === COMMANDS.INVENTORY) {
     const inventory = formatInventory(player.inventory);
     const actions = getDisplayActions(getLocation(player).actions);
     return result([gameMessage(`Inventory:\n${inventory}`, actions)]);

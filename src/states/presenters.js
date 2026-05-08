@@ -1,5 +1,5 @@
 import worldMap from "../world/map.js";
-import { EVENT_ACTIONS, getDisplayActions } from "../game/commands.js";
+import { EVENT_ACTIONS, getCommandLabels, getDisplayActions } from "../game/commands.js";
 import { gameMessage } from "../game/results.js";
 
 export function getLocation(player) {
@@ -11,7 +11,7 @@ export function locationSummaryMessage(location) {
 }
 
 export function eventPromptMessage(event, player) {
-  const actions = EVENT_ACTIONS[event.type];
+  const actions = getCommandLabels(EVENT_ACTIONS[event.type]);
 
   if (event.type === "item") {
     const stat = event.item.attack ? `${event.item.attack} ATK` : `${event.item.hp} HP`;
@@ -32,7 +32,7 @@ export function eventPromptMessage(event, player) {
 export function unknownCommandMessage(player) {
   const location = getLocation(player);
   const actions = player.encounter
-    ? EVENT_ACTIONS[player.encounter.type]
+    ? getCommandLabels(EVENT_ACTIONS[player.encounter.type])
     : getDisplayActions(location.actions);
 
   return gameMessage("Unknown command.", actions);
