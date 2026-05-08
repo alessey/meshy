@@ -1,6 +1,7 @@
 import { MAX_HP } from "../game/player.js";
 import { COMMANDS, EVENT_ACTIONS, getCommandLabels } from "../game/commands.js";
 import { gameMessage, result } from "../game/results.js";
+import { potionPrompt } from "../game/text.js";
 import { getLocation, locationSummaryMessage } from "./presenters.js";
 
 export function handlePotionEncounter(player, command, event) {
@@ -17,5 +18,5 @@ export function handlePotionEncounter(player, command, event) {
     return result([locationSummaryMessage(location)], { shouldSave: true });
   }
 
-  return result([gameMessage(`You found a ${event.potion.name}. (U)se or (D)iscard?`, getCommandLabels(EVENT_ACTIONS.potion))]);
+  return result([gameMessage(potionPrompt(event.potion), getCommandLabels(EVENT_ACTIONS.potion))]);
 }

@@ -3,6 +3,7 @@ import { rollCombatDamage } from "../game/combat.js";
 import { Player } from "../game/player.js";
 import { randomFrom } from "../game/random.js";
 import { gameMessage, plainMessage, result } from "../game/results.js";
+import { combatRoundText, combatStatusText, monsterDefeatedText, monsterPrompt, TEXT } from "../game/text.js";
 import { getLocation, locationSummaryMessage } from "./presenters.js";
 
 export function handleMonsterEncounter(player, command, event) {
@@ -22,7 +23,7 @@ export function handleMonsterEncounter(player, command, event) {
     return result([locationSummaryMessage(getLocation(player))], { shouldSave: true });
   }
 
-  return result([gameMessage(`A ${event.monster.name} appears! (F)ight or (R)un?`, getCommandLabels(EVENT_ACTIONS.monster))]);
+  return result([gameMessage(monsterPrompt(event.monster), getCommandLabels(EVENT_ACTIONS.monster))]);
 }
 
 function resolveCombatRound(player, event) {
@@ -33,13 +34,13 @@ function resolveCombatRound(player, event) {
   monster.hp -= playerDamage;
   player.hp -= monsterDamage;
 
-  const combatMessage = `You hit ${monster.name} for ${playerDamage}. ${monster.name} hits you for ${monsterDamage}. `;
+  const combatMessage = combatRoundText(monster, playerDamage, monsterDamage);
 
   if (player.hp <= 0) {
     Object.assign(player, new Player());
     return result(
       [
-        plainMessage("You died!"),
+        plainMessage(TEXT.YOU_DIED),
         locationSummaryMessage(getLocation(player)),
       ],
       { shouldSave: true }
@@ -52,7 +53,7 @@ function resolveCombatRound(player, event) {
     return result(
       [
         gameMessage(
-          `${combatMessage}${monster.name} is defeated! ${location.desc}`,
+          monsterDefeatedText(combatMessage, monster, location),
           getDisplayActions(location.actions)
         ),
       ],
@@ -63,7 +64,7 @@ function resolveCombatRound(player, event) {
   return result(
     [
       gameMessage(
-        `${combatMessage}Your HP: ${player.hp}. Monster HP: ${monster.hp}. (F)ight or (R)un?`,
+        combatStatusText(combatMessage, player, monster),
         getCommandLabels(EVENT_ACTIONS.monster)
       ),
     ],
