@@ -13,8 +13,26 @@ import type { Player } from "./src/game/player.js";
 // Derive mode from environment variables
 const isMock = process.env.USE_MOCK === "true";
 
+if (!isMock) {
+  log(`Initializing Hardware Mode on port: ${SERIAL_PORT}`);
+  if (process.platform === "darwin" && SERIAL_PORT.startsWith("/dev/ttyUSB")) {
+    log("Warning: You appear to be on macOS using a Linux-style serial path (/dev/ttyUSB).");
+    log("Check 'ls /dev/cu.*' to find your actual device path.");
+  }
+}
+
 // initialize
-const transport: any = isMock ? new MockTransport() : new TransportNodeSerial(SERIAL_PORT as any);
+let transport: any;
+try {
+  transport = isMock ? new MockTransport() : new TransportNodeSerial(SERIAL_PORT as any);
+} catch (e) {
+  logError(
+    "Failed to initialize Transport. Ensure SERIAL_PORT is correct and Node.js version is stable.",
+    e,
+  );
+  process.exit(1);
+}
+
 const device = new MeshDevice(transport);
 
 // Web server setup
