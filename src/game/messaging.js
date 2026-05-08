@@ -13,6 +13,14 @@ export function truncateMessage(text) {
 
 export async function sendGameText(device, recipientId, player, text, actions = []) {
   const safeText = truncateMessage(formatResponse(player, text, actions));
+  return sendText(device, recipientId, safeText);
+}
+
+export async function sendPlainText(device, recipientId, text) {
+  return sendText(device, recipientId, truncateMessage(text));
+}
+
+async function sendText(device, recipientId, safeText) {
   if (USE_MOCK) {
     process.stdout.write(`\n[OUTGOING TO ${recipientId}]: ${safeText}\n> `);
   } else {

@@ -6,7 +6,7 @@ import { Player, MAX_HP } from "./src/game/player.js";
 import { randomFrom } from "./src/game/random.js";
 import { rollCombatDamage } from "./src/game/combat.js";
 import { formatInventory } from "./src/game/inventory.js";
-import { formatResponse, sendGameText } from "./src/game/messaging.js";
+import { formatResponse, sendGameText, sendPlainText } from "./src/game/messaging.js";
 
 export class Game {
   constructor(device, playerStates) {
@@ -152,11 +152,10 @@ export class Game {
 
     if (player.hp <= 0) {
       const newPlayer = new Player();
-      const respawnLocation = this.getLocation(newPlayer);
-      await this.sendGameText(senderId, player, `${combatMsg}You died! Respawning in the ${newPlayer.location}...`, this.getDisplayActions(respawnLocation.actions));
+      await this.sendPlainText(senderId, "You died!");
       Object.assign(player, newPlayer);
       save(this.playerStates);
-      return;
+      return this.sendLocationSummary(senderId, player, this.getLocation(player));
     }
 
     if (monster.hp <= 0) {
@@ -240,6 +239,10 @@ export class Game {
 
   async sendGameText(recipientId, player, text, actions = []) {
     return sendGameText(this.device, recipientId, player, text, actions);
+  }
+
+  async sendPlainText(recipientId, text) {
+    return sendPlainText(this.device, recipientId, text);
   }
 }
 
