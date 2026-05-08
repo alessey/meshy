@@ -7,13 +7,15 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "check-types": "tsc --noEmit",
     "build": "tsc",
     "start": "pnpm run build && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "fmt": "oxfmt",
-    "fmt:check": "oxfmt --check"
+    "fmt:check": "oxfmt --check",
+    "prepare": "husky"
   },
   "dependencies": {
     "@meshtastic/core": "^2.6.7",
@@ -22,8 +24,16 @@
   },
   "devDependencies": {
     "@types/node": "^20.19.40",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.2",
     "oxfmt": "^0.48.0",
     "oxlint": "^1.63.0",
     "typescript": "^5.9.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "oxlint --deny correctness --deny perf",
+      "oxfmt"
+    ]
   }
 }
