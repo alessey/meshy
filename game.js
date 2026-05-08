@@ -70,6 +70,10 @@ export class Game {
     return worldMap[player.location];
   }
 
+  getDisplayActions(actions) {
+    return Object.keys(actions).map((dir) => dir.toUpperCase())
+  }
+
   async resolveSaveAndDisplay(senderId, player, location) {
     player.encounter = null;
     save(this.playerStates);
@@ -203,15 +207,18 @@ export class Game {
 
   async resolveCombatRound(senderId, player, event) {
     const monster = event.monster;
-    monster.hp -= player.weapon.attack;
-    player.hp -= monster.attack;
+    const monsterDamage = Math.max(1, Math.floor(Math.random() * monster.attack) + 1);
+    const playerDamage = Math.max(1, Math.floor(Math.random() * player.weapon.attack) + 1);
 
-    let combatMsg = `You hit ${monster.name} for ${player.weapon.attack}. ${monster.name} hits you for ${monster.attack}. `;
+    monster.hp -= playerDamage;
+    player.hp -= monsterDamage;
+
+    let combatMsg = `You hit ${monster.name} for ${playerDamage}. ${monster.name} hits you for ${monsterDamage}. `;
 
     if (player.hp <= 0) {
       const newPlayer = new Player();
       const respawnLocation = this.getLocation(newPlayer);
-      await this.sendGameText(senderId, player, `${combatMsg}You died! Respawning in the ${newPlayer.location}...`, Object.keys(respawnLocation.actions).map((dir) => dir.toUpperCase()));
+      await this.sendGameText(senderId, player, `${combatMsg}You died! Respawning in the ${newPlayer.location}...`, this.getDisplayActions(respawnLocation.actions));
       Object.assign(player, newPlayer);
       save(this.playerStates);
       return;
@@ -225,7 +232,7 @@ export class Game {
         senderId,
         player,
         `${combatMsg}${monster.name} is defeated! ${location.desc}`,
-        Object.keys(location.actions).map((dir) => dir.toUpperCase())
+        this.getDisplayActions(location.actions)
       );
     }
 
@@ -264,7 +271,7 @@ export class Game {
 
   async sendLocationSummary(senderId, player, location) {
     const message = `${location.desc}`;
-    const actions = Object.keys(location.actions).map((dir) => dir.toUpperCase());
+    const actions = this.getDisplayActions(location.actions);
     await this.sendGameText(senderId, player, message, actions);
   }
 
@@ -285,7 +292,7 @@ export class Game {
   }
 
   async sendUnknownCommand(senderId, player, location) {
-    let actions = Object.keys(location.actions).map((dir) => dir.toUpperCase());
+    let actions = this.getDisplayActions(location.actions);
     if (player.encounter) {
       actions = EVENT_ACTIONS[player.encounter.type];
     }
