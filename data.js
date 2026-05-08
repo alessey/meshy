@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import { log, logError } from "./logging.js";
 import { DB_PATH, SAVE_DEBOUNCE_MS } from "./constants.js";
+import { hydratePlayer } from "./src/game/player.js";
 
 const SAVE_BATCH_SIZE = 5;
 let pendingSaveCount = 0;
@@ -12,7 +13,8 @@ let pendingReject = null;
 export async function loadPlayerData() {
   try {
     const data = await fs.readFile(DB_PATH, 'utf-8');
-    const playerStates = new Map(Object.entries(JSON.parse(data)));
+    const savedPlayers = Object.entries(JSON.parse(data));
+    const playerStates = new Map(savedPlayers.map(([id, player]) => [id, hydratePlayer(player)]));
     log(`Loaded ${playerStates.size} players.`);
     return playerStates;
   } catch (err) {

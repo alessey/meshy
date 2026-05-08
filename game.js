@@ -1,54 +1,12 @@
-import { CHAR_LIMIT, USE_MOCK } from "./constants.js";
 import worldMap from "./map.js";
 import { save } from "./data.js";
-import { logError } from "./logging.js";
-
-const MAX_HP = 20;
-const INITIAL_PLAYER = {
-  location: "woods",
-  hp: MAX_HP,
-  weapon: { name: "Fists", attack: 2 },
-  armor: { name: "Cloth", hp: 0 },
-  encounter: null,
-};
-
-const MOVEMENT_COMMANDS = ["M", "S", "E", "W"];
-const EVENT_ACTIONS = {
-  item: ["T", "D"],
-  monster: ["F", "R"],
-  potion: ["U", "D"],
-  inventory: ["I"],
-};
-
-function roll(chance = 1) {
-  return Math.random() < chance;
-}
-
-function randomFrom(array) {
-  return array.length ? array[Math.floor(Math.random() * array.length)] : null;
-}
-
-class Player {
-  constructor() {
-    this.location = "woods";
-    this._hp = MAX_HP;
-    this.weapon = { name: "Fists", attack: 2 };
-    this.armor = { name: "Cloth", hp: 0 };
-    this.encounter = null;
-  }
-
-  get hp() {
-    return this._hp + this.armor.hp;
-  }
-
-  set hp(value) {
-    this._hp = Math.min(value, MAX_HP);
-  }
-
-  get inventory() {
-    return [this.weapon, this.armor];
-  }
-}
+import { EVENT_ACTIONS, getDisplayActions, isMovementCommand } from "./src/game/commands.js";
+import { resolveLocationEvent } from "./src/game/encounters.js";
+import { Player, MAX_HP } from "./src/game/player.js";
+import { randomFrom } from "./src/game/random.js";
+import { rollCombatDamage } from "./src/game/combat.js";
+import { formatInventory } from "./src/game/inventory.js";
+import { formatResponse, sendGameText } from "./src/game/messaging.js";
 
 export class Game {
   constructor(device, playerStates) {
@@ -71,7 +29,7 @@ export class Game {
   }
 
   getDisplayActions(actions) {
-    return Object.keys(actions).map((dir) => dir.toUpperCase())
+    return getDisplayActions(actions);
   }
 
   async resolveSaveAndDisplay(senderId, player, location) {
@@ -105,7 +63,7 @@ export class Game {
   }
 
   isMovementCommand(command) {
-    return MOVEMENT_COMMANDS.includes(command.toUpperCase());
+    return isMovementCommand(command);
   }
 
   async handleMovement(senderId, player, command) {
@@ -133,30 +91,7 @@ export class Game {
   }
 
   resolveLocationEvent(location) {
-    const eventTypes = [
-      {
-        pool: location.itemPool,
-        chance: location.itemChance ?? 0,
-        build: () => ({ type: "item", item: { ...randomFrom(location.itemPool) } }),
-      },
-      {
-        pool: location.monsterPool,
-        chance: location.monsterChance ?? 0,
-        build: () => ({ type: "monster", monster: { ...randomFrom(location.monsterPool) } }),
-      },
-      {
-        chance: location.potionChance ?? 0,
-        build: () => ({ type: "potion", potion: { name: "Health Potion", heal: location.potionHeal ?? 10 } }),
-      },
-    ];
-
-    for (const { pool, chance, build } of eventTypes) {
-      if (pool?.length && roll(chance)) {
-        return build();
-      }
-    }
-
-    return null;
+    return resolveLocationEvent(location);
   }
 
   async handleEventInput(senderId, player, command, location) {
@@ -207,8 +142,8 @@ export class Game {
 
   async resolveCombatRound(senderId, player, event) {
     const monster = event.monster;
-    const monsterDamage = Math.max(1, Math.floor(Math.random() * monster.attack) + 1);
-    const playerDamage = Math.max(1, Math.floor(Math.random() * player.weapon.attack) + 1);
+    const monsterDamage = rollCombatDamage(monster.attack);
+    const playerDamage = rollCombatDamage(player.weapon.attack);
 
     monster.hp -= playerDamage;
     player.hp -= monsterDamage;
@@ -262,8 +197,8 @@ export class Game {
 
   async handleStatusEvent(senderId, player, command, event) {
     if (command === "i") {
-      const inventory = player.getInventory();
-      return this.sendGameText(senderId, player, `Inventory:\n${inventory}`, Object.keys(this.getLocation(player).actions));
+      const inventory = formatInventory(player.inventory);
+      return this.sendGameText(senderId, player, `Inventory:\n${inventory}`, this.getDisplayActions(this.getLocation(player).actions));
     }
 
     return this.sendUnknownCommand(senderId, player, this.getLocation(player));
@@ -300,23 +235,11 @@ export class Game {
   }
 
   formatResponse(player, text, actions = []) {
-    const status = `[HP: ${player.hp}, ATK: ${player.weapon.attack}]`;
-    const actionList = actions.length ? ` [${actions.join(", ")}]` : "";
-    return `${status} ${text}${actionList}`;
+    return formatResponse(player, text, actions);
   }
 
   async sendGameText(recipientId, player, text, actions = []) {
-    const formattedText = this.formatResponse(player, text, actions);
-    const safeText = formattedText.length > CHAR_LIMIT ? formattedText.substring(0, CHAR_LIMIT - 3) + "..." : formattedText;
-    if (USE_MOCK) {
-      process.stdout.write(`\n[OUTGOING TO ${recipientId}]: ${safeText}\n> `);
-    } else {
-      try {
-        await this.device.sendText(safeText, recipientId);
-      } catch (e) {
-        logError(`Send Error:`, e);
-      }
-    }
+    return sendGameText(this.device, recipientId, player, text, actions);
   }
 }
 
