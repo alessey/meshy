@@ -1,3 +1,5 @@
+import { getLevel, getLevelMultiplier } from "./levels.js";
+
 export const MAX_HP = 20;
 
 export class Player {
@@ -6,19 +8,37 @@ export class Player {
     this._hp = MAX_HP;
     this.weapon = { name: "Fists", attack: 2 };
     this.armor = { name: "Cloth", hp: 0 };
+    this.xp = 0;
     this.encounter = null;
   }
 
+  get level() {
+    return getLevel(this).level;
+  }
+
   get hp() {
-    return this._hp + this.armor.hp;
+    return Math.ceil((this._hp + this.armor.hp) * getLevelMultiplier(this));
   }
 
   set hp(value) {
-    this._hp = Math.min(value, MAX_HP);
+    const baseHpWithArmor = Math.ceil(value / getLevelMultiplier(this));
+    this._hp = Math.min(Math.max(baseHpWithArmor - this.armor.hp, 0), MAX_HP);
+  }
+
+  get maxHp() {
+    return Math.ceil((MAX_HP + this.armor.hp) * getLevelMultiplier(this));
+  }
+
+  get attack() {
+    return Math.ceil(this.weapon.attack * getLevelMultiplier(this));
   }
 
   get inventory() {
     return [this.weapon, this.armor];
+  }
+
+  healToFull() {
+    this._hp = MAX_HP;
   }
 }
 
@@ -29,6 +49,7 @@ export function hydratePlayer(savedPlayer = {}) {
   player._hp = savedPlayer._hp ?? player._hp;
   player.weapon = savedPlayer.weapon ?? player.weapon;
   player.armor = savedPlayer.armor ?? player.armor;
+  player.xp = savedPlayer.xp ?? player.xp;
   player.encounter = savedPlayer.encounter ?? player.encounter;
 
   return player;

@@ -2,8 +2,9 @@ import { COMMANDS, EVENT_ACTIONS, getCommandLabels, getDisplayActions } from "..
 import { rollCombatDamage } from "../game/combat.js";
 import { Player } from "../game/player.js";
 import { randomFrom } from "../game/random.js";
+import { grantMonsterXp, rollLootDrop } from "../game/rewards.js";
 import { gameMessage, plainMessage, result } from "../game/results.js";
-import { combatRoundText, combatStatusText, monsterDefeatedText, monsterPrompt, TEXT } from "../game/text.js";
+import { combatRoundText, combatStatusText, lootDropText, monsterDefeatedText, monsterPrompt, monsterRewardText, TEXT } from "../game/text.js";
 import { getLocation, locationSummaryMessage } from "./presenters.js";
 
 export function handleMonsterEncounter(player, command, event) {
@@ -29,7 +30,7 @@ export function handleMonsterEncounter(player, command, event) {
 function resolveCombatRound(player, event) {
   const monster = event.monster;
   const monsterDamage = rollCombatDamage(monster.attack);
-  const playerDamage = rollCombatDamage(player.weapon.attack);
+  const playerDamage = rollCombatDamage(player.attack);
 
   monster.hp -= playerDamage;
   player.hp -= monsterDamage;
@@ -49,11 +50,25 @@ function resolveCombatRound(player, event) {
 
   if (monster.hp <= 0) {
     const location = getLocation(player);
+    const reward = grantMonsterXp(player, monster);
+    const loot = rollLootDrop(location);
     player.encounter = null;
+
+    if (loot) {
+      player.encounter = { type: "item", item: loot };
+      return result(
+        [
+          gameMessage(`${combatMessage}${monster.name} is defeated! ${monsterRewardText(reward)}`, []),
+          gameMessage(lootDropText(loot), getCommandLabels(EVENT_ACTIONS.item)),
+        ],
+        { shouldSave: true }
+      );
+    }
+
     return result(
       [
         gameMessage(
-          monsterDefeatedText(combatMessage, monster, location),
+          `${monsterDefeatedText(combatMessage, monster)} ${monsterRewardText(reward)} ${location.desc}`,
           getDisplayActions(location.actions)
         ),
       ],

@@ -25,8 +25,17 @@ export function combatRoundText(monster, playerDamage, monsterDamage) {
   return `You hit ${monster.name} for ${playerDamage}. ${monster.name} hits you for ${monsterDamage}. `;
 }
 
-export function monsterDefeatedText(combatMessage, monster, location) {
-  return `${combatMessage}${monster.name} is defeated! ${location.desc}`;
+export function monsterDefeatedText(combatMessage, monster) {
+  return `${combatMessage}${monster.name} is defeated!`;
+}
+
+export function monsterRewardText(reward) {
+  const levelText = reward.didLevelUp ? ` Level up! You are now level ${reward.level}.` : "";
+  return `+${reward.xp} XP.${levelText}`;
+}
+
+export function lootDropText(item) {
+  return `It dropped ${item.name} (${itemStat(item)}). (T)ake or (D)iscard?`;
 }
 
 export function combatStatusText(combatMessage, player, monster) {

@@ -39,7 +39,7 @@ function handleMovement(player, command) {
 
 export function enterLocation(player, shouldSave = false) {
   const location = getLocation(player);
-  const event = resolveLocationEvent(location);
+  const event = resolveLocationEvent(location, player);
 
   if (event) {
     player.encounter = event;

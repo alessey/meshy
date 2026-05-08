@@ -1,6 +1,7 @@
 import { randomFrom, roll } from "./random.js";
+import { scaleMonster } from "./rewards.js";
 
-export function resolveLocationEvent(location) {
+export function resolveLocationEvent(location, player) {
   const eventTypes = [
     {
       pool: location.itemPool,
@@ -10,7 +11,7 @@ export function resolveLocationEvent(location) {
     {
       pool: location.monsterPool,
       chance: location.monsterChance ?? 0,
-      build: () => ({ type: "monster", monster: { ...randomFrom(location.monsterPool) } }),
+      build: () => ({ type: "monster", monster: scaleMonster(randomFrom(location.monsterPool), player) }),
     },
     {
       chance: location.potionChance ?? 0,

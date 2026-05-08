@@ -2,7 +2,7 @@ import { CHAR_LIMIT, USE_MOCK } from "../config/constants.js";
 import { logError } from "../logging.js";
 
 export function formatResponse(player, text, actions = []) {
-  const status = `[HP: ${player.hp}, ATK: ${player.weapon.attack}]`;
+  const status = `[L${player.level} XP:${player.xp} HP:${player.hp}/${player.maxHp} ATK:${player.attack}]`;
   const actionList = actions.length ? ` [${actions.join(", ")}]` : "";
   return `${status} ${text}${actionList}`;
 }
