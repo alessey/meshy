@@ -6,6 +6,7 @@ import {
   InventoryCommand,
   Command,
   PlayCommand,
+  LocationActions,
 } from "../types.js";
 
 export const COMMANDS = {
@@ -73,7 +74,7 @@ export function isCommand(command: string): command is Command {
   );
 }
 
-export function getDisplayActions(actions: Record<string, string>): string[] {
+export function getDisplayActions(actions: LocationActions): string[] {
   return Object.keys(actions).map((dir) => dir.toUpperCase());
 }
 

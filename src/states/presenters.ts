@@ -4,9 +4,14 @@ import { gameMessage } from "../game/results.js";
 import { itemPrompt, monsterPrompt, potionPrompt, TEXT } from "../game/text.js";
 import type { Player } from "../game/player.js";
 import type { Location, Encounter } from "../types.js";
+import { getStartLocationKey } from "../world/utils.js";
 
 export function getLocation(player: Player): Location {
-  return worldMap[player.location as keyof typeof worldMap];
+  const loc = worldMap[player.location];
+  if (loc) return loc;
+
+  // Fallback to start location or first available location if key is invalid (e.g. after death reset)
+  return worldMap[getStartLocationKey()];
 }
 
 export function locationSummaryMessage(location: Location) {

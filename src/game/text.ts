@@ -1,4 +1,5 @@
 import type { Equipment, Monster, Potion, MonsterReward } from "../types.js";
+import { Player } from "./player.js";
 
 export const TEXT = {
   INVENTORY_TITLE: "Inventory:",
@@ -44,10 +45,14 @@ export function lootDropText(item: Equipment): string {
   return `It dropped ${item.name} (${itemStat(item)}). (T)ake or (D)iscard?`;
 }
 
-export function combatStatusText(combatMessage: string, player: any, monster: Monster): string {
+export function combatStatusText(combatMessage: string, player: Player, monster: Monster): string {
   return `${combatMessage}Your HP: ${player.hp}. Monster HP: ${monster.hp}. (F)ight or (R)un?`;
 }
 
 function itemStat(item: Equipment): string {
   return "attack" in item ? `${item.attack} ATK` : `${item.hp} HP`;
+}
+
+export function requirementText(itemName: string): string {
+  return `You need a ${itemName} to pass this way.`;
 }

@@ -94,7 +94,7 @@ const worldMap: Record<string, Location> = {
     desc: "Abandoned Mine Entrance. A dark hole in the earth.",
     actions: { n: "3-1", s: "5-1" },
     itemChance: 0.4,
-    itemPool: [{ name: "Pickaxe", attack: 9 }],
+    itemPool: [{ name: "Machete", attack: 9 }],
   },
   "4-2": { desc: "The Great Lake (West). The water is crystal clear.", actions: { s: "5-2" } }, // Limited access
   "4-3": { desc: "The Great Lake (East). You see fish jumping.", actions: { n: "3-3", s: "5-3" } },
@@ -155,9 +155,14 @@ const worldMap: Record<string, Location> = {
   },
   "6-4": {
     desc: "Deep Jungle. You need a machete to go further south.",
-    actions: { w: "6-3", n: "5-4", e: "6-5" },
+    actions: { w: "6-3", n: "5-4", e: "6-5", s: "7-4" },
     monsterChance: 0.8,
     monsterPool: [{ name: "Tiger", hp: 30, attack: 12 }],
+  },
+  "7-4": {
+    desc: "The Hidden Temple. You hacked your way through the vines!",
+    actions: { n: "6-4" },
+    requiredItem: "Machete",
   },
   "6-5": {
     desc: "Hidden Waterfall. The mist is refreshing.",

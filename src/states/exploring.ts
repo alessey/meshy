@@ -2,7 +2,7 @@ import { COMMANDS, getDisplayActions, isMovementCommand } from "../game/commands
 import { resolveLocationEvent } from "../game/encounters.js";
 import { formatInventory } from "../game/inventory.js";
 import { gameMessage, result } from "../game/results.js";
-import { inventoryText } from "../game/text.js";
+import { inventoryText, requirementText } from "../game/text.js";
 import {
   eventPromptMessage,
   getLocation,
@@ -11,6 +11,7 @@ import {
 } from "./presenters.js";
 import type { Player } from "../game/player.js";
 import type { Command, Direction, GameOutcome } from "../types.js";
+import worldMap from "../world/map.js";
 
 export function handleExploring(player: Player, command: Command): GameOutcome {
   if (!command || command === COMMANDS.PLAY) {
@@ -32,13 +33,29 @@ export function handleExploring(player: Player, command: Command): GameOutcome {
 
 function handleMovement(player: Player, command: Direction): GameOutcome {
   const location = getLocation(player);
-  const nextLocation = location.actions[command];
+  const nextLocationKey = location.actions[command];
 
-  if (!nextLocation) {
+  if (!nextLocationKey) {
     return result([unknownCommandMessage(player)]);
   }
 
-  player.location = nextLocation;
+  const nextLocation = worldMap[nextLocationKey as keyof typeof worldMap];
+  const requirement = nextLocation?.requiredItem;
+
+  if (requirement) {
+    const hasItem = player.inventory.some(
+      (i) => i.name.toLowerCase() === requirement.toLowerCase(),
+    );
+    if (!hasItem) {
+      const message = gameMessage(
+        requirementText(requirement),
+        getDisplayActions(location.actions),
+      );
+      return result([message], { shouldSave: false });
+    }
+  }
+
+  player.location = nextLocationKey;
   player.encounter = null;
 
   return enterLocation(player, true);

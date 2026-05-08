@@ -102,6 +102,7 @@ export type Location = {
   potionChance?: number;
   potionHeal?: number;
   isStart?: boolean;
+  requiredItem?: string;
 };
 
 /**
