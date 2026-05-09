@@ -124,6 +124,7 @@ async function start(): Promise<void> {
      */
     const meshDeviceBridge = {
       sendText: async (text: string, destination: string | number) => {
+        log(`[DEBUG] Bridge: sendText triggered to ${destination}`);
         if (isMock) return 0;
 
         // The destination for a reply should be the integer ID of the sender.
@@ -143,12 +144,17 @@ async function start(): Promise<void> {
           topic = parts.join("/");
         }
 
+        if (!client) {
+          logError("MQTT client not initialized, cannot send text", new Error("No Client"));
+          return 1;
+        }
+
         const payload = JSON.stringify({
           type: "sendtext",
           payload: text,
           dest: destId,
         });
-        log(`[MQTT] Publishing reply to ${topic} for ${destId}`);
+        log(`[DEBUG] Bridge: Publishing to ${topic} for ${destId}`);
         client?.publish(topic, payload);
         return 0;
       },
