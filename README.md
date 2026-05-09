@@ -1,12 +1,12 @@
 Meshtastic node RPG
 
-* nodejs
-* meshtastic
-* express
-* react
-* vite
-* oxlint/oxfmt
-* picocss
+- nodejs
+- meshtastic
+- express
+- react
+- vite
+- oxlint/oxfmt
+- picocss
 
 ```bash
 pnpm install
@@ -21,13 +21,15 @@ pnpm start
 ```
 
 To start game
+
 ```bash
 /play
 ```
 
 To interact
+
 ```bash
-/command 
+/command
 ```
 
 In dev mode (with hotreloading)
