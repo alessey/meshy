@@ -11,6 +11,7 @@ const isMock = process.env.USE_MOCK === "true";
 let client: any = null;
 let game: Game | null = null;
 let playerStates: Map<string, Player> = new Map();
+let lastGatewayId: string | null = null;
 
 if (!isMock) {
   // If you add a username/password later, format it as:
@@ -54,6 +55,11 @@ if (!isMock) {
       const data = JSON.parse(rawPayload);
       const sender = data.from || data.sender;
       const text = typeof data.payload === "string" ? data.payload : data.payload?.text;
+
+      // Capture the gateway ID (data.sender) to use for the return path
+      if (data.sender && data.sender.startsWith("!")) {
+        lastGatewayId = data.sender;
+      }
 
       if (!game || data.type !== "text" || !text || !sender) {
         if (sender && data.type && data.type !== "text")
@@ -131,17 +137,20 @@ async function start(): Promise<void> {
               : parseInt(destination)
             : destination;
 
-        /**
-         * To ensure the gateway picks up the message, we publish to the base channel topic
-         * rather than the specific destination node topic.
-         */
-        const topic = `msh/US/2/json/LongFast`;
+        // We try to use the last seen gateway ID in the topic.
+        // If we haven't seen one yet, we fall back to the base channel topic.
+        const gatewaySuffix = lastGatewayId ? `/${lastGatewayId}` : "";
+
+        // Using the US region and LongFast channel as seen in your logs.
+        // Topic format: msh/US/2/json/LongFast/!gatewayId
+        const topic = `msh/US/2/json/LongFast${gatewaySuffix}`;
 
         const payload = JSON.stringify({
           type: "sendtext",
           payload: text,
           dest: destId,
         });
+        log(`[MQTT] Publishing reply to ${topic} for ${destId}`);
         client?.publish(topic, payload);
         return 0;
       },
