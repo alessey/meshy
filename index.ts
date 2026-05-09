@@ -168,6 +168,7 @@ async function start(): Promise<void> {
         const payload = JSON.stringify({
           type: "sendtext",
           to: +destination,
+          from: lastGatewayId ? parseInt(lastGatewayId.substring(1), 16) : 0,
           text: text,
           channel: lastChannelIndex,
         });
