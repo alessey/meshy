@@ -53,9 +53,12 @@ if (!isMock) {
       const data = JSON.parse(rawPayload);
       log(`[TRAFFIC] Topic: ${topic} | Data: ${rawPayload.substring(0, 100)}...`);
 
-      // Capture the gateway node ID (the sender of the MQTT packet)
-      if (data.sender && data.sender.startsWith("!")) {
-        lastGatewayId = data.sender;
+      // Capture the gateway node ID from the MQTT topic path.
+      // Topics usually look like: msh/US/2/json/LongFast/!gatewayId
+      const topicParts = topic.split("/");
+      const gatewayId = topicParts.find((part: string) => part.startsWith("!"));
+      if (gatewayId) {
+        lastGatewayId = gatewayId;
       }
 
       const sender = data.from || data.sender;
@@ -137,8 +140,15 @@ async function start(): Promise<void> {
               : parseInt(destination)
             : destination;
 
-        // Meshtastic gateways (like the mobile app) usually listen for commands on their specific 'in' topic.
-        const topic = lastGatewayId ? `msh/US/2/json/in/${lastGatewayId}` : `msh/US/2/json/out`;
+        /**
+         * Based on Meshtastic docs, the topic for sending via a gateway is:
+         * msh/<region>/2/json/<channel>/<gateway_id>/in
+         * 'LongFast' is the default channel name for most regional setups.
+         */
+        const channel = "LongFast";
+        const topic = lastGatewayId
+          ? `msh/US/2/json/${channel}/${lastGatewayId}/in`
+          : `msh/US/2/json/${channel}/in`;
 
         if (!client) {
           logError("MQTT client not initialized, cannot send text", new Error("No Client"));
