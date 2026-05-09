@@ -141,13 +141,13 @@ async function start(): Promise<void> {
         log(`[DEBUG] Bridge: sendText triggered to ${destination}`);
         if (isMock) return 0;
 
-        // The destination for a reply should be the hex ID string (e.g. !d1be3043)
-        const destId =
-          typeof destination === "number"
-            ? `!${destination.toString(16)}`
-            : destination.startsWith("!")
-              ? destination
-              : `!${Number(destination).toString(16)}`;
+        // The MQTT JSON API expects a numeric ID for the 'dest' field.
+        const numericDest =
+          typeof destination === "string"
+            ? destination.startsWith("!")
+              ? parseInt(destination.substring(1), 16)
+              : parseInt(destination, 10)
+            : destination;
 
         /**
          * Based on Meshtastic docs, the topic for sending via a gateway is:
@@ -167,14 +167,14 @@ async function start(): Promise<void> {
 
         const payload = JSON.stringify({
           type: "sendtext",
-          to: +destination,
+          dest: numericDest,
           from: lastGatewayId ? parseInt(lastGatewayId.substring(1), 16) : 0,
           text: text,
           channel: lastChannelIndex,
         });
 
         log(
-          `[DEBUG] Bridge: Publishing to ${topic} | Dest: ${destId} | Channel: ${lastChannelIndex} | Text: ${text}`,
+          `[DEBUG] Bridge: Publishing to ${topic} | Dest: ${numericDest} | Channel: ${lastChannelIndex} | Text: ${text}`,
         );
         client?.publish(topic, payload);
         return 0;
