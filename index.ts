@@ -192,7 +192,7 @@ async function start(): Promise<void> {
           from: gatewayId ? parseInt(gatewayId.replace("!", ""), 16) : 0,
           to: numericDest,
           channel: channelIndex,
-          payload: text,
+          text,
         });
 
         log(
