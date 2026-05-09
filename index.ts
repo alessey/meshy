@@ -7,36 +7,41 @@ import { log, logError } from "./src/logging.js";
 import { loadPlayerData } from "./src/storage/playerStore.js";
 import type { Player } from "./src/game/player.js";
 
-const client = mqtt.connect("mqtt://localhost:1883");
+const isMock = process.env.USE_MOCK === "true";
+let client: any = null;
 let game: Game | null = null;
 let playerStates: Map<string, Player> = new Map();
 
-client.on("connect", () => {
-  log("Connected to MQTT broker");
+if (!isMock) {
+  client = mqtt.connect("mqtt://localhost:1883");
 
-  client.subscribe("msh/#", (err) => {
-    if (!err) {
-      log("Subscribed to mesh topics");
+  client.on("connect", () => {
+    log("Connected to MQTT broker");
+
+    client.subscribe("msh/#", (err: any) => {
+      if (!err) {
+        log("Subscribed to mesh topics");
+      }
+    });
+  });
+
+  client.on("message", (topic: any, message: any) => {
+    try {
+      if (!game) return;
+
+      const data = JSON.parse(message.toString());
+      // Filter for text messages from the mesh
+      if (data.type !== "text" || !data.payload?.text) {
+        return;
+      }
+
+      log(`Message from ${data.sender}: ${data.payload.text}`);
+      game.handleGameLogic(data.sender, data.payload.text);
+    } catch (e) {
+      logError("MQTT Parse error:", e);
     }
   });
-});
-
-client.on("message", (topic, message) => {
-  try {
-    if (!game) return;
-
-    const data = JSON.parse(message.toString());
-    // Filter for text messages from the mesh
-    if (data.type !== "text" || !data.payload?.text) {
-      return;
-    }
-
-    log(`Message from ${data.sender}: ${data.payload.text}`);
-    game.handleGameLogic(data.sender, data.payload.text);
-  } catch (e) {
-    logError("MQTT Parse error:", e);
-  }
-});
+}
 
 // Web server setup
 const app = express();
@@ -87,19 +92,33 @@ async function start(): Promise<void> {
      * that the Meshtastic MQTT gateway understands.
      */
     const meshDeviceBridge = {
-      sendText: (text: string, destination: string | number) => {
+      sendText: async (text: string, destination: string | number) => {
+        if (isMock) return 0;
+
         const topic = `msh/2/json/LongFast`;
         const payload = JSON.stringify({
           type: "sendtext",
           payload: text,
           dest: destination,
         });
-        client.publish(topic, payload);
+        client?.publish(topic, payload);
+        return 0;
       },
     };
 
     game = new Game(meshDeviceBridge as any, playerStates);
-    log("Mesh Game System initialized via MQTT");
+
+    if (isMock) {
+      log("Mock mode enabled. Type commands in terminal (e.g. /play)");
+      process.stdin.on("data", (data) => {
+        const input = data.toString().trim();
+        if (input && game) {
+          game.handleGameLogic("MOCK_USER", input);
+        }
+      });
+    }
+
+    log(isMock ? "Simulator ready (Mock Mode)." : "Mesh Game System initialized via MQTT");
   } catch (error) {
     logError("Critical Failure:", error);
   }
