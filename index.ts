@@ -70,7 +70,7 @@ if (!isMock) {
       if (gatewayIndex !== -1) {
         const gatewayId = topicParts[gatewayIndex];
         const channelName =
-          topicParts[gatewayIndex - 1] !== "json" ? topicParts[gatewayIndex - 1] : "LongFast";
+          topicParts[gatewayIndex - 1] !== "json" ? topicParts[gatewayIndex - 1] : "0";
 
         playerContexts.set(senderId, {
           gatewayId,
@@ -79,7 +79,9 @@ if (!isMock) {
         });
       }
 
-      const text = typeof data.payload === "string" ? data.payload : data.payload?.text;
+      // Extract text safely from various possible JSON structures
+      const text =
+        typeof data.payload === "string" ? data.payload : (data.payload?.text ?? data.text);
 
       if (!game || data.type !== "text" || !text || !sender) {
         if (sender && data.type && data.type !== "text")
@@ -156,13 +158,18 @@ async function start(): Promise<void> {
               : parseInt(destination, 10)
             : destination;
 
-        // Look up the specific context for this player
+        // Look up the specific context for this player, fallback to primary channel '0'
         const context = playerContexts.get(numericDest.toString());
-        const channel = context?.channelName || "mqtt";
+        const channel = context?.channelName || "0";
         const gatewayId = context?.gatewayId;
         const channelIndex = context?.channelIndex ?? 0;
 
-        //If you are in the US, your topic for sending messages via MQTT to the mesh is msh/US/2/json/mqtt/
+        /**
+         * Reference: https://meshtastic.org/docs/software/integrations/mqtt/#json-downlink-to-instruct-a-node-to-send-a-message
+         * The documentation specifies publishing directly to the channel topic (e.g., msh/US/2/json/mqtt/)
+         * The gateway identifies itself via the "from" field in the JSON payload and transmits
+         * the content of the "payload" field to the mesh.
+         */
         const topic = gatewayId
           ? `msh/US/2/json/${channel}/${gatewayId}`
           : `msh/US/2/json/${channel}`;
@@ -174,10 +181,10 @@ async function start(): Promise<void> {
 
         const payload = JSON.stringify({
           type: "sendtext",
-          dest: numericDest,
-          from: gatewayId ? parseInt(gatewayId.substring(1), 16) : 0,
-          text: text,
+          from: gatewayId ? parseInt(gatewayId.replace("!", ""), 16) : 0,
+          to: numericDest,
           channel: channelIndex,
+          payload: text,
         });
 
         log(
