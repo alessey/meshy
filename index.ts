@@ -26,8 +26,11 @@ if (!isMock) {
   });
 
   client.on("message", (topic: any, message: any) => {
+    const rawPayload = message.toString();
+    log(`[DEBUG] MQTT Topic: ${topic} | Raw: ${rawPayload}`);
+
     try {
-      const data = JSON.parse(message.toString());
+      const data = JSON.parse(rawPayload);
 
       // Meshtastic JSON often uses 'from' for the sender ID
       const sender = data.from || data.sender;
@@ -35,7 +38,11 @@ if (!isMock) {
       if (!game) return;
 
       // Filter for text messages from the mesh
-      if (data.type !== "text" || !data.payload?.text || !sender) {
+      if (
+        data.type !== "text" ||
+        (!data.payload?.text && typeof data.payload !== "string") ||
+        !sender
+      ) {
         return;
       }
 
