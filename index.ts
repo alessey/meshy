@@ -28,7 +28,8 @@ if (!isMock) {
   client.on("message", (topic: any, message: any) => {
     try {
       if (!game) return;
-
+      console.log("Received MQTT message on topic:", topic);
+      console.log("Raw message payload:", message.toString());
       const data = JSON.parse(message.toString());
       // Filter for text messages from the mesh
       if (data.type !== "text" || !data.payload?.text) {
