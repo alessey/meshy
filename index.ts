@@ -11,9 +11,13 @@ const isMock = process.env.USE_MOCK === "true";
 let client: any = null;
 let game: Game | null = null;
 let playerStates: Map<string, Player> = new Map();
-let lastGatewayId: string | null = null;
-let lastChannelName: string | null = null;
-let lastChannelIndex: number = 0;
+
+interface MessageContext {
+  gatewayId: string;
+  channelName: string;
+  channelIndex: number;
+}
+const playerContexts: Map<string, MessageContext> = new Map();
 
 if (!isMock) {
   // If you add a username/password later, format it as:
@@ -55,22 +59,26 @@ if (!isMock) {
       const data = JSON.parse(rawPayload);
       log(`[TRAFFIC] Topic: ${topic} | Data: ${rawPayload}`);
 
+      const sender = data.from || data.sender;
+      if (!sender) return;
+      const senderId = sender.toString();
+
       // Extract Gateway ID and Channel Name from the topic path
-      // Documentation: msh/<region>/2/json/<channel>/<gateway_id>
       const topicParts = topic.split("/");
       const gatewayIndex = topicParts.findIndex((part: string) => part.startsWith("!"));
 
       if (gatewayIndex !== -1) {
-        lastGatewayId = topicParts[gatewayIndex];
-        // The channel name (e.g., 'PKI' or 'LongFast') is the segment before the gateway ID
-        const channelCandidate = topicParts[gatewayIndex - 1];
-        if (channelCandidate && channelCandidate !== "json") {
-          lastChannelName = channelCandidate;
-        }
-      }
-      lastChannelIndex = data.channel ?? 0;
+        const gatewayId = topicParts[gatewayIndex];
+        const channelName =
+          topicParts[gatewayIndex - 1] !== "json" ? topicParts[gatewayIndex - 1] : "LongFast";
 
-      const sender = data.from || data.sender;
+        playerContexts.set(senderId, {
+          gatewayId,
+          channelName,
+          channelIndex: data.channel ?? 0,
+        });
+      }
+
       const text = typeof data.payload === "string" ? data.payload : data.payload?.text;
 
       if (!game || data.type !== "text" || !text || !sender) {
@@ -79,7 +87,6 @@ if (!isMock) {
         return;
       }
 
-      const senderId = sender.toString();
       log(`[GAME] Valid message from ${senderId}: ${text}`);
       game.handleGameLogic(senderId, text);
     } catch (e) {
@@ -149,16 +156,16 @@ async function start(): Promise<void> {
               : parseInt(destination, 10)
             : destination;
 
-        /**
-         * Based on Meshtastic docs, the topic for sending via a gateway is:
-         * msh/<region>/2/json/<channel>/<gateway_id>/in
-         * When the gateway is configured to include channel names in topics,
-         * it expects the downlink on the channel-specific path.
-         */
-        const channel = lastChannelName || "LongFast";
-        const topic = lastGatewayId
-          ? `msh/US/2/json/${channel}/${lastGatewayId}/in`
-          : `msh/US/2/json/${channel}/in`;
+        // Look up the specific context for this player
+        const context = playerContexts.get(numericDest.toString());
+        const channel = context?.channelName || "mqtt";
+        const gatewayId = context?.gatewayId;
+        const channelIndex = context?.channelIndex ?? 0;
+
+        //If you are in the US, your topic for sending messages via MQTT to the mesh is msh/US/2/json/mqtt/
+        const topic = gatewayId
+          ? `msh/US/2/json/${channel}/${gatewayId}`
+          : `msh/US/2/json/${channel}`;
 
         if (!client) {
           logError("MQTT client not initialized, cannot send text", new Error("No Client"));
@@ -168,13 +175,13 @@ async function start(): Promise<void> {
         const payload = JSON.stringify({
           type: "sendtext",
           dest: numericDest,
-          from: lastGatewayId ? parseInt(lastGatewayId.substring(1), 16) : 0,
+          from: gatewayId ? parseInt(gatewayId.substring(1), 16) : 0,
           text: text,
-          channel: lastChannelIndex,
+          channel: channelIndex,
         });
 
         log(
-          `[DEBUG] Bridge: Publishing to ${topic} | Dest: ${numericDest} | Channel: ${lastChannelIndex} | Text: ${text}`,
+          `[DEBUG] Bridge: Publishing to ${topic} | Dest: ${numericDest} | Channel: ${channelIndex} | Text: ${text}`,
         );
         client?.publish(topic, payload);
         return 0;
