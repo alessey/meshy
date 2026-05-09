@@ -16,6 +16,7 @@ interface MessageContext {
   gatewayId: string;
   channelName: string;
   channelIndex: number;
+  fullTopic: string;
 }
 const playerContexts: Map<string, MessageContext> = new Map();
 
@@ -62,10 +63,11 @@ if (!isMock) {
       const sender = data.from || data.sender;
       if (!sender) return;
 
-      // Normalize senderId to a decimal string for consistent Map lookup
+      // Normalize senderId to a decimal string for consistent Map lookup.
+      // Incoming 'from' is often a number, 'sender' is often a hex string like '!02eca9ec'.
       const senderId =
-        typeof sender === "string" && sender.startsWith("!")
-          ? parseInt(sender.substring(1), 16).toString()
+        typeof sender === "string" && (sender.startsWith("!") || /^[0-9a-fA-F]+$/.test(sender))
+          ? parseInt(sender.startsWith("!") ? sender.substring(1) : sender, 16).toString()
           : sender.toString();
 
       // Extract Gateway ID and Channel Name from the topic path
@@ -81,6 +83,7 @@ if (!isMock) {
           gatewayId,
           channelName,
           channelIndex: data.channel ?? 0,
+          fullTopic: topic,
         });
       }
 
@@ -169,21 +172,16 @@ async function start(): Promise<void> {
         const gatewayId = context?.gatewayId;
         const channelIndex = context?.channelIndex ?? 0;
 
-        /**
-         * Reference: https://meshtastic.org/docs/software/integrations/mqtt/#json-downlink-to-instruct-a-node-to-send-a-message
-         * The documentation specifies publishing directly to the channel topic (e.g., msh/US/2/json/mqtt/)
-         * The gateway identifies itself via the "from" field in the JSON payload and transmits
-         * the content of the "payload" field to the mesh.
-         */
-        // The topic for downlink should be msh/US/2/json/<channel_name>/
-        // The gateway ID is specified in the 'from' field of the JSON payload.
-        const topic = `msh/US/2/json/${channel}/`;
+        // Respond to the exact same topic the message was received from.
+        // Fallback to the channel-root topic if no context exists.
+        const topic = context?.fullTopic || `msh/US/2/json/${channel}/`;
 
         if (!client) {
           logError("MQTT client not initialized, cannot send text", new Error("No Client"));
           return 1;
         }
 
+        // Reference: https://meshtastic.org/docs/software/integrations/mqtt/#json-downlink-to-instruct-a-node-to-send-a-message
         const payload = JSON.stringify({
           type: "sendtext",
           from: gatewayId ? parseInt(gatewayId.replace("!", ""), 16) : 0,
