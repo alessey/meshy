@@ -56,7 +56,8 @@ if (!isMock) {
       const text = typeof data.payload === "string" ? data.payload : data.payload?.text;
 
       if (!game || data.type !== "text" || !text || !sender) {
-        if (sender && data.type !== "text") log(`[MQTT] Ignored ${data.type} from ${sender}`);
+        if (sender && data.type && data.type !== "text")
+          log(`[MQTT] Ignored ${data.type} from ${sender}`);
         return;
       }
 
@@ -130,10 +131,11 @@ async function start(): Promise<void> {
               : parseInt(destination)
             : destination;
 
-        // Your logs show the 'US' region prefix. We use a wildcard or specific prefix
-        // but standard Meshtastic gateways listen to the 'msh/2/json' path.
-        // We'll use the 'msh/US/2/json' prefix to match your current traffic pattern.
-        const topic = `msh/US/2/json/LongFast/!${destId.toString(16).toLowerCase()}`;
+        /**
+         * To ensure the gateway picks up the message, we publish to the base channel topic
+         * rather than the specific destination node topic.
+         */
+        const topic = `msh/US/2/json/LongFast`;
 
         const payload = JSON.stringify({
           type: "sendtext",
