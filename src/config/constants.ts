@@ -1,7 +1,7 @@
 /**
  * CONFIGURATION
  */
-export const USE_MOCK = true;
+export const USE_MOCK = false;
 export const DB_PATH = "./players.json";
 export const CHAR_LIMIT = 220;
 
