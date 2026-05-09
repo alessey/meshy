@@ -27,17 +27,20 @@ if (!isMock) {
 
   client.on("message", (topic: any, message: any) => {
     try {
-      if (!game) return;
-      console.log("Received MQTT message on topic:", topic);
-      console.log("Raw message payload:", message.toString());
       const data = JSON.parse(message.toString());
+
+      // Meshtastic JSON often uses 'from' for the sender ID
+      const sender = data.from || data.sender;
+
+      if (!game) return;
+
       // Filter for text messages from the mesh
-      if (data.type !== "text" || !data.payload?.text) {
+      if (data.type !== "text" || !data.payload?.text || !sender) {
         return;
       }
 
-      log(`Message from ${data.sender}: ${data.payload.text}`);
-      game.handleGameLogic(data.sender, data.payload.text);
+      log(`Message from ${sender}: ${data.payload.text}`);
+      game.handleGameLogic(sender, data.payload.text);
     } catch (e) {
       logError("MQTT Parse error:", e);
     }
@@ -96,11 +99,14 @@ async function start(): Promise<void> {
       sendText: async (text: string, destination: string | number) => {
         if (isMock) return 0;
 
-        const topic = `msh/2/json/LongFast`;
+        // LongFast is usually channel 0.
+        // The destination for a reply should be the integer ID of the sender.
+        const destId = typeof destination === "string" ? parseInt(destination) : destination;
+        const topic = `msh/2/json/LongFast/!${destId.toString(16)}`; // Specific node topic
         const payload = JSON.stringify({
           type: "sendtext",
           payload: text,
-          dest: destination,
+          dest: destId,
         });
         client?.publish(topic, payload);
         return 0;
