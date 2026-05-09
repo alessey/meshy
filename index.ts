@@ -157,8 +157,8 @@ async function start(): Promise<void> {
          */
         const channel = lastChannelName || "LongFast";
         const topic = lastGatewayId
-          ? `msh/US/2/json/${channel}/${lastGatewayId}`
-          : `msh/US/2/json/${channel}`;
+          ? `msh/US/2/json/${channel}/${lastGatewayId}/in`
+          : `msh/US/2/json/${channel}/in`;
 
         if (!client) {
           logError("MQTT client not initialized, cannot send text", new Error("No Client"));
