@@ -21,13 +21,18 @@ if (!isMock) {
   });
 
   client.on("connect", () => {
-    log("Server successfully connected to local MQTT broker");
+    log("Server script connected to local MQTT broker");
 
+    // Subscribe to the root. Since your logs show msh/US, msh/# covers it.
     client.subscribe("msh/#", (err: any) => {
       if (!err) {
-        log("Subscribed to 'msh/#' topics");
+        log("Subscribed to Meshtastic topics (msh/#)");
       }
     });
+  });
+
+  client.on("reconnect", () => {
+    log("Attempting to reconnect to MQTT broker...");
   });
 
   client.on("error", (err: any) => {
@@ -39,18 +44,19 @@ if (!isMock) {
   });
 
   client.on("message", (topic: any, message: any) => {
-    const rawPayload = message.toString();
-    log(`[DEBUG] MQTT Topic: ${topic} | Raw: ${rawPayload}`);
+    // Ignore binary/encrypted packets (topic contains '/e/') to prevent JSON parse errors
+    if (!topic.includes("/json/")) return;
 
     try {
-      const data = JSON.parse(rawPayload);
+      const rawPayload = message.toString();
+      log(`[TRAFFIC] Topic: ${topic} | Data: ${rawPayload.substring(0, 100)}...`);
 
-      // Meshtastic JSON often uses 'from' for the sender ID
+      const data = JSON.parse(rawPayload);
       const sender = data.from || data.sender;
       const text = typeof data.payload === "string" ? data.payload : data.payload?.text;
 
       if (!game || data.type !== "text" || !text || !sender) {
-        log(`[DEBUG] Ignored non-text or invalid packet from ${sender || "unknown"}`);
+        if (sender && data.type !== "text") log(`[MQTT] Ignored ${data.type} from ${sender}`);
         return;
       }
 
@@ -58,7 +64,7 @@ if (!isMock) {
       log(`[GAME] Valid message from ${senderId}: ${text}`);
       game.handleGameLogic(senderId, text);
     } catch (e) {
-      logError("MQTT Parse error:", e);
+      logError(`[PARSE ERROR] Failed to parse JSON on ${topic}:`, e);
     }
   });
 }
@@ -117,8 +123,18 @@ async function start(): Promise<void> {
 
         // LongFast is usually channel 0.
         // The destination for a reply should be the integer ID of the sender.
-        const destId = typeof destination === "string" ? parseInt(destination) : destination;
-        const topic = `msh/2/json/LongFast/!${destId.toString(16)}`; // Specific node topic
+        const destId =
+          typeof destination === "string"
+            ? destination.startsWith("!")
+              ? parseInt(destination.substring(1), 16)
+              : parseInt(destination)
+            : destination;
+
+        // Your logs show the 'US' region prefix. We use a wildcard or specific prefix
+        // but standard Meshtastic gateways listen to the 'msh/2/json' path.
+        // We'll use the 'msh/US/2/json' prefix to match your current traffic pattern.
+        const topic = `msh/US/2/json/LongFast/!${destId.toString(16).toLowerCase()}`;
+
         const payload = JSON.stringify({
           type: "sendtext",
           payload: text,
