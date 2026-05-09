@@ -61,7 +61,12 @@ if (!isMock) {
 
       const sender = data.from || data.sender;
       if (!sender) return;
-      const senderId = sender.toString();
+
+      // Normalize senderId to a decimal string for consistent Map lookup
+      const senderId =
+        typeof sender === "string" && sender.startsWith("!")
+          ? parseInt(sender.substring(1), 16).toString()
+          : sender.toString();
 
       // Extract Gateway ID and Channel Name from the topic path
       const topicParts = topic.split("/");
@@ -170,9 +175,9 @@ async function start(): Promise<void> {
          * The gateway identifies itself via the "from" field in the JSON payload and transmits
          * the content of the "payload" field to the mesh.
          */
-        const topic = gatewayId
-          ? `msh/US/2/json/${channel}/${gatewayId}`
-          : `msh/US/2/json/${channel}`;
+        // The topic for downlink should be msh/US/2/json/<channel_name>/
+        // The gateway ID is specified in the 'from' field of the JSON payload.
+        const topic = `msh/US/2/json/${channel}/`;
 
         if (!client) {
           logError("MQTT client not initialized, cannot send text", new Error("No Client"));
