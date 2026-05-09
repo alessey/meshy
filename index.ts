@@ -11,6 +11,7 @@ const isMock = process.env.USE_MOCK === "true";
 let client: any = null;
 let game: Game | null = null;
 let playerStates: Map<string, Player> = new Map();
+let lastGatewayId: string | null = null;
 
 if (!isMock) {
   // If you add a username/password later, format it as:
@@ -49,9 +50,14 @@ if (!isMock) {
 
     try {
       const rawPayload = message.toString();
+      const data = JSON.parse(rawPayload);
       log(`[TRAFFIC] Topic: ${topic} | Data: ${rawPayload.substring(0, 100)}...`);
 
-      const data = JSON.parse(rawPayload);
+      // Capture the gateway node ID (the sender of the MQTT packet)
+      if (data.sender && data.sender.startsWith("!")) {
+        lastGatewayId = data.sender;
+      }
+
       const sender = data.from || data.sender;
       const text = typeof data.payload === "string" ? data.payload : data.payload?.text;
 
@@ -131,9 +137,8 @@ async function start(): Promise<void> {
               : parseInt(destination)
             : destination;
 
-        // The standard command topic for gateways to transmit text is <root>/2/json/sendtext.
-        // Based on your logs, your root is "msh/US".
-        const topic = `msh/US/2/json/out`;
+        // Meshtastic gateways (like the mobile app) usually listen for commands on their specific 'in' topic.
+        const topic = lastGatewayId ? `msh/US/2/json/in/${lastGatewayId}` : `msh/US/2/json/out`;
 
         if (!client) {
           logError("MQTT client not initialized, cannot send text", new Error("No Client"));
@@ -141,10 +146,10 @@ async function start(): Promise<void> {
         }
 
         const payload = JSON.stringify({
-          dest: destId,
-          text: text, // Gateways expect 'text' for the message body
-          channel: 0, // Matches your logs showing channel 0
           type: "sendtext",
+          dest: destId,
+          text: text,
+          channel: 0,
         });
 
         log(`[DEBUG] Bridge: Publishing to ${topic} | Dest: ${destId}`);
