@@ -53,7 +53,7 @@ if (!isMock) {
     try {
       const rawPayload = message.toString();
       const data = JSON.parse(rawPayload);
-      log(`[TRAFFIC] Topic: ${topic} | Data: ${rawPayload.substring(0, 100)}...`);
+      log(`[TRAFFIC] Topic: ${topic} | Data: ${rawPayload}`);
 
       // Extract Gateway ID and Channel Name from the topic path
       // Documentation: msh/<region>/2/json/<channel>/<gateway_id>
@@ -172,7 +172,9 @@ async function start(): Promise<void> {
           channel: lastChannelIndex,
         });
 
-        log(`[DEBUG] Bridge: Publishing to ${topic} | Dest: ${destId}`);
+        log(
+          `[DEBUG] Bridge: Publishing to ${topic} | Dest: ${destId} | Channel: ${lastChannelIndex} | Text: ${text}`,
+        );
         client?.publish(topic, payload);
         return 0;
       },
