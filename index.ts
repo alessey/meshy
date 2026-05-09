@@ -11,7 +11,7 @@ const isMock = process.env.USE_MOCK === "true";
 let client: any = null;
 let game: Game | null = null;
 let playerStates: Map<string, Player> = new Map();
-let lastGatewayId: string | null = null;
+let lastResponseTopic: string | null = null;
 
 if (!isMock) {
   // If you add a username/password later, format it as:
@@ -56,9 +56,9 @@ if (!isMock) {
       const sender = data.from || data.sender;
       const text = typeof data.payload === "string" ? data.payload : data.payload?.text;
 
-      // Capture the gateway ID (data.sender) to use for the return path
-      if (data.sender && data.sender.startsWith("!")) {
-        lastGatewayId = data.sender;
+      // Capture the exact topic to use as the return path for the gateway
+      if (topic.includes("/json/")) {
+        lastResponseTopic = topic;
       }
 
       if (!game || data.type !== "text" || !text || !sender) {
@@ -137,13 +137,9 @@ async function start(): Promise<void> {
               : parseInt(destination)
             : destination;
 
-        // We try to use the last seen gateway ID in the topic.
-        // If we haven't seen one yet, we fall back to the base channel topic.
-        const gatewaySuffix = lastGatewayId ? `/${lastGatewayId}` : "";
-
-        // Using the US region and LongFast channel as seen in your logs.
-        // Topic format: msh/US/2/json/LongFast/!gatewayId
-        const topic = `msh/US/2/json/LongFast${gatewaySuffix}`;
+        // Use the exact topic the last message came in on,
+        // or fall back to a sensible default if none captured.
+        const topic = lastResponseTopic ?? `msh/US/2/json/LongFast`;
 
         const payload = JSON.stringify({
           type: "sendtext",
