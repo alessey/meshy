@@ -61,11 +61,6 @@ if (!isMock) {
 
       if (gatewayIndex !== -1) {
         lastGatewayId = topicParts[gatewayIndex];
-        // The channel name (e.g., 'PKI' or 'LongFast') is the segment before the gateway ID
-        const channelCandidate = topicParts[gatewayIndex - 1];
-        if (channelCandidate && channelCandidate !== "json") {
-          lastChannelName = channelCandidate;
-        }
       }
       lastChannelIndex = data.channel ?? 0;
 
