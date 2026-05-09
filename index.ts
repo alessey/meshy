@@ -12,6 +12,7 @@ let client: any = null;
 let game: Game | null = null;
 let playerStates: Map<string, Player> = new Map();
 let lastGatewayId: string | null = null;
+let lastChannelName: string | null = null;
 
 if (!isMock) {
   // If you add a username/password later, format it as:
@@ -53,12 +54,18 @@ if (!isMock) {
       const data = JSON.parse(rawPayload);
       log(`[TRAFFIC] Topic: ${topic} | Data: ${rawPayload.substring(0, 100)}...`);
 
-      // Capture the gateway node ID from the MQTT topic path.
-      // Topics usually look like: msh/US/2/json/LongFast/!gatewayId
+      // Extract Gateway ID and Channel Name from the topic path
+      // Documentation: msh/<region>/2/json/<channel>/<gateway_id>
       const topicParts = topic.split("/");
-      const gatewayId = topicParts.find((part: string) => part.startsWith("!"));
-      if (gatewayId) {
-        lastGatewayId = gatewayId;
+      const gatewayIndex = topicParts.findIndex((part: string) => part.startsWith("!"));
+
+      if (gatewayIndex !== -1) {
+        lastGatewayId = topicParts[gatewayIndex];
+        // The channel name (e.g., 'PKI' or 'LongFast') is the segment before the gateway ID
+        const channelCandidate = topicParts[gatewayIndex - 1];
+        if (channelCandidate && channelCandidate !== "json") {
+          lastChannelName = channelCandidate;
+        }
       }
 
       const sender = data.from || data.sender;
@@ -143,9 +150,8 @@ async function start(): Promise<void> {
         /**
          * Based on Meshtastic docs, the topic for sending via a gateway is:
          * msh/<region>/2/json/<channel>/<gateway_id>/in
-         * 'LongFast' is the default channel name for most regional setups.
          */
-        const channel = "LongFast";
+        const channel = lastChannelName || "LongFast";
         const topic = lastGatewayId
           ? `msh/US/2/json/${channel}/${lastGatewayId}/in`
           : `msh/US/2/json/${channel}/in`;
