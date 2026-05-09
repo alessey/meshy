@@ -11,7 +11,6 @@ const isMock = process.env.USE_MOCK === "true";
 let client: any = null;
 let game: Game | null = null;
 let playerStates: Map<string, Player> = new Map();
-let lastResponseTopic: string | null = null;
 
 if (!isMock) {
   // If you add a username/password later, format it as:
@@ -55,9 +54,6 @@ if (!isMock) {
       const data = JSON.parse(rawPayload);
       const sender = data.from || data.sender;
       const text = typeof data.payload === "string" ? data.payload : data.payload?.text;
-
-      // Capture the topic to use as the return path for the gateway
-      lastResponseTopic = topic;
 
       if (!game || data.type !== "text" || !text || !sender) {
         if (sender && data.type && data.type !== "text")
@@ -135,14 +131,9 @@ async function start(): Promise<void> {
               : parseInt(destination)
             : destination;
 
-        // Deriving the base channel topic (e.g., msh/US/2/json/PKI) by stripping
-        // the specific gateway ID (!...) from the end if it exists.
-        let topic = lastResponseTopic ?? `msh/US/2/json/LongFast`;
-        const parts = topic.split("/");
-        if (parts[parts.length - 1].startsWith("!")) {
-          parts.pop();
-          topic = parts.join("/");
-        }
+        // The standard command topic for gateways to transmit text is <root>/2/json/sendtext.
+        // Based on your logs, your root is "msh/US".
+        const topic = `msh/US/2/json/out`;
 
         if (!client) {
           logError("MQTT client not initialized, cannot send text", new Error("No Client"));
@@ -150,11 +141,13 @@ async function start(): Promise<void> {
         }
 
         const payload = JSON.stringify({
-          type: "sendtext",
-          payload: text,
           dest: destId,
+          text: text, // Gateways expect 'text' for the message body
+          channel: 0, // Matches your logs showing channel 0
+          type: "sendtext",
         });
-        log(`[DEBUG] Bridge: Publishing to ${topic} for ${destId}`);
+
+        log(`[DEBUG] Bridge: Publishing to ${topic} | Dest: ${destId}`);
         client?.publish(topic, payload);
         return 0;
       },
