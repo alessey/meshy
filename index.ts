@@ -56,10 +56,8 @@ if (!isMock) {
       const sender = data.from || data.sender;
       const text = typeof data.payload === "string" ? data.payload : data.payload?.text;
 
-      // Capture the exact topic to use as the return path for the gateway
-      if (topic.includes("/json/")) {
-        lastResponseTopic = topic;
-      }
+      // Capture the topic to use as the return path for the gateway
+      lastResponseTopic = topic;
 
       if (!game || data.type !== "text" || !text || !sender) {
         if (sender && data.type && data.type !== "text")
@@ -127,8 +125,7 @@ async function start(): Promise<void> {
     const meshDeviceBridge = {
       sendText: async (text: string, destination: string | number) => {
         if (isMock) return 0;
-        console.log(1);
-        // LongFast is usually channel 0.
+
         // The destination for a reply should be the integer ID of the sender.
         const destId =
           typeof destination === "string"
@@ -136,11 +133,16 @@ async function start(): Promise<void> {
               ? parseInt(destination.substring(1), 16)
               : parseInt(destination)
             : destination;
-        console.log(2);
-        // Use the exact topic the last message came in on,
-        // or fall back to a sensible default if none captured.
-        const topic = lastResponseTopic ?? `msh/US/2/json/LongFast`;
-        console.log(3);
+
+        // Deriving the base channel topic (e.g., msh/US/2/json/PKI) by stripping
+        // the specific gateway ID (!...) from the end if it exists.
+        let topic = lastResponseTopic ?? `msh/US/2/json/LongFast`;
+        const parts = topic.split("/");
+        if (parts[parts.length - 1].startsWith("!")) {
+          parts.pop();
+          topic = parts.join("/");
+        }
+
         const payload = JSON.stringify({
           type: "sendtext",
           payload: text,
