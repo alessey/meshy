@@ -12,6 +12,7 @@ let client: any = null;
 let game: Game | null = null;
 let playerStates: Map<string, Player> = new Map();
 let lastGatewayId: string | null = null;
+let lastChannelName: string | null = null;
 let lastChannelIndex: number = 0;
 
 if (!isMock) {
@@ -61,6 +62,11 @@ if (!isMock) {
 
       if (gatewayIndex !== -1) {
         lastGatewayId = topicParts[gatewayIndex];
+        // The channel name (e.g., 'PKI' or 'LongFast') is the segment before the gateway ID
+        const channelCandidate = topicParts[gatewayIndex - 1];
+        if (channelCandidate && channelCandidate !== "json") {
+          lastChannelName = channelCandidate;
+        }
       }
       lastChannelIndex = data.channel ?? 0;
 
@@ -135,20 +141,24 @@ async function start(): Promise<void> {
         log(`[DEBUG] Bridge: sendText triggered to ${destination}`);
         if (isMock) return 0;
 
-        // The destination for a reply should be the integer ID of the sender.
+        // The destination for a reply should be the hex ID string (e.g. !d1be3043)
         const destId =
-          typeof destination === "string"
-            ? destination.startsWith("!")
-              ? parseInt(destination.substring(1), 16)
-              : parseInt(destination)
-            : destination;
+          typeof destination === "number"
+            ? `!${destination.toString(16)}`
+            : destination.startsWith("!")
+              ? destination
+              : `!${Number(destination).toString(16)}`;
 
         /**
          * Based on Meshtastic docs, the topic for sending via a gateway is:
-         * msh/<region>/2/json/in OR msh/<region>/2/json/<gateway_id>/in
-         * The channel name is usually NOT part of the command topic path.
+         * msh/<region>/2/json/<channel>/<gateway_id>/in
+         * When the gateway is configured to include channel names in topics,
+         * it expects the downlink on the channel-specific path.
          */
-        const topic = lastGatewayId ? `msh/US/2/json/${lastGatewayId}/in` : `msh/US/2/json/in`;
+        const channel = lastChannelName || "LongFast";
+        const topic = lastGatewayId
+          ? `msh/US/2/json/${channel}/${lastGatewayId}/in`
+          : `msh/US/2/json/${channel}/in`;
 
         if (!client) {
           logError("MQTT client not initialized, cannot send text", new Error("No Client"));
