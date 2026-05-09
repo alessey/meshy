@@ -127,7 +127,7 @@ async function start(): Promise<void> {
     const meshDeviceBridge = {
       sendText: async (text: string, destination: string | number) => {
         if (isMock) return 0;
-
+        console.log(1);
         // LongFast is usually channel 0.
         // The destination for a reply should be the integer ID of the sender.
         const destId =
@@ -136,11 +136,11 @@ async function start(): Promise<void> {
               ? parseInt(destination.substring(1), 16)
               : parseInt(destination)
             : destination;
-
+        console.log(2);
         // Use the exact topic the last message came in on,
         // or fall back to a sensible default if none captured.
         const topic = lastResponseTopic ?? `msh/US/2/json/LongFast`;
-
+        console.log(3);
         const payload = JSON.stringify({
           type: "sendtext",
           payload: text,
