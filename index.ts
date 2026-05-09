@@ -12,7 +12,7 @@ let client: any = null;
 let game: Game | null = null;
 let playerStates: Map<string, Player> = new Map();
 let lastGatewayId: string | null = null;
-let lastChannelName: string | null = null;
+let lastChannelIndex: number = 0;
 
 if (!isMock) {
   // If you add a username/password later, format it as:
@@ -67,6 +67,7 @@ if (!isMock) {
           lastChannelName = channelCandidate;
         }
       }
+      lastChannelIndex = data.channel ?? 0;
 
       const sender = data.from || data.sender;
       const text = typeof data.payload === "string" ? data.payload : data.payload?.text;
@@ -149,12 +150,10 @@ async function start(): Promise<void> {
 
         /**
          * Based on Meshtastic docs, the topic for sending via a gateway is:
-         * msh/<region>/2/json/<channel>/<gateway_id>/in
+         * msh/<region>/2/json/in OR msh/<region>/2/json/<gateway_id>/in
+         * The channel name is usually NOT part of the command topic path.
          */
-        const channel = lastChannelName || "LongFast";
-        const topic = lastGatewayId
-          ? `msh/US/2/json/${channel}/${lastGatewayId}/in`
-          : `msh/US/2/json/${channel}/in`;
+        const topic = lastGatewayId ? `msh/US/2/json/${lastGatewayId}/in` : `msh/US/2/json/in`;
 
         if (!client) {
           logError("MQTT client not initialized, cannot send text", new Error("No Client"));
@@ -165,7 +164,7 @@ async function start(): Promise<void> {
           type: "sendtext",
           dest: destId,
           text: text,
-          channel: 0,
+          channel: lastChannelIndex,
         });
 
         log(`[DEBUG] Bridge: Publishing to ${topic} | Dest: ${destId}`);
