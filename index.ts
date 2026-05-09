@@ -13,16 +13,29 @@ let game: Game | null = null;
 let playerStates: Map<string, Player> = new Map();
 
 if (!isMock) {
-  client = mqtt.connect("mqtt://localhost:1883");
+  // If you add a username/password later, format it as:
+  // mqtt://username:password@localhost:1883
+  client = mqtt.connect("mqtt://localhost:1883", {
+    keepalive: 60,
+    reconnectPeriod: 1000,
+  });
 
   client.on("connect", () => {
-    log("Connected to MQTT broker");
+    log("Server successfully connected to local MQTT broker");
 
     client.subscribe("msh/#", (err: any) => {
       if (!err) {
-        log("Subscribed to mesh topics");
+        log("Subscribed to 'msh/#' topics");
       }
     });
+  });
+
+  client.on("error", (err: any) => {
+    logError("MQTT Client Error:", err);
+  });
+
+  client.on("offline", () => {
+    log("MQTT Client went offline");
   });
 
   client.on("message", (topic: any, message: any) => {
@@ -34,20 +47,16 @@ if (!isMock) {
 
       // Meshtastic JSON often uses 'from' for the sender ID
       const sender = data.from || data.sender;
+      const text = typeof data.payload === "string" ? data.payload : data.payload?.text;
 
-      if (!game) return;
-
-      // Filter for text messages from the mesh
-      if (
-        data.type !== "text" ||
-        (!data.payload?.text && typeof data.payload !== "string") ||
-        !sender
-      ) {
+      if (!game || data.type !== "text" || !text || !sender) {
+        log(`[DEBUG] Ignored non-text or invalid packet from ${sender || "unknown"}`);
         return;
       }
 
-      log(`Message from ${sender}: ${data.payload.text}`);
-      game.handleGameLogic(sender, data.payload.text);
+      const senderId = sender.toString();
+      log(`[GAME] Valid message from ${senderId}: ${text}`);
+      game.handleGameLogic(senderId, text);
     } catch (e) {
       logError("MQTT Parse error:", e);
     }
