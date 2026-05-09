@@ -1,4 +1,4 @@
-import { CHAR_LIMIT, USE_MOCK } from "../config/constants.js";
+import { CHAR_LIMIT, USE_LOGGING, USE_MOCK } from "../config/constants.js";
 import { logError } from "../logging.js";
 import type { Player } from "./player.js";
 
@@ -32,9 +32,11 @@ export async function sendPlainText(
 }
 
 async function sendText(device: any, recipientId: unknown, safeText: string): Promise<void> {
-  if (USE_MOCK) {
+  if (USE_LOGGING) {
     process.stdout.write(`\n[OUTGOING TO ${recipientId}]: ${safeText}\n> `);
-  } else {
+  }
+
+  if (!USE_MOCK) {
     try {
       await device.sendText(safeText, recipientId);
     } catch (e) {
