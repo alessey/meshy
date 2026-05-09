@@ -167,7 +167,7 @@ async function start(): Promise<void> {
 
         const payload = JSON.stringify({
           type: "sendtext",
-          to: destination,
+          to: +destination,
           text: text,
           channel: lastChannelIndex,
         });
