@@ -172,9 +172,14 @@ async function start(): Promise<void> {
         const gatewayId = context?.gatewayId;
         const channelIndex = context?.channelIndex ?? 0;
 
-        // Respond to the exact same topic the message was received from.
-        // Fallback to the channel-root topic if no context exists.
-        const topic = context?.fullTopic || `msh/US/2/json/${channel}/`;
+        /**
+         * MQTT.cpp and the JSON API require a 'downlink' topic to process commands.
+         * Publishing to the uplink topic (fullTopic) will be ignored by the gateway.
+         * Standard format: msh/<region>/2/json/<channel>/<gatewayId>/in
+         */
+        const topic = gatewayId
+          ? `msh/US/2/json/${channel}/${gatewayId}/in`
+          : `msh/US/2/json/${channel}/in`;
 
         if (!client) {
           logError("MQTT client not initialized, cannot send text", new Error("No Client"));
