@@ -35,21 +35,6 @@ async function initTransport() {
       }
     });
 
-    // meshDevice.events.onChannelPacket.subscribe((packet: Protobuf.Mesh.IMeshPacket) => {
-    //   if (
-    //     packet.decoded?.portnum === Protobuf.PortNums.PortNum.TEXT_MESSAGE_APP &&
-    //     packet.decoded.payload
-    //   ) {
-    //     const senderId = packet.from.toString();
-    //     const text = new TextDecoder().decode(packet.decoded.payload);
-
-    //     log(`[MESH] Received from ${senderId}: ${text}`);
-    //     if (game) {
-    //       game.handleGameLogic(senderId, text);
-    //     }
-    //   }
-    // });
-
     log(`Connected to Meshtastic device at ${DEVICE_IP}`);
   } catch (err) {
     logError("Failed to connect to Meshtastic node:", err);
@@ -57,8 +42,6 @@ async function initTransport() {
     setTimeout(initTransport, 5000);
   }
 }
-
-if (!isMock) initTransport();
 
 // Web server setup
 const app = express();
@@ -139,6 +122,10 @@ async function start(): Promise<void> {
     // };
 
     game = new Game(meshDevice as any, playerStates);
+
+    if (!isMock) {
+      initTransport();
+    }
 
     if (isMock) {
       log("Mock mode enabled. Type commands in terminal (e.g. /play)");
