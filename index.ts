@@ -1,6 +1,6 @@
 import path from "path";
 import express from "express";
-import { TransportHTTP } from "@meshtastic/transport-http";
+import { TransportNode } from "@meshtastic/transport-node";
 import { Protobuf, MeshDevice } from "@meshtastic/core";
 import { Game } from "./src/app/Game.js";
 import worldMap from "./src/world/map.js";
@@ -16,20 +16,25 @@ let playerStates: Map<string, Player> = new Map();
 
 async function initTransport() {
   try {
-    const transport = await TransportHTTP.create(DEVICE_IP);
+    const transport = await TransportNode.create(DEVICE_IP);
     meshDevice = new MeshDevice(transport);
+    await meshDevice.configure();
 
-    meshDevice.handleMeshPacket = async (packet: Protobuf.IMeshPacket) => {
-      if (packet.decoded?.portnum === Protobuf.PortNum.TEXT_MESSAGE_APP && packet.decoded.payload) {
-        const senderId = packet.from?.toString() || "unknown";
-        const text = new TextDecoder().decode(packet.decoded.payload);
-
-        log(`[MESH] Received from ${senderId}: ${text}`);
-        if (game) {
-          game.handleGameLogic(senderId, text);
-        }
+    // Use the native RxJS Observables provided by MeshDevice
+    // ts-ignore because the library's types don't reflect the actual observables available
+    // @ts-ignore
+    meshDevice.onTextPacket$.subscribe((packet: Protobuf.IMeshPacket) => {
+      if (!packet.decoded?.payload || !packet.from) {
+        return;
       }
-    };
+      const senderId = packet.from.toString();
+      const text = new TextDecoder().decode(packet.decoded.payload);
+
+      log(`[MESH] Received from ${senderId}: ${text}`);
+      if (game) {
+        game.handleGameLogic(senderId, text);
+      }
+    });
 
     log(`Connected to Meshtastic device at ${DEVICE_IP}`);
   } catch (err) {

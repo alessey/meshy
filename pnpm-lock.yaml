@@ -11,9 +11,9 @@ importers:
       '@meshtastic/core':
         specifier: ^2.6.7
         version: 2.6.7(buffer@6.0.3)
-      '@meshtastic/transport-http':
-        specifier: ^0.2.5
-        version: 0.2.5(buffer@6.0.3)
+      '@meshtastic/transport-node':
+        specifier: ^0.0.2
+        version: 0.0.2(buffer@6.0.3)
       '@picocss/pico':
         specifier: ^2.0.6
         version: 2.1.1
@@ -32,6 +32,9 @@ importers:
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
     devDependencies:
       '@types/express':
         specifier: ^5.0.6
@@ -475,8 +478,8 @@ packages:
   '@meshtastic/core@2.6.7':
     resolution: {integrity: sha512-0iP/gfzhqVWBzTpJNn2dHp2BiUSQq5xPUDCtssBqI9Y/X64sQ2cPDCKoyGsFPn8VXrJG3B/lQd/yPhg0GytATA==}
 
-  '@meshtastic/transport-http@0.2.5':
-    resolution: {integrity: sha512-iYB6e8fqO0sFQBoiw46tGO0cGql4SsVkEreaOl4GXtuH/2rQB2d0gfJtHYNH8JpZhCjulKJPq5ISfFXe959MTA==}
+  '@meshtastic/transport-node@0.0.2':
+    resolution: {integrity: sha512-EO3fXPmAyfAW5Tv6IhG+zG6CZXIbnAm8C3vIpD0olcB5Dk6vIObcSo50gAJdUGcmeenQms8ogaxGmDXpL5f4UA==}
 
   '@oxfmt/binding-android-arm-eabi@0.48.0':
     resolution: {integrity: sha512-uwqk+/KhQvBIpULD8SMM/zAafMRC/+DV/xsEQjkkIsJ/kLmEI/2bxonVowcYTiXqqZ/a0FEW8DPkZY3VvwELDA==}
@@ -2034,7 +2037,7 @@ snapshots:
     transitivePeerDependencies:
       - buffer
 
-  '@meshtastic/transport-http@0.2.5(buffer@6.0.3)':
+  '@meshtastic/transport-node@0.0.2(buffer@6.0.3)':
     dependencies:
       '@meshtastic/core': 2.6.7(buffer@6.0.3)
     transitivePeerDependencies:
