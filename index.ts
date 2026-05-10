@@ -192,7 +192,7 @@ async function start(): Promise<void> {
         const payload = JSON.stringify({
           type: "sendtext",
           to: numericDest,
-          channel: channelIndex,
+          channel: 0, //channelIndex,
           text,
         });
 
