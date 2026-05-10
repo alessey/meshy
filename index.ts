@@ -169,7 +169,7 @@ async function start(): Promise<void> {
         // Look up the specific context for this player, fallback to primary channel '0'
         const context = playerContexts.get(numericDest.toString());
         const channel = context?.channelName || "0";
-        const gatewayId = context?.gatewayId;
+        // const gatewayId = context?.gatewayId;
         const channelIndex = context?.channelIndex ?? 0;
 
         /**
@@ -177,9 +177,10 @@ async function start(): Promise<void> {
          * Publishing to the uplink topic (fullTopic) will be ignored by the gateway.
          * Standard format: msh/<region>/2/json/<channel>/<gatewayId>/in
          */
-        const topic = gatewayId
-          ? `msh/US/2/json/${channel}/${gatewayId}`
-          : `msh/US/2/json/${channel}`;
+        // const topic = gatewayId
+        //   ? `msh/US/2/json/${channel}/${gatewayId}`
+        //   : `msh/US/2/json/${channel}`;
+        const topic = `msh/US/2/json/${channel}`;
 
         if (!client) {
           logError("MQTT client not initialized, cannot send text", new Error("No Client"));
