@@ -11,13 +11,15 @@ export async function initTransport(
   onMessage: (senderId: string, text: string) => void,
 ): Promise<MeshDevice> {
   try {
+    if (!DEVICE_IP) {
+      throw new Error("DEVICE_IP is not defined in environment variables.");
+    }
+
     const transport = await TransportNode.create(DEVICE_IP);
     const meshDevice = new MeshDevice(transport);
     await meshDevice.configure();
 
     meshDevice.events.onMessagePacket.subscribe(async (packet: Protobuf.Mesh.IMeshPacket) => {
-      console.log("message packet", packet);
-
       if (!packet.data || !packet.data.startsWith("/")) {
         return;
       }
@@ -35,7 +37,7 @@ export async function initTransport(
     logError("Failed to connect to Meshtastic node:", err);
     // Recursive retry after 5 seconds
     return new Promise((resolve) => {
-      setTimeout(() => resolve(initTransport(onMessage)), 5000);
+      setTimeout(() => resolve(initTransport(onMessage)), 5_000);
     });
   }
 }
