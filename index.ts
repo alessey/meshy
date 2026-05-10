@@ -23,7 +23,7 @@ async function initTransport() {
     meshDevice.events.onMessagePacket.subscribe(async (packet: Protobuf.Mesh.IMeshPacket) => {
       console.log("message packet", packet);
 
-      if (!packet.data || packet.data.substring(0) !== "/") {
+      if (!packet.data || !packet.data.startsWith("/")) {
         return;
       }
 
@@ -121,11 +121,11 @@ async function start(): Promise<void> {
     //   },
     // };
 
-    game = new Game(meshDevice as any, playerStates);
-
     if (!isMock) {
-      initTransport();
+      await initTransport();
     }
+
+    game = new Game(meshDevice as any, playerStates);
 
     if (isMock) {
       log("Mock mode enabled. Type commands in terminal (e.g. /play)");
