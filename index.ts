@@ -20,26 +20,22 @@ async function initTransport() {
     meshDevice = new MeshDevice(transport);
     await meshDevice.configure();
 
-    meshDevice.events.onMeshPacket.subscribe(async (meshPacket: Protobuf.Mesh.MeshPacket) => {
-      console.log("aaaaaa meshpacket", meshPacket);
-      // await meshDevice.sendText(response, messagePacket.from, true, messagePacket.channel)
-    });
+    // The MeshDevice class emits decoded packets through its 'onPacket' RxJS Subject.
+    // We cast to 'any' because this property is often excluded from the public TypeScript definitions
+    // even though it is the primary way to consume mesh traffic.
+    (meshDevice as any).onPacket.subscribe((packet: Protobuf.Mesh.IMeshPacket) => {
+      if (
+        packet.decoded?.portnum === Protobuf.PortNums.PortNum.TEXT_MESSAGE_APP &&
+        packet.decoded.payload
+      ) {
+        const senderId = packet.from.toString();
+        const text = new TextDecoder().decode(packet.decoded.payload);
 
-    // Use the native RxJS Observables provided by MeshDevice
-    // ts-ignore because the library's types don't reflect the actual observables available
-    meshDevice.handleMeshPacket((meshPacket: Protobuf.Mesh.MeshPacket) => {
-      if (!meshPacket) {
-        return;
+        log(`[MESH] Received from ${senderId}: ${text}`);
+        if (game) {
+          game.handleGameLogic(senderId, text);
+        }
       }
-      console.log("meshpacket", meshPacket);
-
-      // const senderId = packet.from.toString();
-      // const text = new TextDecoder().decode(packet.decoded.payload);
-
-      // log(`[MESH] Received from ${senderId}: ${text}`);
-      // if (game) {
-      //   game.handleGameLogic(senderId, text);
-      // }
     });
 
     log(`Connected to Meshtastic device at ${DEVICE_IP}`);
