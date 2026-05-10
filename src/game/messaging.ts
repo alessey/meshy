@@ -38,6 +38,7 @@ async function sendText(device: any, recipientId: unknown, safeText: string): Pr
 
   if (!USE_MOCK) {
     try {
+      console.log("sending text", safeText, recipientId);
       await device.sendText(safeText, recipientId);
     } catch (e) {
       logError(`Send Error:`, e);

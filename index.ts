@@ -108,30 +108,37 @@ async function start(): Promise<void> {
      * When the Game calls 'device.sendText', we translate that into an MQTT publish
      * that the Meshtastic MQTT gateway understands.
      */
-    const meshDeviceBridge = {
-      sendText: async (text: string, destination: string | number) => {
-        if (isMock || !meshDevice) {
-          log(
-            `[DEBUG] Bridge: Mock or Transport not ready. Target: ${destination} | Text: ${text}`,
-          );
-          return 0;
-        }
+    /*
+    await meshDevice.sendText(response, messagePacket.from, true, messagePacket.channel).catch((error) => {
+      console.error(error);
+    });
+*/
 
-        const numericDest =
-          typeof destination === "string"
-            ? destination.startsWith("!")
-              ? parseInt(destination.substring(1), 16)
-              : parseInt(destination, 10)
-            : destination;
+    // const meshDeviceBridge = {
+    //   sendText: async (text: string, destination: string | number) => {
+    //     console.log('send text called');
+    //     if (isMock || !meshDevice) {
+    //       log(
+    //         `[DEBUG] Bridge: Mock or Transport not ready. Target: ${destination} | Text: ${text}`,
+    //       );
+    //       return 0;
+    //     }
 
-        // Use the high-level API provided by MeshDevice
-        await meshDevice.sendText(text, numericDest);
-        log(`[DEBUG] Bridge: Sent packet to ${numericDest}`);
-        return 0;
-      },
-    };
+    //     const numericDest =
+    //       typeof destination === "string"
+    //         ? destination.startsWith("!")
+    //           ? parseInt(destination.substring(1), 16)
+    //           : parseInt(destination, 10)
+    //         : destination;
 
-    game = new Game(meshDeviceBridge as any, playerStates);
+    //     // Use the high-level API provided by MeshDevice
+    //     await meshDevice.sendText(text, numericDest);
+    //     log(`[DEBUG] Bridge: Sent packet to ${numericDest}`);
+    //     return 0;
+    //   },
+    // };
+
+    game = new Game(meshDevice as any, playerStates);
 
     if (isMock) {
       log("Mock mode enabled. Type commands in terminal (e.g. /play)");
