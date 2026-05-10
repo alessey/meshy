@@ -23,20 +23,36 @@ async function initTransport() {
     // The MeshDevice class emits decoded packets through its 'onPacket' RxJS Subject.
     // We cast to 'any' because this property is often excluded from the public TypeScript definitions
     // even though it is the primary way to consume mesh traffic.
-    (meshDevice as any).onPacket.subscribe((packet: Protobuf.Mesh.IMeshPacket) => {
-      if (
-        packet.decoded?.portnum === Protobuf.PortNums.PortNum.TEXT_MESSAGE_APP &&
-        packet.decoded.payload
-      ) {
-        const senderId = packet.from.toString();
-        const text = new TextDecoder().decode(packet.decoded.payload);
-
-        log(`[MESH] Received from ${senderId}: ${text}`);
-        if (game) {
-          game.handleGameLogic(senderId, text);
-        }
-      }
+    meshDevice.events.onChannelPacket((channel: Protobuf.Mesh.IChannel) => {
+      console.log("channel packet", channel);
     });
+
+    meshDevice.events.onFromRadio((packet: Protobuf.Mesh.IMeshPacket) => {
+      console.log("radio packet", packet);
+    });
+
+    meshDevice.events.onMeshPacket((packet: Protobuf.Mesh.IMeshPacket) => {
+      console.log("mesh packet", packet);
+    });
+
+    meshDevice.events.onMessagePacket((packet: Protobuf.Mesh.IMeshPacket) => {
+      console.log("message packet", packet);
+    });
+
+    // meshDevice.events.onChannelPacket.subscribe((packet: Protobuf.Mesh.IMeshPacket) => {
+    //   if (
+    //     packet.decoded?.portnum === Protobuf.PortNums.PortNum.TEXT_MESSAGE_APP &&
+    //     packet.decoded.payload
+    //   ) {
+    //     const senderId = packet.from.toString();
+    //     const text = new TextDecoder().decode(packet.decoded.payload);
+
+    //     log(`[MESH] Received from ${senderId}: ${text}`);
+    //     if (game) {
+    //       game.handleGameLogic(senderId, text);
+    //     }
+    //   }
+    // });
 
     log(`Connected to Meshtastic device at ${DEVICE_IP}`);
   } catch (err) {
