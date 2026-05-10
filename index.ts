@@ -192,8 +192,8 @@ async function start(): Promise<void> {
         const payload = JSON.stringify({
           type: "sendtext",
           to: numericDest,
-          channel: 0, //channelIndex,
-          from: 12345,
+          channel: 1, //channelIndex,
+          from: Math.floor(Math.random() * 0xffffffff),
           payload: { text },
         });
 
