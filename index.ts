@@ -181,7 +181,7 @@ async function start(): Promise<void> {
         //   ? `msh/US/2/json/${channel}/${gatewayId}`
         //   : `msh/US/2/json/${channel}`;
         //const topic = `msh/US/2/json/${channel}`;
-        const topic = "msh/US/2/json";
+        const topic = "msh/US/2/json/PKI/!02eca9ec";
 
         if (!client) {
           logError("MQTT client not initialized, cannot send text", new Error("No Client"));
