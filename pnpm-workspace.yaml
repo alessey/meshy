@@ -1,5 +1,6 @@
 allowBuilds:
   "@meshtastic/core": true
+  '@meshtastic/transport-http': true
   "@meshtastic/transport-node-serial": true
   "@serialport/bindings-cpp": true
   esbuild: true

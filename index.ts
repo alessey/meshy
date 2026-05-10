@@ -1,109 +1,46 @@
 import path from "path";
-import mqtt from "mqtt";
 import express from "express";
+import { HttpTransport } from "@meshtastic/transport-http";
+import { MeshPacket, PortNum, Data } from "@meshtastic/core";
 import { Game } from "./src/app/Game.js";
 import worldMap from "./src/world/map.js";
 import { log, logError } from "./src/logging.js";
+import { DEVICE_IP } from "./src/config/constants.js";
 import { loadPlayerData } from "./src/storage/playerStore.js";
 import type { Player } from "./src/game/player.js";
 
 const isMock = process.env.USE_MOCK === "true";
-let client: any = null;
+let transport: HttpTransport | null = null;
 let game: Game | null = null;
 let playerStates: Map<string, Player> = new Map();
 
-interface MessageContext {
-  gatewayId: string;
-  channelName: string;
-  channelIndex: number;
-  fullTopic: string;
-}
-const playerContexts: Map<string, MessageContext> = new Map();
+async function initTransport() {
+  transport = new HttpTransport(`http://${DEVICE_IP}`);
 
-if (!isMock) {
-  // If you add a username/password later, format it as:
-  // mqtt://username:password@localhost:1883
-  client = mqtt.connect("mqtt://localhost:1883", {
-    keepalive: 60,
-    reconnectPeriod: 1000,
-  });
+  transport.onPacket.subscribe((packet: MeshPacket) => {
+    // Only process TEXT_MESSAGE_APP packets
+    if (packet.decoded?.portnum === PortNum.TEXT_MESSAGE_APP) {
+      const senderId = packet.from.toString();
+      const text = new TextDecoder().decode(packet.decoded.payload);
 
-  client.on("connect", () => {
-    log("Server script connected to local MQTT broker");
-
-    // Subscribe to the root. Since your logs show msh/US, msh/# covers it.
-    client.subscribe("msh/#", (err: any) => {
-      if (!err) {
-        log("Subscribed to Meshtastic topics (msh/#)");
+      log(`[MESH] Received from ${senderId}: ${text}`);
+      if (game) {
+        game.handleGameLogic(senderId, text);
       }
-    });
-  });
-
-  client.on("reconnect", () => {
-    log("Attempting to reconnect to MQTT broker...");
-  });
-
-  client.on("error", (err: any) => {
-    logError("MQTT Client Error:", err);
-  });
-
-  client.on("offline", () => {
-    log("MQTT Client went offline");
-  });
-
-  client.on("message", (topic: any, message: any) => {
-    // Ignore binary/encrypted packets (topic contains '/e/') to prevent JSON parse errors
-    if (!topic.includes("/json/")) return;
-
-    try {
-      const rawPayload = message.toString();
-      const data = JSON.parse(rawPayload);
-      log(`[TRAFFIC] Topic: ${topic} | Data: ${rawPayload}`);
-
-      const sender = data.from || data.sender;
-      if (!sender) return;
-
-      // Normalize senderId to a decimal string for consistent Map lookup.
-      // Incoming 'from' is often a number, 'sender' is often a hex string like '!02eca9ec'.
-      const senderId =
-        typeof sender === "string" && (sender.startsWith("!") || /^[0-9a-fA-F]+$/.test(sender))
-          ? parseInt(sender.startsWith("!") ? sender.substring(1) : sender, 16).toString()
-          : sender.toString();
-
-      // Extract Gateway ID and Channel Name from the topic path
-      const topicParts = topic.split("/");
-      const gatewayIndex = topicParts.findIndex((part: string) => part.startsWith("!"));
-
-      if (gatewayIndex !== -1) {
-        const gatewayId = topicParts[gatewayIndex];
-        const channelName =
-          topicParts[gatewayIndex - 1] !== "json" ? topicParts[gatewayIndex - 1] : "0";
-
-        playerContexts.set(senderId, {
-          gatewayId,
-          channelName,
-          channelIndex: data.channel ?? 0,
-          fullTopic: topic,
-        });
-      }
-
-      // Extract text safely from various possible JSON structures
-      const text =
-        typeof data.payload === "string" ? data.payload : (data.payload?.text ?? data.text);
-
-      if (!game || data.type !== "text" || !text || !sender) {
-        if (sender && data.type && data.type !== "text")
-          log(`[MQTT] Ignored ${data.type} from ${sender}`);
-        return;
-      }
-
-      log(`[GAME] Valid message from ${senderId}: ${text}`);
-      game.handleGameLogic(senderId, text);
-    } catch (e) {
-      logError(`[PARSE ERROR] Failed to parse JSON on ${topic}:`, e);
     }
   });
+
+  try {
+    await transport.connect();
+    log(`Connected to Meshtastic device at ${DEVICE_IP}`);
+  } catch (err) {
+    logError("Failed to connect to Meshtastic node:", err);
+    // Retry logic
+    setTimeout(initTransport, 5000);
+  }
 }
+
+if (!isMock) initTransport();
 
 // Web server setup
 const app = express();
@@ -155,10 +92,13 @@ async function start(): Promise<void> {
      */
     const meshDeviceBridge = {
       sendText: async (text: string, destination: string | number) => {
-        log(`[DEBUG] Bridge: sendText triggered to ${destination}`);
-        if (isMock) return 0;
+        if (isMock || !transport) {
+          log(
+            `[DEBUG] Bridge: Mock or Transport not ready. Target: ${destination} | Text: ${text}`,
+          );
+          return 0;
+        }
 
-        // The MQTT JSON API expects a numeric ID for the 'dest' field.
         const numericDest =
           typeof destination === "string"
             ? destination.startsWith("!")
@@ -166,41 +106,17 @@ async function start(): Promise<void> {
               : parseInt(destination, 10)
             : destination;
 
-        // Look up the specific context for this player, fallback to primary channel '0'
-        const context = playerContexts.get(numericDest.toString());
-        // const channel = context?.channelName || "0";
-        // const gatewayId = context?.gatewayId;
-        const channelIndex = context?.channelIndex ?? 0;
-
-        /**
-         * MQTT.cpp and the JSON API require a 'downlink' topic to process commands.
-         * Publishing to the uplink topic (fullTopic) will be ignored by the gateway.
-         * Standard format: msh/<region>/2/json/<channel>/<gatewayId>/in
-         */
-        // const topic = gatewayId
-        //   ? `msh/US/2/json/${channel}/${gatewayId}`
-        //   : `msh/US/2/json/${channel}`;
-        //const topic = `msh/US/2/json/${channel}`;
-        const topic = "msh/US/2/json/mqtt/!02eca9ec";
-
-        if (!client) {
-          logError("MQTT client not initialized, cannot send text", new Error("No Client"));
-          return 1;
-        }
-
-        // Reference: https://meshtastic.org/docs/software/integrations/mqtt/#json-downlink-to-instruct-a-node-to-send-a-message
-        const payload = JSON.stringify({
-          type: "sendtext",
+        const packet = new MeshPacket({
           to: numericDest,
-          channel: 1, //channelIndex,
-          from: Math.floor(Math.random() * 0xffffffff),
-          payload: { text },
+          decoded: new Data({
+            portnum: PortNum.TEXT_MESSAGE_APP,
+            payload: new TextEncoder().encode(text),
+          }),
+          id: Math.floor(Math.random() * 0xffffffff),
         });
 
-        log(
-          `[DEBUG] Bridge: Publishing to ${topic} | Dest: ${numericDest} | Channel: ${channelIndex} | Text: ${text}`,
-        );
-        client?.publish(topic, payload);
+        await transport.sendPacket(packet);
+        log(`[DEBUG] Bridge: Sent packet to ${numericDest}`);
         return 0;
       },
     };
@@ -217,7 +133,11 @@ async function start(): Promise<void> {
       });
     }
 
-    log(isMock ? "Simulator ready (Mock Mode)." : "Mesh Game System initialized via MQTT");
+    log(
+      isMock
+        ? "Simulator ready (Mock Mode)."
+        : "Mesh Game System initialized via HTTP/WS Transport",
+    );
   } catch (error) {
     logError("Critical Failure:", error);
   }

@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@meshtastic/core':
+        specifier: ^2.6.7
+        version: 2.6.7(buffer@6.0.3)
+      '@meshtastic/transport-http':
+        specifier: ^0.2.5
+        version: 0.2.5(buffer@6.0.3)
       '@picocss/pico':
         specifier: ^2.0.6
         version: 2.1.1
@@ -465,6 +471,12 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@meshtastic/core@2.6.7':
+    resolution: {integrity: sha512-0iP/gfzhqVWBzTpJNn2dHp2BiUSQq5xPUDCtssBqI9Y/X64sQ2cPDCKoyGsFPn8VXrJG3B/lQd/yPhg0GytATA==}
+
+  '@meshtastic/transport-http@0.2.5':
+    resolution: {integrity: sha512-iYB6e8fqO0sFQBoiw46tGO0cGql4SsVkEreaOl4GXtuH/2rQB2d0gfJtHYNH8JpZhCjulKJPq5ISfFXe959MTA==}
 
   '@oxfmt/binding-android-arm-eabi@0.48.0':
     resolution: {integrity: sha512-uwqk+/KhQvBIpULD8SMM/zAafMRC/+DV/xsEQjkkIsJ/kLmEI/2bxonVowcYTiXqqZ/a0FEW8DPkZY3VvwELDA==}
@@ -1050,6 +1062,15 @@ packages:
   cookie@0.7.2:
     resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
     engines: {node: '>= 0.6'}
+
+  crc@4.3.2:
+    resolution: {integrity: sha512-uGDHf4KLLh2zsHa8D8hIQ1H/HtFQhyHrc0uhHBcoKGol/Xnb+MPYfUMw7cvON6ze/GUESTudKayDcJC5HnJv1A==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      buffer: '>=6.0.3'
+    peerDependenciesMeta:
+      buffer:
+        optional: true
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
@@ -2007,6 +2028,18 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  '@meshtastic/core@2.6.7(buffer@6.0.3)':
+    dependencies:
+      crc: 4.3.2(buffer@6.0.3)
+    transitivePeerDependencies:
+      - buffer
+
+  '@meshtastic/transport-http@0.2.5(buffer@6.0.3)':
+    dependencies:
+      '@meshtastic/core': 2.6.7(buffer@6.0.3)
+    transitivePeerDependencies:
+      - buffer
+
   '@oxfmt/binding-android-arm-eabi@0.48.0':
     optional: true
 
@@ -2436,6 +2469,10 @@ snapshots:
   cookie-signature@1.2.2: {}
 
   cookie@0.7.2: {}
+
+  crc@4.3.2(buffer@6.0.3):
+    optionalDependencies:
+      buffer: 6.0.3
 
   csstype@3.2.3: {}
 
