@@ -44,7 +44,8 @@ function handleMovement(player: Player, command: Direction): GameOutcome {
 
   if (requirement) {
     const hasItem = player.hasItem(requirement);
-    if (!hasItem) {
+    const hasWeapon = player.hasWeapon(requirement);
+    if (!hasItem && !hasWeapon) {
       const message = gameMessage(
         requirementText(requirement),
         getDisplayActions(location.actions),

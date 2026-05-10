@@ -19,10 +19,13 @@ async function start(): Promise<void> {
 
     if (!isMock) {
       meshDevice = await initTransport((senderId, text) => {
-        if (game) game.handleGameLogic(senderId, text);
+        if (game) {
+          game.handleGameLogic(senderId, text);
+        }
       });
     }
 
+    // TODO: Fix meshDevice type
     game = new Game(meshDevice as any, playerStates);
 
     startWebServer(playerStates);

@@ -51,6 +51,10 @@ export class Player {
     this._hp = MAX_HP;
   }
 
+  hasWeapon(weaponName: string): boolean {
+    return this.weapon.name.toLowerCase() === weaponName.toLowerCase();
+  }
+
   hasItem(itemName: string): boolean {
     return this.items.some((item) => item.name.toLowerCase() === itemName.toLowerCase());
   }
