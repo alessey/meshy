@@ -22,18 +22,19 @@ async function initTransport() {
 
     // Use the native RxJS Observables provided by MeshDevice
     // ts-ignore because the library's types don't reflect the actual observables available
-    // @ts-ignore
-    meshDevice.onTextPacket$.subscribe((packet: Protobuf.IMeshPacket) => {
-      if (!packet.decoded?.payload || !packet.from) {
+    meshDevice.handleMeshPacket((meshPacket: Protobuf.Mesh.MeshPacket) => {
+      if (!meshPacket) {
         return;
       }
-      const senderId = packet.from.toString();
-      const text = new TextDecoder().decode(packet.decoded.payload);
+      console.log("meshpacket", meshPacket);
 
-      log(`[MESH] Received from ${senderId}: ${text}`);
-      if (game) {
-        game.handleGameLogic(senderId, text);
-      }
+      // const senderId = packet.from.toString();
+      // const text = new TextDecoder().decode(packet.decoded.payload);
+
+      // log(`[MESH] Received from ${senderId}: ${text}`);
+      // if (game) {
+      //   game.handleGameLogic(senderId, text);
+      // }
     });
 
     log(`Connected to Meshtastic device at ${DEVICE_IP}`);
