@@ -193,6 +193,7 @@ async function start(): Promise<void> {
           type: "sendtext",
           to: numericDest,
           channel: 0, //channelIndex,
+          from: 12345,
           text,
         });
 
