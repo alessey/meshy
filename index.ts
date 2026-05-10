@@ -23,15 +23,15 @@ async function initTransport() {
     // The MeshDevice class emits decoded packets through its 'onPacket' RxJS Subject.
     // We cast to 'any' because this property is often excluded from the public TypeScript definitions
     // even though it is the primary way to consume mesh traffic.
-    meshDevice.events.onFromRadio((packet: Protobuf.Mesh.IMeshPacket) => {
+    meshDevice.events.onFromRadio.subscribe(async (packet: Protobuf.Mesh.IMeshPacket) => {
       console.log("radio packet", packet);
     });
 
-    meshDevice.events.onMeshPacket((packet: Protobuf.Mesh.IMeshPacket) => {
+    meshDevice.events.onMeshPacket.subscribe(async (packet: Protobuf.Mesh.IMeshPacket) => {
       console.log("mesh packet", packet);
     });
 
-    meshDevice.events.onMessagePacket((packet: Protobuf.Mesh.IMeshPacket) => {
+    meshDevice.events.onMessagePacket.subscribe(async (packet: Protobuf.Mesh.IMeshPacket) => {
       console.log("message packet", packet);
     });
 
