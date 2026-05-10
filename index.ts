@@ -20,6 +20,11 @@ async function initTransport() {
     meshDevice = new MeshDevice(transport);
     await meshDevice.configure();
 
+    meshDevice.events.onMessagePacket.subscribe(async (meshPacket: Protobuf.Mesh.MeshPacket) => {
+      console.log("aaaaaa meshpacket", meshPacket);
+      // await meshDevice.sendText(response, messagePacket.from, true, messagePacket.channel)
+    });
+
     // Use the native RxJS Observables provided by MeshDevice
     // ts-ignore because the library's types don't reflect the actual observables available
     meshDevice.handleMeshPacket((meshPacket: Protobuf.Mesh.MeshPacket) => {
