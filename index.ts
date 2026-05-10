@@ -189,7 +189,6 @@ async function start(): Promise<void> {
         // Reference: https://meshtastic.org/docs/software/integrations/mqtt/#json-downlink-to-instruct-a-node-to-send-a-message
         const payload = JSON.stringify({
           type: "sendtext",
-          from: gatewayId ? parseInt(gatewayId.replace("!", ""), 16) : 0,
           to: numericDest,
           channel: channelIndex,
           text,
