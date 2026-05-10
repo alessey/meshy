@@ -46,11 +46,11 @@ export class Game {
     input: string | number | Uint8Array,
   ): Promise<void> {
     const rawInput = input.toString().trim();
-
+    console.log("raw input", rawInput);
     if (!rawInput || !rawInput.startsWith(GAME_PREFIX)) {
       return;
     }
-
+    console.log("2");
     const command = rawInput.slice(GAME_PREFIX.length).toLowerCase().trim() || COMMANDS.PLAY;
     const player = this.getPlayer(senderId);
 
@@ -66,7 +66,7 @@ export class Game {
     if (outcome.shouldSave) {
       save(this.playerStates);
     }
-
+    console.log("3", outcome.messages);
     // Always respond directly to the sender to keep the game private and save airtime
     return dispatchMessages(this.device, senderId, player, outcome.messages);
   }
