@@ -20,7 +20,7 @@ async function initTransport() {
     meshDevice = new MeshDevice(transport);
     await meshDevice.configure();
 
-    meshDevice.events.onMessagePacket.subscribe(async (meshPacket: Protobuf.Mesh.MeshPacket) => {
+    meshDevice.events.onMeshPacket.subscribe(async (meshPacket: Protobuf.Mesh.MeshPacket) => {
       console.log("aaaaaa meshpacket", meshPacket);
       // await meshDevice.sendText(response, messagePacket.from, true, messagePacket.channel)
     });
