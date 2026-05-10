@@ -1,7 +1,7 @@
 import path from "path";
 import express from "express";
-import { HttpTransport } from "@meshtastic/transport-http";
-import { MeshPacket, PortNum, Data } from "@meshtastic/core";
+import { TransportHTTP } from "@meshtastic/transport-http";
+import { Protobuf, MeshDevice } from "@meshtastic/core";
 import { Game } from "./src/app/Game.js";
 import worldMap from "./src/world/map.js";
 import { log, logError } from "./src/logging.js";
@@ -10,28 +10,27 @@ import { loadPlayerData } from "./src/storage/playerStore.js";
 import type { Player } from "./src/game/player.js";
 
 const isMock = process.env.USE_MOCK === "true";
-let transport: HttpTransport | null = null;
+let meshDevice: MeshDevice | null = null;
 let game: Game | null = null;
 let playerStates: Map<string, Player> = new Map();
 
 async function initTransport() {
-  transport = new HttpTransport(`http://${DEVICE_IP}`);
-
-  transport.onPacket.subscribe((packet: MeshPacket) => {
-    // Only process TEXT_MESSAGE_APP packets
-    if (packet.decoded?.portnum === PortNum.TEXT_MESSAGE_APP) {
-      const senderId = packet.from.toString();
-      const text = new TextDecoder().decode(packet.decoded.payload);
-
-      log(`[MESH] Received from ${senderId}: ${text}`);
-      if (game) {
-        game.handleGameLogic(senderId, text);
-      }
-    }
-  });
-
   try {
-    await transport.connect();
+    const transport = await TransportHTTP.create(DEVICE_IP);
+    meshDevice = new MeshDevice(transport);
+
+    meshDevice.handleMeshPacket = async (packet: Protobuf.IMeshPacket) => {
+      if (packet.decoded?.portnum === Protobuf.PortNum.TEXT_MESSAGE_APP && packet.decoded.payload) {
+        const senderId = packet.from?.toString() || "unknown";
+        const text = new TextDecoder().decode(packet.decoded.payload);
+
+        log(`[MESH] Received from ${senderId}: ${text}`);
+        if (game) {
+          game.handleGameLogic(senderId, text);
+        }
+      }
+    };
+
     log(`Connected to Meshtastic device at ${DEVICE_IP}`);
   } catch (err) {
     logError("Failed to connect to Meshtastic node:", err);
@@ -92,7 +91,7 @@ async function start(): Promise<void> {
      */
     const meshDeviceBridge = {
       sendText: async (text: string, destination: string | number) => {
-        if (isMock || !transport) {
+        if (isMock || !meshDevice) {
           log(
             `[DEBUG] Bridge: Mock or Transport not ready. Target: ${destination} | Text: ${text}`,
           );
@@ -106,16 +105,8 @@ async function start(): Promise<void> {
               : parseInt(destination, 10)
             : destination;
 
-        const packet = new MeshPacket({
-          to: numericDest,
-          decoded: new Data({
-            portnum: PortNum.TEXT_MESSAGE_APP,
-            payload: new TextEncoder().encode(text),
-          }),
-          id: Math.floor(Math.random() * 0xffffffff),
-        });
-
-        await transport.sendPacket(packet);
+        // Use the high-level API provided by MeshDevice
+        await meshDevice.sendText(text, numericDest);
         log(`[DEBUG] Bridge: Sent packet to ${numericDest}`);
         return 0;
       },
