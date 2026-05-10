@@ -194,7 +194,7 @@ async function start(): Promise<void> {
           to: numericDest,
           channel: 0, //channelIndex,
           from: 12345,
-          payload: text,
+          payload: { text },
         });
 
         log(
