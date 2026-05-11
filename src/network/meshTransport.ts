@@ -32,11 +32,24 @@ export async function initTransport(
       onMessage(senderId, text);
     });
 
+    let testPacketId: number | null = null;
+    meshDevice.events.onFromRadio.subscribe(async (packet: Protobuf.Mesh.IMeshPacket) => {
+      log("Received packet from radio:", packet, testPacketId === packet.requestId);
+      if (testPacketId && packet.requestId === testPacketId) {
+        log("Packet received for ACK check:", packet);
+        if (packet.routing?.variant?.case === "ack") {
+          log(`ACK received for packet ${testPacketId}`);
+        } else if (packet.routing?.errorReason) {
+          logError(`NACK received for packet ${testPacketId}: ${packet.routing.errorReason}`);
+        }
+      }
+    });
+
     const MeshDeviceWithRetry = {
       sendText: async (text: string, recipientId: Destination): Promise<void> => {
         const packetId = await meshDevice.sendText(text, recipientId, true);
         log(`Sent to ${recipientId}. Packet ID: ${packetId}`);
-
+        testPacketId = packetId;
         // meshDevice.events.onFromRadio.subscribe(async (packet: Protobuf.Mesh.IMeshPacket) => {
         //   log("Received packet from radio:", packet);
         //   if (packet.requestId === packetId) {
