@@ -14,7 +14,7 @@ let pendingReject: ((err: unknown) => void) | null = null;
 export async function loadPlayerData(): Promise<Map<string, Player>> {
   try {
     const data = await fs.readFile(DB_PATH, "utf-8");
-    const savedPlayers = Object.entries(JSON.parse(data));
+    const savedPlayers = Object.entries(JSON.parse(data)) as [string, Player][];
     const playerStates = new Map(savedPlayers.map(([id, player]) => [id, hydratePlayer(player)]));
     log(`Loaded ${playerStates.size} players.`);
     return playerStates;

@@ -1,4 +1,4 @@
-import { Location } from "../types.js";
+import type { Location } from "../types.js";
 
 const worldMap: Record<string, Location> = {
   // row 1 - northern peaks

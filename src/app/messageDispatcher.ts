@@ -1,14 +1,12 @@
+import { type MeshDevice } from "@meshtastic/core";
 import { sendGameText, sendPlainText } from "../game/messaging.js";
 import type { Player } from "../game/player.js";
 import type { Message } from "../types.js";
-
-type MeshDevice = {
-  sendText(text: string, recipientId: unknown): Promise<number | void>;
-};
+import { type Destination } from "../network/types.js";
 
 export async function dispatchMessages(
   device: MeshDevice,
-  recipientId: unknown,
+  recipientId: Destination,
   player: Player,
   messages: Message[],
 ): Promise<void> {

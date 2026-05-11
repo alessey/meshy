@@ -37,7 +37,9 @@ export function resolveLocationEvent(location: Location, player: Player): Encoun
   for (const { chance, build } of eventConfigs) {
     if (roll(chance)) {
       const event = build();
-      if (event) return event;
+      if (event) {
+        return event;
+      }
     }
   }
 

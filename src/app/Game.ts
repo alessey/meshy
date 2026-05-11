@@ -1,17 +1,15 @@
-import { save } from "../storage/playerStore.js";
-import { dispatchMessages } from "./messageDispatcher.js";
+import { COMMANDS, isCommand } from "../game/commands.js";
+import { type Destination } from "../network/types.js";
 import { Player } from "../game/player.js";
+import { getStartLocationKey } from "../world/utils.js";
 import { handleEncounter } from "../states/encounters.js";
 import { handleExploring } from "../states/exploring.js";
-import { COMMANDS, isCommand } from "../game/commands.js";
+import { type MeshDevice } from "@meshtastic/core";
+import { dispatchMessages } from "./messageDispatcher.js";
 import { unknownCommandMessage } from "../states/presenters.js";
 import { result } from "../game/results.js";
-import { getStartLocationKey } from "../world/utils.js";
+import { save } from "../storage/playerStore.js";
 import worldMap from "../world/map.js";
-
-type MeshDevice = {
-  sendText(text: string, recipientId: unknown): Promise<number>;
-};
 
 const GAME_PREFIX = "/";
 
@@ -41,10 +39,7 @@ export class Game {
     return player;
   }
 
-  async handleGameLogic(
-    senderId: string | number,
-    input: string | number | Uint8Array,
-  ): Promise<void> {
+  async handleGameLogic(senderId: Destination, input: string | number | Uint8Array): Promise<void> {
     const rawInput = input.toString().trim();
 
     if (!rawInput || !rawInput.startsWith(GAME_PREFIX)) {

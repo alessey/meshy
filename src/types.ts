@@ -1,4 +1,4 @@
-import { COMMANDS, EVENT_ACTIONS, GAME_ACTIONS } from "./game/commands.js";
+import type { COMMANDS, EVENT_ACTIONS, GAME_ACTIONS } from "./game/commands.js";
 
 /**
  * Equipment and Inventory Types

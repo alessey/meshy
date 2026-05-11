@@ -1,10 +1,11 @@
-import { MeshDevice } from "@meshtastic/core";
+import type { MeshDevice } from "@meshtastic/core";
+import type { Player } from "./src/game/player.js";
+import type { Destination } from "./src/network/types.js";
 import { Game } from "./src/app/Game.js";
 import { log, logError } from "./src/logging.js";
 import { loadPlayerData } from "./src/storage/playerStore.js";
 import { initTransport } from "./src/network/meshTransport.js";
 import { startWebServer } from "./src/web/server.js";
-import type { Player } from "./src/game/player.js";
 
 const isMock = process.env.USE_MOCK === "true";
 let meshDevice: MeshDevice | null = null;
@@ -20,13 +21,16 @@ async function start(): Promise<void> {
     if (!isMock) {
       meshDevice = await initTransport((senderId, text) => {
         if (game) {
-          game.handleGameLogic(senderId, text);
+          game.handleGameLogic(senderId as Destination, text);
         }
       });
     }
 
-    // TODO: Fix meshDevice type
-    game = new Game(meshDevice as any, playerStates);
+    if (!meshDevice) {
+      throw new Error("Failed to initialize mesh device.");
+    }
+
+    game = new Game(meshDevice, playerStates);
 
     startWebServer(playerStates);
 
@@ -35,7 +39,7 @@ async function start(): Promise<void> {
       process.stdin.on("data", (data) => {
         const input = data.toString().trim();
         if (input && game) {
-          game.handleGameLogic("MOCK_USER", input);
+          game.handleGameLogic("MOCK_USER" as Destination, input);
         }
       });
     }

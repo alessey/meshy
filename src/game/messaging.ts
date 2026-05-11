@@ -1,6 +1,8 @@
+import { type MeshDevice } from "@meshtastic/core";
 import { CHAR_LIMIT, USE_LOGGING, USE_MOCK } from "../config/constants.js";
 import { logError } from "../logging.js";
 import type { Player } from "./player.js";
+import { type Destination } from "../network/types.js";
 
 export function formatResponse(player: Player, text: string, actions: string[] = []): string {
   const status = `[L${player.level} XP:${player.xp} HP:${player.hp}/${player.maxHp} ATK:${player.attack}]`;
@@ -13,8 +15,8 @@ export function truncateMessage(text: string): string {
 }
 
 export async function sendGameText(
-  device: any,
-  recipientId: unknown,
+  device: MeshDevice,
+  recipientId: Destination,
   player: Player,
   text: string,
   actions: string[] = [],
@@ -24,14 +26,18 @@ export async function sendGameText(
 }
 
 export async function sendPlainText(
-  device: any,
-  recipientId: unknown,
+  device: MeshDevice,
+  recipientId: Destination,
   text: string,
 ): Promise<void> {
   return sendText(device, recipientId, truncateMessage(text));
 }
 
-async function sendText(device: any, recipientId: unknown, safeText: string): Promise<void> {
+async function sendText(
+  device: MeshDevice,
+  recipientId: Destination,
+  safeText: string,
+): Promise<void> {
   if (USE_LOGGING) {
     process.stdout.write(`\n[OUTGOING TO ${recipientId}]: ${safeText}\n> `);
   }

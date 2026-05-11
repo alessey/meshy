@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import styles from "./App.module.css";
 import StatBox from "./components/StatBox/StatBox";
 import MapCell from "./components/MapCell/MapCell";
-import { PlayerSummary } from "./types";
+import type { PlayerSummary } from "./types";
 import Header from "./components/Header/Header";
 
 export default function App() {

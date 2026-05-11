@@ -1,5 +1,5 @@
 import { TransportNode } from "@meshtastic/transport-node";
-import { Protobuf, MeshDevice } from "@meshtastic/core";
+import { type Protobuf, MeshDevice } from "@meshtastic/core";
 import { log, logError } from "../logging.js";
 import { DEVICE_IP } from "../config/constants.js";
 

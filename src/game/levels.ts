@@ -1,3 +1,5 @@
+import { type Player } from "./player.js";
+
 export const LEVELS = [
   { level: 1, minXp: 0, multiplier: 1 },
   { level: 2, minXp: 10, multiplier: 1.15 },
@@ -19,10 +21,10 @@ export function getLevelForXp(xp: number): LevelInfo {
   }, LEVELS[0]);
 }
 
-export function getLevel(player: any): LevelInfo {
+export function getLevel(player: Player): LevelInfo {
   return getLevelForXp(player.xp);
 }
 
-export function getLevelMultiplier(player: any): number {
+export function getLevelMultiplier(player: Player): number {
   return getLevel(player).multiplier;
 }

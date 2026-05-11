@@ -1,7 +1,7 @@
 import { getLevelMultiplier } from "./levels.js";
 import { randomFrom, roll } from "./random.js";
 import type { Monster, Location, MonsterReward, Equipment } from "../types.js";
-import { Player } from "./player.js";
+import { type Player } from "./player.js";
 
 export const LOOT_DROP_CHANCE = 0.2;
 const DEFAULT_LOOT_POOL = [

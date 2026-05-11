@@ -1,5 +1,5 @@
 import type { Equipment, Monster, Potion, MonsterReward } from "../types.js";
-import { Player } from "./player.js";
+import { type Player } from "./player.js";
 
 export const TEXT = {
   INVENTORY_TITLE: "Inventory:",
@@ -38,6 +38,7 @@ export function monsterDefeatedText(combatMessage: string, monster: Monster): st
 
 export function monsterRewardText(reward: MonsterReward): string {
   const levelText = reward.didLevelUp ? ` Level up! You are now level ${reward.level}.` : "";
+
   return `+${reward.xp} XP.${levelText}`;
 }
 
@@ -50,8 +51,14 @@ export function combatStatusText(combatMessage: string, player: Player, monster:
 }
 
 function itemStat(item: Equipment): string {
-  if (item.attack !== undefined) return `${item.attack} ATK`;
-  if (item.hp !== undefined) return `${item.hp} HP`;
+  if (item.attack !== undefined) {
+    return `${item.attack} ATK`;
+  }
+
+  if (item.hp !== undefined) {
+    return `${item.hp} HP`;
+  }
+
   return item.type ?? ""; // For items like "key"
 }
 

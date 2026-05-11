@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./Header.module.css";
-import { PlayerSummary } from "../../types";
+import type { PlayerSummary } from "../../types";
 
 type HeaderProps = {
   setSelectedId: (id: string) => void;
