@@ -39,7 +39,7 @@ async function sendText(
   safeText: string,
 ): Promise<void> {
   if (USE_LOGGING) {
-    log(`\n[OUTGOING TO ${recipientId}]: ${safeText}\n> `);
+    log(`Outgoing to ${recipientId}: ${safeText}`);
   }
 
   if (!USE_MOCK) {

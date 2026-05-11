@@ -21,7 +21,7 @@ USE_MOCK=false
 DB_PATH="./players.json" 
 
 # meshtastic character limit
-CHAR_LIMIT=220 
+CHAR_LIMIT=200 
 
 # debounce time for saving player data
 SAVE_DEBOUNCE_MS=3000 

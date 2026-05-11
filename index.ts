@@ -21,7 +21,7 @@ async function start(): Promise<void> {
     if (!USE_MOCK) {
       meshDevice = await initTransport((senderId, text) => {
         if (USE_LOGGING) {
-          console.log(`Message received from ${senderId}: ${text}`);
+          log(`Message received from ${senderId}: ${text}`);
         }
 
         if (game) {
