@@ -55,13 +55,14 @@ async function sendText(
           device.events.onFromRadio.pipe(
             filter((packet: Protobuf.Mesh.IMeshPacket) => packet.requestId === packetId),
             map((packet: Protobuf.Mesh.IMeshPacket) => {
+              log("packet received for ACK check:", packet);
               if (packet.routing?.variant?.case === "ack") {
-                return { success: true };
+                return true;
               }
               if (packet.routing?.errorReason) {
                 throw new Error(`NACK: ${packet.routing.errorReason}`);
               }
-              return { success: false };
+              return false;
             }),
           ),
         );
