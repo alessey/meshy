@@ -12,12 +12,12 @@ function getTimestamp(): string {
 
 export function log(...args: unknown[]): void {
   if (USE_LOGGING) {
-    console.log(`${getTimestamp()}\t${GREEN}INFO${RESET}\t${CYAN}[MESHY]${RESET}`, ...args);
+    console.log(`${getTimestamp()}\t${GREEN}INFO${RESET}\t${CYAN}[MESHY]${RESET}\t`, ...args);
   }
 }
 
 export function logError(...args: unknown[]): void {
   if (USE_LOGGING) {
-    console.error(`${getTimestamp()}\t${RED}ERROR${RESET}\t${CYAN}[MESHY]${RESET}`, ...args);
+    console.error(`${getTimestamp()}\t${RED}ERROR${RESET}\t${CYAN}[MESHY]${RESET}\t`, ...args);
   }
 }
