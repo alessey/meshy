@@ -2,14 +2,14 @@ import { useEffect, useState, useMemo } from "react";
 import styles from "./App.module.css";
 import StatBox from "./components/StatBox/StatBox";
 import MapCell from "./components/MapCell/MapCell";
-import type { PlayerSummary } from "./types";
+import type { Player, Location } from "../../src/types";
 import Header from "./components/Header/Header";
 
 export default function App() {
-  const [worldMap, setWorldMap] = useState<any>(null);
-  const [players, setPlayers] = useState<PlayerSummary[]>([]);
+  const [worldMap, setWorldMap] = useState<Record<string, Location> | null>(null);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [selectedId, setSelectedId] = useState<string>("");
-  const [playerDetails, setPlayerDetails] = useState<any>(null);
+  const [playerDetails, setPlayerDetails] = useState<Player | null>(null);
 
   // Load Map once
   useEffect(() => {

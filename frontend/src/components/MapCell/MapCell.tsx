@@ -1,9 +1,9 @@
-import React from "react";
 import styles from "./MapCell.module.css";
 import TileIcon from "../TileIcon/TileIcon";
+import type { Location } from "../../../../src/types";
 
 interface MapCellProps {
-  cell: any; // Ideally, this would be a more specific Location type
+  cell: Location | undefined;
   coord: string;
   playersHere: { id: string; location: string; level: number }[];
   selectedId: string;
@@ -33,11 +33,13 @@ export default function MapCell({
       <TileIcon type={cell.cellType} />
       <div className={styles.cellLabel}>{coord}</div>
       <div className={styles.mapIcons}>
-        {(cell.monsterChance > 0 || cell.monsterPool?.length > 0) && (
+        {((cell.monsterChance ?? 0) > 0 || (cell.monsterPool ?? []).length > 0) && (
           <span title="Monster">👾</span>
         )}
-        {(cell.itemChance > 0 || cell.itemPool?.length > 0) && <span title="Item">⚔️</span>}
-        {cell.potionChance > 0 && <span title="Potion">🧪</span>}
+        {((cell.itemChance ?? 0) > 0 || (cell.itemPool ?? []).length > 0) && (
+          <span title="Item">⚔️</span>
+        )}
+        {(cell.potionChance ?? 0) > 0 && <span title="Potion">🧪</span>}
       </div>
       <div className={styles.markerTray}>
         {playersHere.map((p) => (

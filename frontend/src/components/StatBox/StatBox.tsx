@@ -1,10 +1,9 @@
-import React from "react";
 import styles from "./StatBox.module.css";
 
-interface StatBoxProps {
+type StatBoxProps = {
   label: string;
   value: string | number;
-}
+};
 
 export default function StatBox({ label, value }: StatBoxProps) {
   return (
