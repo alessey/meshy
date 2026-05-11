@@ -35,7 +35,7 @@ pnpm install
 ```
 
 ```bash
-pnpm start-dev
+pnpm start:dev
 ```
 
 ```bash

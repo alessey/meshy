@@ -1,8 +1,13 @@
-import { type MeshDevice } from "@meshtastic/core";
-import { CHAR_LIMIT, USE_LOGGING, USE_MOCK } from "../config/constants.js";
+/* eslint-disable no-await-in-loop */
+import type { Protobuf, MeshDevice } from "@meshtastic/core";
+import { CHAR_LIMIT, USE_MOCK } from "../config/constants.js";
 import { log, logError } from "../logging.js";
 import type { Player } from "./player.js";
 import { type Destination } from "../network/types.js";
+import { filter, firstValueFrom, timer, map } from "rxjs";
+
+const MAX_RETRIES = 1;
+const ACK_TIMEOUT_MS = 60_000; // 60 seconds is safer for mesh hops
 
 export function formatResponse(player: Player, text: string, actions: string[] = []): string {
   const status = `[L${player.level} XP:${player.xp} HP:${player.hp}/${player.maxHp} ATK:${player.attack}]`;
@@ -38,15 +43,54 @@ async function sendText(
   recipientId: Destination,
   safeText: string,
 ): Promise<void> {
-  if (USE_LOGGING) {
-    log(`Outgoing to ${recipientId}: ${safeText}`);
-  }
+  log(`Outgoing to ${recipientId}: ${safeText}`);
 
   if (!USE_MOCK) {
-    try {
-      await device.sendText(safeText, recipientId);
-    } catch (e) {
-      logError(`Send Error:`, e);
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const packetId = await device.sendText(safeText, recipientId, true);
+        log(`[Attempt ${attempt}/${MAX_RETRIES}] Sent to ${recipientId}. Packet ID: ${packetId}`);
+
+        const ackPromise = firstValueFrom(
+          device.events.onFromRadio.pipe(
+            filter((packet: Protobuf.Mesh.IMeshPacket) => packet.requestId === packetId),
+            map((packet: Protobuf.Mesh.IMeshPacket) => {
+              if (packet.routing?.variant?.case === "ack") {
+                return { success: true };
+              }
+              if (packet.routing?.errorReason) {
+                throw new Error(`NACK: ${packet.routing.errorReason}`);
+              }
+              return { success: false };
+            }),
+          ),
+        );
+
+        const timeoutPromise = firstValueFrom(
+          timer(ACK_TIMEOUT_MS).pipe(
+            map(() => {
+              throw new Error("Timeout waiting for ACK");
+            }),
+          ),
+        );
+
+        // Race the ACK against the timer
+        await Promise.race([ackPromise, timeoutPromise]);
+
+        log(`✅ Message ${packetId} acknowledged by ${recipientId}`);
+        return; // Success, exit function
+      } catch (e) {
+        const errorMsg = e instanceof Error ? e.message : String(e);
+        logError(`[Attempt ${attempt}] Failed to send to ${recipientId}: ${errorMsg}`);
+
+        if (attempt === MAX_RETRIES) {
+          logError(`Maximum retries reached for ${recipientId}. Giving up.`);
+        } else {
+          // Exponential backoff: wait longer between each retry
+          const backoff = attempt * 2000;
+          await new Promise((resolve) => setTimeout(resolve, backoff));
+        }
+      }
     }
   }
 }
