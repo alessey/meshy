@@ -20,6 +20,7 @@ async function start(): Promise<void> {
 
     if (!isMock) {
       meshDevice = await initTransport((senderId, text) => {
+        console.log(`Received from ${senderId}: ${text}`);
         if (game) {
           game.handleGameLogic(senderId as Destination, text);
         }

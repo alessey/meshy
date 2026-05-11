@@ -1,6 +1,6 @@
 import { type MeshDevice } from "@meshtastic/core";
 import { CHAR_LIMIT, USE_LOGGING, USE_MOCK } from "../config/constants.js";
-import { logError } from "../logging.js";
+import { log, logError } from "../logging.js";
 import type { Player } from "./player.js";
 import { type Destination } from "../network/types.js";
 
@@ -39,7 +39,7 @@ async function sendText(
   safeText: string,
 ): Promise<void> {
   if (USE_LOGGING) {
-    process.stdout.write(`\n[OUTGOING TO ${recipientId}]: ${safeText}\n> `);
+    log(`\n[OUTGOING TO ${recipientId}]: ${safeText}\n> `);
   }
 
   if (!USE_MOCK) {
