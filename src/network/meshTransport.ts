@@ -27,7 +27,6 @@ export async function initTransport(
 
       const senderId = packet.from.toString();
       const text = packet.data;
-      log(`[MESH] Received from ${senderId}: ${text}`);
 
       onMessage(senderId, text);
     });
