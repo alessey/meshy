@@ -1,12 +1,12 @@
 import { USE_LOGGING } from "./config/constants.js";
 
-export async function log(...args: unknown[]): Promise<void> {
+export function log(...args: unknown[]): void {
   if (USE_LOGGING) {
     console.log(...args);
   }
 }
 
-export async function logError(...args: unknown[]): Promise<void> {
+export function logError(...args: unknown[]): void {
   if (USE_LOGGING) {
     console.error(...args);
   }

@@ -6,9 +6,8 @@ import { log, logError } from "./src/logging.js";
 import { loadPlayerData } from "./src/storage/playerStore.js";
 import { initTransport } from "./src/network/meshTransport.js";
 import { startWebServer } from "./src/web/server.js";
-import { USE_LOGGING } from "./src/config/constants.js";
+import { USE_LOGGING, USE_MOCK } from "./src/config/constants.js";
 
-const isMock = process.env.USE_MOCK === "true";
 let meshDevice: MeshDevice | null = null;
 let game: Game | null = null;
 const playerStates: Map<string, Player> = new Map();
@@ -19,7 +18,7 @@ async function start(): Promise<void> {
     const loadedData = await loadPlayerData();
     loadedData.forEach((value, key) => playerStates.set(key, value));
 
-    if (!isMock) {
+    if (!USE_MOCK) {
       meshDevice = await initTransport((senderId, text) => {
         if (USE_LOGGING) {
           console.log(`[MESH] Message received from ${senderId}: ${text}`);
@@ -39,7 +38,7 @@ async function start(): Promise<void> {
 
     startWebServer(playerStates);
 
-    if (isMock) {
+    if (USE_MOCK) {
       log("Mock mode enabled. Type commands in terminal (e.g. /play)");
       process.stdin.on("data", (data) => {
         const input = data.toString().trim();
@@ -50,7 +49,7 @@ async function start(): Promise<void> {
     }
 
     log(
-      isMock
+      USE_MOCK
         ? "Simulator ready (Mock Mode)."
         : "Mesh Game System initialized via HTTP/WS Transport",
     );
