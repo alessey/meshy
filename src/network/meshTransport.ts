@@ -37,17 +37,17 @@ export async function initTransport(
         const packetId = await meshDevice.sendText(text, recipientId, true);
         log(`Sent to ${recipientId}. Packet ID: ${packetId}`);
 
-        meshDevice.events.onFromRadio.subscribe(async (packet: Protobuf.Mesh.IMeshPacket) => {
-          log("Received packet from radio:", packet);
-          if (packet.requestId === packetId) {
-            log("packet received for ACK check:", packet);
-            if (packet.routing?.variant?.case === "ack") {
-              log(`ACK received for packet ${packetId}`);
-            } else if (packet.routing?.errorReason) {
-              logError(`NACK received for packet ${packetId}: ${packet.routing.errorReason}`);
-            }
-          }
-        });
+        // meshDevice.events.onFromRadio.subscribe(async (packet: Protobuf.Mesh.IMeshPacket) => {
+        //   log("Received packet from radio:", packet);
+        //   if (packet.requestId === packetId) {
+        //     log("packet received for ACK check:", packet);
+        //     if (packet.routing?.variant?.case === "ack") {
+        //       log(`ACK received for packet ${packetId}`);
+        //     } else if (packet.routing?.errorReason) {
+        //       logError(`NACK received for packet ${packetId}: ${packet.routing.errorReason}`);
+        //     }
+        //   }
+        // });
       },
     } as unknown as MeshDevice;
 

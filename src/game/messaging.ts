@@ -42,7 +42,7 @@ async function sendText(
 
   if (!USE_MOCK) {
     try {
-      await device.sendText(safeText, recipientId, true);
+      await device.sendText(safeText, recipientId);
     } catch (e) {
       logError(`Send Error:`, e);
     }
