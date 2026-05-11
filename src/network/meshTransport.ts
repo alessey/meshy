@@ -18,6 +18,7 @@ export async function initTransport(
     const transport = await TransportNode.create(DEVICE_IP);
     const meshDevice = new MeshDevice(transport);
     await meshDevice.configure();
+    log("Successfully connected to Meshtastic node. Setting up listeners...");
 
     meshDevice.events.onMessagePacket.subscribe(async (packet: Protobuf.Mesh.IMeshPacket) => {
       if (!packet.data || !packet.data.startsWith("/")) {

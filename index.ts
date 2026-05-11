@@ -6,6 +6,7 @@ import { log, logError } from "./src/logging.js";
 import { loadPlayerData } from "./src/storage/playerStore.js";
 import { initTransport } from "./src/network/meshTransport.js";
 import { startWebServer } from "./src/web/server.js";
+import { USE_LOGGING } from "./src/config/constants.js";
 
 const isMock = process.env.USE_MOCK === "true";
 let meshDevice: MeshDevice | null = null;
@@ -20,7 +21,10 @@ async function start(): Promise<void> {
 
     if (!isMock) {
       meshDevice = await initTransport((senderId, text) => {
-        console.log(`Received from ${senderId}: ${text}`);
+        if (USE_LOGGING) {
+          console.log(`[MESH] Message received from ${senderId}: ${text}`);
+        }
+
         if (game) {
           game.handleGameLogic(senderId as Destination, text);
         }
