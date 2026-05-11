@@ -11,12 +11,23 @@ Meshtastic node RPG
 
 .env file
 ```bash
-USE_LOGGING = true;
-USE_MOCK = false;
-DB_PATH = "./players.json";
-CHAR_LIMIT = 220;
-SAVE_DEBOUNCE_MS = 3000;
-DEVICE_IP = "192.168.1.x";
+# turn on logging
+USE_LOGGING=true
+
+# mock mode for local testing
+USE_MOCK=false 
+
+# path to player database
+DB_PATH="./players.json" 
+
+# meshtastic character limit
+CHAR_LIMIT=220 
+
+# debounce time for saving player data
+SAVE_DEBOUNCE_MS=3000 
+
+# IP address of the Meshtastic node
+DEVICE_IP="192.168.1.x" 
 ```
 
 ```bash
