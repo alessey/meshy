@@ -10,24 +10,25 @@ Meshtastic node RPG
 - picocss
 
 .env file
+
 ```bash
 # turn on logging
 USE_LOGGING=true
 
 # mock mode for local testing
-USE_MOCK=false 
+USE_MOCK=false
 
 # path to player database
-DB_PATH="./players.json" 
+DB_PATH="./players.json"
 
 # meshtastic character limit
-CHAR_LIMIT=200 
+CHAR_LIMIT=200
 
 # debounce time for saving player data
-SAVE_DEBOUNCE_MS=3000 
+SAVE_DEBOUNCE_MS=3000
 
 # IP address of the Meshtastic node
-DEVICE_IP="192.168.1.x" 
+DEVICE_IP="192.168.1.x"
 ```
 
 ```bash

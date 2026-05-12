@@ -4,9 +4,10 @@ import type { Destination } from "./src/network/types.js";
 import { Game } from "./src/app/Game.js";
 import { log, logError } from "./src/logging.js";
 import { loadPlayerData } from "./src/storage/playerStore.js";
-import { initTransport } from "./src/network/meshTransport.js";
 import { startWebServer } from "./src/web/server.js";
-import { USE_MOCK } from "./src/config/constants.js";
+import { DEVICE_IP, USE_MOCK } from "./src/config/constants.js";
+import { dispatchMessages } from "./src/app/messageDispatcher.js";
+import { MeshClient } from "./src/network/meshClient.js";
 
 let meshDevice: MeshDevice | null = null;
 let game: Game | null = null;
@@ -20,30 +21,42 @@ async function start(): Promise<void> {
     const loadedData = await loadPlayerData();
     loadedData.forEach((value, key) => playerStates.set(key, value));
 
+    game = new Game(playerStates);
+
     if (!USE_MOCK) {
-      meshDevice = await initTransport((senderId, text) => {
+      if (!DEVICE_IP) {
+        throw new Error("DEVICE_IP is not defined in environment variables.");
+      }
+
+      const meshClient = new MeshClient(DEVICE_IP, async (senderId, text) => {
         log(`Message received from ${senderId}: ${text}`);
 
-        if (game) {
-          game.handleGameLogic(senderId as Destination, text);
+        if (game && meshDevice) {
+          const messages = game.handleGameLogic(senderId as Destination, text);
+          const player = game.getPlayer(senderId);
+          await dispatchMessages(meshDevice, senderId as Destination, player, messages);
         }
       });
-    }
 
-    if (!meshDevice) {
-      throw new Error("Failed to initialize mesh device.");
+      meshClient.connect();
     }
-
-    game = new Game(meshDevice, playerStates);
 
     startWebServer(playerStates);
 
     if (USE_MOCK) {
       log("Mock mode enabled. Type commands in terminal (e.g. /play)");
-      process.stdin.on("data", (data) => {
+      process.stdin.on("data", async (data) => {
         const input = data.toString().trim();
         if (input && game) {
-          game.handleGameLogic("MOCK_USER" as Destination, input);
+          const messages = game.handleGameLogic("MOCK_USER" as Destination, input);
+          const player = game.getPlayer("MOCK_USER");
+
+          await dispatchMessages(
+            meshDevice as MeshDevice,
+            "MOCK_USER" as Destination,
+            player,
+            messages,
+          );
         }
       });
     }

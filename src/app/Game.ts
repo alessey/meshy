@@ -4,21 +4,18 @@ import { Player } from "../game/player.js";
 import { getStartLocationKey } from "../world/utils.js";
 import { handleEncounter } from "../states/encounters.js";
 import { handleExploring } from "../states/exploring.js";
-import { type MeshDevice } from "@meshtastic/core";
-import { dispatchMessages } from "./messageDispatcher.js";
 import { unknownCommandMessage } from "../states/presenters.js";
 import { result } from "../game/results.js";
 import { save } from "../storage/playerStore.js";
 import worldMap from "../world/map.js";
+import { type Message } from "../types.js";
 
 const GAME_PREFIX = "/";
 
 export class Game {
-  device: MeshDevice;
   playerStates: Map<string, Player>;
 
-  constructor(device: MeshDevice, playerStates: Map<string, Player>) {
-    this.device = device;
+  constructor(playerStates: Map<string, Player>) {
     this.playerStates = playerStates;
   }
 
@@ -39,11 +36,11 @@ export class Game {
     return player;
   }
 
-  async handleGameLogic(senderId: Destination, input: string | number | Uint8Array): Promise<void> {
+  handleGameLogic(senderId: Destination, input: string | number | Uint8Array): Message[] {
     const rawInput = input.toString().trim();
 
     if (!rawInput || !rawInput.startsWith(GAME_PREFIX)) {
-      return;
+      return [];
     }
 
     const command = rawInput.slice(GAME_PREFIX.length).toLowerCase().trim() || COMMANDS.PLAY;
@@ -62,7 +59,6 @@ export class Game {
       save(this.playerStates);
     }
 
-    // Always respond directly to the sender to keep the game private and save airtime
-    return dispatchMessages(this.device, senderId, player, outcome.messages);
+    return outcome.messages;
   }
 }
