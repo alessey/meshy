@@ -14,7 +14,7 @@ const playerStates: Map<string, Player> = new Map();
 
 async function start(): Promise<void> {
   try {
-    log("Initializing Mesh Game System with USE_MOCK:", USE_MOCK);
+    log("Initializing Meshy...");
 
     // Load existing player data into our state map
     const loadedData = await loadPlayerData();

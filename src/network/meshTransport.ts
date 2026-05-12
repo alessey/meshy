@@ -16,7 +16,7 @@ export async function initTransport(
       throw new Error("DEVICE_IP is not defined in environment variables.");
     }
 
-    log("Initializing transport to Meshtastic node at", DEVICE_IP);
+    log(`Initializing transport to Meshtastic node at ${DEVICE_IP}...`);
     const transport = await TransportNode.create(DEVICE_IP);
     log("Transport connection established");
     const meshDevice = new MeshDevice(transport);
@@ -37,16 +37,8 @@ export async function initTransport(
 
     let testPacketId: number | null = null;
     try {
-      meshDevice.events.onRoutingPacket.subscribe(async (packet: Protobuf.Mesh.IMeshPacket) => {
+      meshDevice.events.onRoutingPacket.subscribe(async (packet: Protobuf.Mesh.IRoutingPacket) => {
         log("Received routing packet:", packet, testPacketId === packet.requestId);
-        if (testPacketId && packet.requestId === testPacketId) {
-          log("Routing packet received for ACK check:", packet);
-          if (packet.routing?.variant?.case === "ack") {
-            log(`ACK received for packet ${testPacketId}`);
-          } else if (packet.routing?.errorReason) {
-            logError(`NACK received for packet ${testPacketId}: ${packet.routing.errorReason}`);
-          }
-        }
       });
     } catch (e) {
       logError("Failed to set up routing packet listener:", e);
