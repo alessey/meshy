@@ -16,7 +16,7 @@
     "start": "pnpm run build && pnpm run build:web && node --env-file=.env dist/index.js",
     "start:dev": "pnpm run build && concurrently -i -n \"server,client\" -c \"magenta,cyan\" \"USE_MOCK=true node --env-file=.env dist/index.js\" \"pnpm run dev:web\"",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "oxlint",
+    "lint": "oxlint --deny correctness --deny perf --allow no-await-in-loop",
     "lint:fix": "oxlint --fix",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
@@ -49,7 +49,7 @@
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
-      "oxlint --deny correctness --deny perf",
+      "oxlint --deny correctness --deny perf --allow no-await-in-loop",
       "oxfmt"
     ]
   }

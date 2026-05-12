@@ -5,6 +5,8 @@ import { DeviceStatusEnum } from "./types.js";
 import { type MeshMessageContext } from "./messageContext.js";
 import { type Message } from "../types.js";
 
+const MAX_RETRY_ATTEMPTS = 3;
+
 export class MeshClient {
   private host: string;
   private transport?: TransportNode;
@@ -90,7 +92,6 @@ export class MeshClient {
         }
         for (const message of messages) {
           log(`Replying to ${senderId}: ${message.text}`);
-          // eslint-disable-next-line no-await-in-loop
           await this.sendMessage(senderId, message.text);
         }
       };
@@ -102,19 +103,28 @@ export class MeshClient {
   }
 
   async sendMessage(recipientId: number | "self" | "broadcast", text: string): Promise<void> {
-    if (!this.device) {
-      await this.handleReconnect();
-    }
+    for (let attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
+      try {
+        if (!this.device) {
+          await this.handleReconnect();
+        }
 
-    if (!this.device) {
-      log("Unable to send message: Device not connected");
-      return;
-    }
+        if (!this.device) {
+          throw new Error("Device not connected");
+        }
 
-    this.device.sendText(text, recipientId).catch((err) => {
-      const error = err instanceof Error ? err.message : err;
-      log("Send failed:", error);
-    });
+        await this.device.sendText(text, recipientId);
+        return;
+      } catch (err) {
+        const error = err instanceof Error ? err.message : err;
+        log(`Send attempt ${attempt}/${MAX_RETRY_ATTEMPTS} failed: ${error}`);
+
+        if (attempt < MAX_RETRY_ATTEMPTS) {
+          // wait 1s, try again
+          await new Promise((resolve) => setTimeout(resolve, 1_000));
+        }
+      }
+    }
   }
 
   async handleReconnect() {

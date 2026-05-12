@@ -1,5 +1,6 @@
 {
   "rules": {
-    "typescript/consistent-type-imports": "error"
+    "typescript/consistent-type-imports": "error",
+    "no-await-in-loop": "off"
   }
 }
