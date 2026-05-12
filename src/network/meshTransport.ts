@@ -16,8 +16,9 @@ export async function initTransport(
       throw new Error("DEVICE_IP is not defined in environment variables.");
     }
 
+    log("Initializing transport to Meshtastic node at", DEVICE_IP);
     const transport = await TransportNode.create(DEVICE_IP);
-    log("Transport connection established to Meshtastic node at", DEVICE_IP);
+    log("Transport connection established");
     const meshDevice = new MeshDevice(transport);
     log("Configuring MeshDevice...");
     await meshDevice.configure();
