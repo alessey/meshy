@@ -39,6 +39,14 @@ export async function initTransport(
     try {
       meshDevice.events.onRoutingPacket.subscribe(async (packet: Protobuf.Mesh.IRoutingPacket) => {
         log("Received routing packet:", packet, testPacketId === packet.requestId);
+        log(
+          "Full Data Tree:",
+          JSON.stringify(
+            packet.data,
+            (key, value) => (typeof value === "bigint" ? value.toString() : value),
+            2,
+          ),
+        );
       });
     } catch (e) {
       logError("Failed to set up routing packet listener:", e);
