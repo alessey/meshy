@@ -1,15 +1,13 @@
-import type { MeshDevice } from "@meshtastic/core";
 import type { Player } from "./src/game/player.js";
 import type { Destination } from "./src/network/types.js";
+import type { MeshMessageContext } from "./src/network/messageContext.js";
 import { Game } from "./src/app/Game.js";
 import { log, logError } from "./src/logging.js";
 import { loadPlayerData } from "./src/storage/playerStore.js";
 import { startWebServer } from "./src/web/server.js";
 import { DEVICE_IP, USE_MOCK } from "./src/config/constants.js";
-import { dispatchMessages } from "./src/app/messageDispatcher.js";
 import { MeshClient } from "./src/network/meshClient.js";
 
-let meshDevice: MeshDevice | null = null;
 let game: Game | null = null;
 const playerStates: Map<string, Player> = new Map();
 
@@ -23,45 +21,47 @@ async function start(): Promise<void> {
 
     game = new Game(playerStates);
 
+    const handleIncomingMessage = async (ctx: MeshMessageContext) => {
+      log(`Message received from ${ctx.senderId}: ${ctx.text}`);
+
+      if (game) {
+        const messages = game.handleGameLogic(ctx.senderId, ctx.text);
+        await ctx.reply(messages);
+      }
+    };
+
     if (!USE_MOCK) {
       if (!DEVICE_IP) {
         throw new Error("DEVICE_IP is not defined in environment variables.");
       }
 
-      const meshClient = new MeshClient(DEVICE_IP, async (senderId, text) => {
-        log(`Message received from ${senderId}: ${text}`);
-
-        if (game) {
-          const messages = game.handleGameLogic(senderId as Destination, text);
-
-          // const player = game.getPlayer(senderId);
-          console.log("messages", messages);
-          //await dispatchMessages(meshDevice, senderId as Destination, player, messages);
-        }
-      });
+      const meshClient = new MeshClient(DEVICE_IP, handleIncomingMessage);
 
       meshClient.connect();
+    } else {
+      log("Mock mode enabled. Type commands in terminal (e.g. /play)");
+      process.stdin.on("data", async (data) => {
+        const text = data.toString().trim();
+        if (!text || !game) {
+          return;
+        }
+
+        const mockCtx: MeshMessageContext = {
+          senderId: "MOCK_USER" as Destination,
+          text,
+          reply: async (messages) => {
+            messages.forEach((msg) => {
+              const actions = "actions" in msg ? ` [${msg.actions.join(", ")}]` : "";
+              log(`[MOCK OUT] ${msg.text}${actions}`);
+            });
+          },
+        };
+
+        await handleIncomingMessage(mockCtx);
+      });
     }
 
     startWebServer(playerStates);
-
-    if (USE_MOCK) {
-      log("Mock mode enabled. Type commands in terminal (e.g. /play)");
-      process.stdin.on("data", async (data) => {
-        const input = data.toString().trim();
-        if (input && game) {
-          const messages = game.handleGameLogic("MOCK_USER" as Destination, input);
-          const player = game.getPlayer("MOCK_USER");
-
-          await dispatchMessages(
-            meshDevice as MeshDevice,
-            "MOCK_USER" as Destination,
-            player,
-            messages,
-          );
-        }
-      });
-    }
 
     log(
       USE_MOCK

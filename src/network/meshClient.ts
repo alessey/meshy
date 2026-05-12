@@ -2,6 +2,8 @@ import { MeshDevice, type Protobuf } from "@meshtastic/core";
 import { TransportNode } from "@meshtastic/transport-node";
 import { log } from "../logging.js";
 import { DeviceStatusEnum } from "./types.js";
+import { type MeshMessageContext } from "./messageContext.js";
+import { type Message } from "../types.js";
 
 export class MeshClient {
   private host: string;
@@ -9,11 +11,11 @@ export class MeshClient {
   private device?: MeshDevice;
   private reconnectTimeout: number = 5000;
   private connecting: boolean = false;
-  private onMessage: (senderId: string, text: string) => void;
+  private onMessageWithContext: (ctx: MeshMessageContext) => void; // New property for context handler
 
-  constructor(host: string, onMessage: (senderId: string, text: string) => void) {
+  constructor(host: string, onMessageWithContext: (ctx: MeshMessageContext) => void) {
     this.host = host;
-    this.onMessage = onMessage;
+    this.onMessageWithContext = onMessageWithContext;
   }
 
   get meshDevice(): MeshDevice | undefined {
@@ -81,7 +83,19 @@ export class MeshClient {
       const senderId = packet.from.toString();
       const text = packet.data;
 
-      this.onMessage(senderId, text);
+      const replyFunction = async (messages: Message[]) => {
+        if (!this.device) {
+          log("Attempted to reply but device is not connected.");
+          return;
+        }
+        for (const message of messages) {
+          log(`Replying to ${senderId}: ${message.text}`);
+          // eslint-disable-next-line no-await-in-loop
+          await this.sendMessage(senderId, message.text);
+        }
+      };
+
+      this.onMessageWithContext({ senderId, text, reply: replyFunction });
     });
 
     log("Message handler set up.");
