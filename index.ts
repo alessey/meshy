@@ -6,7 +6,7 @@ import { log, logError } from "./src/logging.js";
 import { loadPlayerData } from "./src/storage/playerStore.js";
 import { initTransport } from "./src/network/meshTransport.js";
 import { startWebServer } from "./src/web/server.js";
-import { USE_LOGGING, USE_MOCK } from "./src/config/constants.js";
+import { USE_MOCK } from "./src/config/constants.js";
 
 let meshDevice: MeshDevice | null = null;
 let game: Game | null = null;
@@ -14,15 +14,15 @@ const playerStates: Map<string, Player> = new Map();
 
 async function start(): Promise<void> {
   try {
+    log("Initializing Mesh Game System with USE_MOCK:", USE_MOCK);
+
     // Load existing player data into our state map
     const loadedData = await loadPlayerData();
     loadedData.forEach((value, key) => playerStates.set(key, value));
 
     if (!USE_MOCK) {
       meshDevice = await initTransport((senderId, text) => {
-        if (USE_LOGGING) {
-          log(`Message received from ${senderId}: ${text}`);
-        }
+        log(`Message received from ${senderId}: ${text}`);
 
         if (game) {
           game.handleGameLogic(senderId as Destination, text);

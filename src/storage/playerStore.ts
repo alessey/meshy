@@ -28,7 +28,6 @@ async function performSave(playerStates: Map<string, Player>): Promise<void> {
   try {
     const data = JSON.stringify(Object.fromEntries(playerStates));
     await fs.writeFile(DB_PATH, data, "utf-8");
-    // log("Disk Sync: Player states saved.");
   } catch (err) {
     logError("Save Error:", err);
     throw err;
