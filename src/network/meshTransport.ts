@@ -2,7 +2,6 @@ import { TransportNode } from "@meshtastic/transport-node";
 import { type Protobuf, MeshDevice } from "@meshtastic/core";
 import { log, logError } from "../logging.js";
 import { DEVICE_IP } from "../config/constants.js";
-import type { Destination } from "./types.js";
 
 /**
  * Initializes the connection to the Meshtastic node and sets up listeners.
@@ -35,33 +34,8 @@ export async function initTransport(
       onMessage(senderId, text);
     });
 
-    let testPacketId: number | null = null;
-    try {
-      meshDevice.events.onRoutingPacket.subscribe(async (packet: Protobuf.Mesh.IRoutingPacket) => {
-        log("Received routing packet:", packet, testPacketId === packet.requestId);
-        log(
-          "Full Data Tree:",
-          JSON.stringify(
-            packet.data,
-            (key, value) => (typeof value === "bigint" ? value.toString() : value),
-            2,
-          ),
-        );
-      });
-    } catch (e) {
-      logError("Failed to set up routing packet listener:", e);
-    }
-
-    const MeshDeviceWithRetry = {
-      sendText: async (text: string, recipientId: Destination): Promise<void> => {
-        const packetId = await meshDevice.sendText(text, recipientId, true);
-        log(`Sent to ${recipientId}. Packet ID: ${packetId}`);
-        testPacketId = packetId;
-      },
-    } as unknown as MeshDevice;
-
     log(`Connected to Meshtastic device at ${DEVICE_IP}`);
-    return MeshDeviceWithRetry;
+    return meshDevice;
   } catch (err) {
     logError("Failed to connect to Meshtastic node:", err);
     // Recursive retry after 5 seconds
