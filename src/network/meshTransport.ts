@@ -17,7 +17,9 @@ export async function initTransport(
     }
 
     const transport = await TransportNode.create(DEVICE_IP);
+    log("Transport connection established to Meshtastic node at", DEVICE_IP);
     const meshDevice = new MeshDevice(transport);
+    log("Configuring MeshDevice...");
     await meshDevice.configure();
     log("Successfully connected to Meshtastic node. Setting up listeners...");
 
