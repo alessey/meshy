@@ -31,10 +31,12 @@ async function start(): Promise<void> {
       const meshClient = new MeshClient(DEVICE_IP, async (senderId, text) => {
         log(`Message received from ${senderId}: ${text}`);
 
-        if (game && meshDevice) {
+        if (game) {
           const messages = game.handleGameLogic(senderId as Destination, text);
-          const player = game.getPlayer(senderId);
-          await dispatchMessages(meshDevice, senderId as Destination, player, messages);
+
+          // const player = game.getPlayer(senderId);
+          console.log("messages", messages);
+          //await dispatchMessages(meshDevice, senderId as Destination, player, messages);
         }
       });
 

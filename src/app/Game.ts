@@ -8,7 +8,8 @@ import { unknownCommandMessage } from "../states/presenters.js";
 import { result } from "../game/results.js";
 import { save } from "../storage/playerStore.js";
 import worldMap from "../world/map.js";
-import { type Message } from "../types.js";
+import type { Message } from "../types.js";
+import { formatMessage } from "./messageFormatter.js";
 
 const GAME_PREFIX = "/";
 
@@ -59,6 +60,6 @@ export class Game {
       save(this.playerStates);
     }
 
-    return outcome.messages;
+    return outcome.messages.map((msg) => formatMessage(player, msg));
   }
 }

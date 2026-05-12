@@ -8,7 +8,7 @@ export class MeshClient {
   private transport?: TransportNode;
   private device?: MeshDevice;
   private reconnectTimeout: number = 5000;
-  private reconnecting: boolean = false;
+  private connecting: boolean = false;
   private onMessage: (senderId: string, text: string) => void;
 
   constructor(host: string, onMessage: (senderId: string, text: string) => void) {
@@ -29,9 +29,11 @@ export class MeshClient {
       log("Configuring MeshDevice...");
 
       await this.device.configure();
-      log(`Successfully connected to Meshtastic device at ${this.host}. Setting up listeners...`);
+      log(`Successfully connected to Meshtastic device at ${this.host}.`);
 
       this.setupListeners();
+
+      this.connecting = false;
     } catch (err) {
       const error = err instanceof Error ? err.message : err;
       log("Connection failed, retrying in 5s...", error);
@@ -41,6 +43,8 @@ export class MeshClient {
   }
 
   setupListeners() {
+    log("Setting up device listeners...");
+
     this.setupDeviceStatusHandler();
     this.setupMessageHandler();
   }
@@ -59,6 +63,8 @@ export class MeshClient {
         this.handleReconnect();
       }
     });
+
+    log("Device status handler set up.");
   }
 
   setupMessageHandler() {
@@ -77,17 +83,31 @@ export class MeshClient {
 
       this.onMessage(senderId, text);
     });
+
+    log("Message handler set up.");
   }
 
-  handleReconnect() {
-    if (this.reconnecting) {
+  async sendMessage(recipientId: number | "self" | "broadcast", text: string): Promise<void> {
+    if (!this.device) {
+      await this.handleReconnect();
+    }
+
+    if (!this.device) {
+      log("Unable to send message: Device not connected");
       return;
     }
-    this.reconnecting = true;
 
-    setTimeout(async () => {
-      await this.connect();
-      this.reconnecting = false;
-    }, this.reconnectTimeout);
+    this.device.sendText(text, recipientId).catch((err) => {
+      const error = err instanceof Error ? err.message : err;
+      log("Send failed:", error);
+    });
+  }
+
+  async handleReconnect() {
+    if (this.connecting) {
+      return;
+    }
+    this.connecting = true;
+    return await this.connect();
   }
 }
