@@ -32,24 +32,24 @@ export async function initTransport(
       onMessage(senderId, text);
     });
 
-    let testPacketId: number | null = null;
-    meshDevice.events.onRoutingPacket.subscribe(async (packet: Protobuf.Mesh.IMeshPacket) => {
-      log("Received routing packet:", packet, testPacketId === packet.requestId);
-      if (testPacketId && packet.requestId === testPacketId) {
-        log("Routing packet received for ACK check:", packet);
-        if (packet.routing?.variant?.case === "ack") {
-          log(`ACK received for packet ${testPacketId}`);
-        } else if (packet.routing?.errorReason) {
-          logError(`NACK received for packet ${testPacketId}: ${packet.routing.errorReason}`);
-        }
-      }
-    });
+    // let testPacketId: number | null = null;
+    // meshDevice.events.onRoutingPacket.subscribe(async (packet: Protobuf.Mesh.IMeshPacket) => {
+    //   log("Received routing packet:", packet, testPacketId === packet.requestId);
+    //   if (testPacketId && packet.requestId === testPacketId) {
+    //     log("Routing packet received for ACK check:", packet);
+    //     if (packet.routing?.variant?.case === "ack") {
+    //       log(`ACK received for packet ${testPacketId}`);
+    //     } else if (packet.routing?.errorReason) {
+    //       logError(`NACK received for packet ${testPacketId}: ${packet.routing.errorReason}`);
+    //     }
+    //   }
+    // });
 
     const MeshDeviceWithRetry = {
       sendText: async (text: string, recipientId: Destination): Promise<void> => {
         const packetId = await meshDevice.sendText(text, recipientId, true);
         log(`Sent to ${recipientId}. Packet ID: ${packetId}`);
-        testPacketId = packetId;
+        // testPacketId = packetId;
       },
     } as unknown as MeshDevice;
 
