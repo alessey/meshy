@@ -1,6 +1,6 @@
 import { MeshDevice, type Protobuf } from "@meshtastic/core";
 import { TransportNode } from "@meshtastic/transport-node";
-import { log } from "../logging.js";
+import { log, logError } from "../logging.js";
 import { DeviceStatusEnum } from "./types.js";
 import { type MeshMessageContext } from "./messageContext.js";
 import { type Message } from "../types.js";
@@ -60,10 +60,10 @@ export class MeshClient {
     }
 
     this.device.events.onDeviceStatus.subscribe((status: DeviceStatusEnum) => {
-      console.log("Status changed:", DeviceStatusEnum[status]);
+      log("Status changed:", DeviceStatusEnum[status]);
 
       if (status === DeviceStatusEnum.DeviceDisconnected) {
-        console.warn("Socket timed out or lost. Reconnecting...");
+        logError("Socket timed out or lost. Reconnecting...");
         this.handleReconnect();
       }
     });
