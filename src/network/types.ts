@@ -1,3 +1,5 @@
+import type { Message } from "../types.js";
+
 export type Destination = number | "self" | "broadcast";
 
 export enum DeviceStatusEnum {
@@ -9,3 +11,9 @@ export enum DeviceStatusEnum {
   DeviceConfiguring = 6,
   DeviceConfigured = 7,
 }
+
+export type MeshMessageContext = {
+  senderId: Destination;
+  text: string;
+  reply: (messages: Message[]) => Promise<void>;
+};

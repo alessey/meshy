@@ -70,7 +70,7 @@ function resolveCombatRound(player: Player, event: MonsterEncounter): GameOutcom
       return result(
         [
           gameMessage(
-            `${combatMessage}${monster.name} is defeated! ${monsterRewardText(reward)}`,
+            `${monsterDefeatedText(combatMessage, monster)} ${monsterRewardText(reward)}`,
             [],
           ),
           gameMessage(lootDropText(loot), getCommandLabels(EVENT_ACTIONS.item)),

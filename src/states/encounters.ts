@@ -31,10 +31,10 @@ export function handleEncounter(player: Player, command: Command): GameOutcome {
       }
       break;
     default:
-      // Unhandled encounter type
+      // unhandled encounter type
       return result([unknownCommandMessage(player)]);
   }
 
-  // If the command doesn't match the encounter type or the type is unhandled
+  // if command doesn't match the encounter type or the type is unhandled
   return result([unknownCommandMessage(player)]);
 }

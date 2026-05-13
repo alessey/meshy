@@ -1,10 +1,9 @@
 import type { Player } from "./src/game/player.js";
-import type { Destination } from "./src/network/types.js";
-import type { MeshMessageContext } from "./src/network/messageContext.js";
+import type { Destination, MeshMessageContext } from "./src/network/types.js";
 import { Game } from "./src/app/Game.js";
 import { log, logError } from "./src/logging.js";
 import { loadPlayerData } from "./src/storage/playerStore.js";
-import { startWebServer } from "./src/web/server.js";
+import { startWebServer } from "./src/webserver/server.js";
 import { DEVICE_IP, USE_MOCK } from "./src/config/constants.js";
 import { MeshClient } from "./src/network/meshClient.js";
 
@@ -51,8 +50,7 @@ async function start(): Promise<void> {
           text,
           reply: async (messages) => {
             messages.forEach((msg) => {
-              const actions = "actions" in msg ? ` [${msg.actions.join(", ")}]` : "";
-              log(`[MOCK OUT] ${msg.text}${actions}`);
+              log(msg.text);
             });
           },
         };

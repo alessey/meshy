@@ -1,8 +1,7 @@
 import { MeshDevice, type Protobuf } from "@meshtastic/core";
 import { TransportNode } from "@meshtastic/transport-node";
 import { log, logError } from "../logging.js";
-import { DeviceStatusEnum } from "./types.js";
-import { type MeshMessageContext } from "./messageContext.js";
+import { DeviceStatusEnum, type MeshMessageContext } from "./types.js";
 import { type Message } from "../types.js";
 
 const MAX_RETRY_ATTEMPTS = 3;
@@ -13,7 +12,7 @@ export class MeshClient {
   private device?: MeshDevice;
   private reconnectTimeout: number = 5000;
   private connecting: boolean = false;
-  private onMessageWithContext: (ctx: MeshMessageContext) => void; // New property for context handler
+  private onMessageWithContext: (ctx: MeshMessageContext) => void;
 
   constructor(host: string, onMessageWithContext: (ctx: MeshMessageContext) => void) {
     this.host = host;

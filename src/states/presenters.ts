@@ -10,7 +10,7 @@ export function getLocation(player: Player): Location {
   const loc = worldMap[player.location];
   if (loc) return loc;
 
-  // Fallback to start location or first available location if key is invalid (e.g. after death reset)
+  // fallback to start location or first available location if key is invalid (e.g. after death reset)
   return worldMap[getStartLocationKey()];
 }
 
@@ -21,19 +21,16 @@ export function locationSummaryMessage(location: Location) {
 export function eventPromptMessage(event: Encounter, player: Player) {
   const actions = getCommandLabels(EVENT_ACTIONS[event.type]);
 
-  if (event.type === "item") {
-    return gameMessage(itemPrompt(event.item), actions);
+  switch (event.type) {
+    case "item":
+      return gameMessage(itemPrompt(event.item), actions);
+    case "monster":
+      return gameMessage(monsterPrompt(event.monster), actions);
+    case "potion":
+      return gameMessage(potionPrompt(event.potion), actions);
+    default:
+      return gameMessage(TEXT.WAITING_EVENT, getDisplayActions(getLocation(player).actions));
   }
-
-  if (event.type === "monster") {
-    return gameMessage(monsterPrompt(event.monster), actions);
-  }
-
-  if (event.type === "potion") {
-    return gameMessage(potionPrompt(event.potion), actions);
-  }
-
-  return gameMessage(TEXT.WAITING_EVENT, getDisplayActions(getLocation(player).actions));
 }
 
 export function unknownCommandMessage(player: Player) {
