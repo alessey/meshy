@@ -2,14 +2,14 @@ import styles from "./MapCell.module.css";
 import TileIcon from "../TileIcon/TileIcon";
 import type { Location } from "../../../../src/types";
 
-interface MapCellProps {
+type MapCellProps = {
   cell: Location | undefined;
   coord: string;
   playersHere: { id: string; location: string; level: number }[];
   selectedId: string;
   isSelectedCell: boolean;
   isStart: boolean;
-}
+};
 
 export default function MapCell({
   cell,

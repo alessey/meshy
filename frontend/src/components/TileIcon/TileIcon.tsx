@@ -1,8 +1,8 @@
 import styles from "./TileIcon.module.css";
 
-interface TileIconProps {
+type TileIconProps = {
   type?: string;
-}
+};
 
 export default function TileIcon({ type }: TileIconProps) {
   if (!type) return null;
