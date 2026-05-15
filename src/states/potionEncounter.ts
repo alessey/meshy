@@ -1,4 +1,3 @@
-import { MAX_HP } from "../game/player.js";
 import { COMMANDS, EVENT_ACTIONS, getCommandLabels } from "../game/commands.js";
 import { gameMessage, result } from "../game/results.js";
 import { potionPrompt } from "../game/text.js";
@@ -14,7 +13,7 @@ export function handlePotionEncounter(
   const location = getLocation(player);
 
   if (command === COMMANDS.USE) {
-    player.hp = Math.min(player.hp + event.potion.heal, MAX_HP);
+    player.hp += event.potion.heal;
     player.encounter = null;
     return result([locationSummaryMessage(location)], { shouldSave: true });
   }

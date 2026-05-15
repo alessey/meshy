@@ -6,17 +6,17 @@ export const MAX_HP = 20;
 export class Player {
   location: string;
   _hp: number;
+  private _armor: Armor;
   weapon: Weapon;
-  armor: Armor;
   items: Item[];
   xp: number;
   encounter: Encounter | null;
 
   constructor() {
     this.location = "";
-    this._hp = MAX_HP;
     this.weapon = { name: "Fists", attack: 2 };
-    this.armor = { name: "Cloth", hp: 0 };
+    this._armor = { name: "Cloth", hp: 0 };
+    this._hp = MAX_HP;
     this.items = [];
     this.xp = 0;
     this.encounter = null;
@@ -26,17 +26,43 @@ export class Player {
     return getLevel(this).level;
   }
 
+  get armor(): Armor {
+    return this._armor;
+  }
+
+  set armor(newArmor: Armor) {
+    this._armor = {
+      ...newArmor,
+      max: newArmor.max ?? newArmor.hp,
+    };
+  }
+
   get hp() {
     return Math.ceil((this._hp + this.armor.hp) * getLevelMultiplier(this));
   }
 
   set hp(value) {
-    const baseHpWithArmor = Math.ceil(value / getLevelMultiplier(this));
-    this._hp = Math.min(Math.max(baseHpWithArmor - this.armor.hp, 0), MAX_HP);
+    const multiplier = getLevelMultiplier(this);
+    const unscaledNewTotal = Math.ceil(value / multiplier);
+    const currentUnscaledTotal = this._hp + this.armor.hp;
+    const diff = unscaledNewTotal - currentUnscaledTotal;
+
+    if (diff < 0) {
+      let damageRemaining = Math.abs(diff);
+
+      const armorDamage = Math.min(this.armor.hp, damageRemaining);
+      this.armor.hp -= armorDamage;
+      damageRemaining -= armorDamage;
+
+      this._hp = Math.max(0, this._hp - damageRemaining);
+    } else if (diff > 0) {
+      // healing doesn't fix armor
+      this._hp = Math.min(MAX_HP, this._hp + diff);
+    }
   }
 
   get maxHp() {
-    return Math.ceil((MAX_HP + this.armor.hp) * getLevelMultiplier(this));
+    return Math.ceil((MAX_HP + this._armor.hp) * getLevelMultiplier(this));
   }
 
   get attack() {
@@ -44,7 +70,7 @@ export class Player {
   }
 
   get inventory(): Equipment[] {
-    return [this.weapon, this.armor, ...this.items];
+    return [this.weapon, this._armor, ...this.items];
   }
 
   healToFull() {
@@ -64,9 +90,9 @@ export function hydratePlayer(savedPlayer: Partial<Player> = {}) {
   const player = new Player();
 
   player.location = savedPlayer.location ?? player.location;
+  player.armor = savedPlayer.armor ?? player.armor;
   player._hp = savedPlayer._hp ?? player._hp;
   player.weapon = savedPlayer.weapon ?? player.weapon;
-  player.armor = savedPlayer.armor ?? player.armor;
   player.xp = savedPlayer.xp ?? player.xp;
   player.encounter = savedPlayer.encounter ?? player.encounter;
   player.items = savedPlayer.items ?? player.items;

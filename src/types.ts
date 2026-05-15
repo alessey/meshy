@@ -18,6 +18,7 @@ export type Weapon = Equipment & {
 
 export type Armor = Equipment & {
   hp: number;
+  max?: number;
 };
 
 export type Item = Equipment & {
