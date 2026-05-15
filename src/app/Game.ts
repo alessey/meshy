@@ -60,7 +60,10 @@ export class Game {
     let outcome: GameOutcome = { messages: [], shouldSave: false };
     if (isCommand(command)) {
       if (isSystemCommand(command)) {
-        outcome.messages.push(handleSystem(player, command));
+        const systemMessage = handleSystem(player, command);
+        if (systemMessage) {
+          outcome.messages.push(systemMessage);
+        }
       }
 
       const result = player.encounter

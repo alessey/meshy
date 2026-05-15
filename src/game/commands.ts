@@ -21,6 +21,7 @@ export const COMMANDS = {
   USE: "u",
   PLAY: "play",
   HELP: "help",
+  RETRY: "retry",
 } as const;
 
 export const MOVEMENT_COMMANDS = [
@@ -30,7 +31,7 @@ export const MOVEMENT_COMMANDS = [
   COMMANDS.MOVE_WEST,
 ];
 
-export const SYSTEM_ACTIONS = [COMMANDS.PLAY, COMMANDS.HELP, COMMANDS.INVENTORY];
+export const SYSTEM_ACTIONS = [COMMANDS.PLAY, COMMANDS.HELP, COMMANDS.INVENTORY, COMMANDS.RETRY];
 
 export const EVENT_ACTIONS = {
   item: [COMMANDS.TAKE, COMMANDS.DISCARD],
@@ -40,6 +41,12 @@ export const EVENT_ACTIONS = {
 
 export function isMovementCommand(command: string): command is Direction {
   return MOVEMENT_COMMANDS.includes(command as Direction);
+}
+
+export function isEncounterCommand(
+  command: string,
+): command is ItemCommand | MonsterCommand | PotionCommand {
+  return isItemCommand(command) || isMonsterCommand(command) || isPotionCommand(command);
 }
 
 export function isSystemCommand(command: string): command is SystemCommand {
