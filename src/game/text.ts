@@ -3,7 +3,7 @@ import { type Player } from "./player.js";
 
 export const TEXT = {
   INVENTORY_TITLE: "Inventory:",
-  UNKNOWN_COMMAND: "Unknown command.",
+  UNKNOWN_COMMAND: "Unknown command, type /help for more info.",
   YOU_DIED: "You died!",
   WAITING_EVENT: "An event is waiting.",
 };

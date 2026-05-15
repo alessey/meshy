@@ -1,4 +1,4 @@
-import type { COMMANDS, EVENT_ACTIONS, GAME_ACTIONS } from "./game/commands.js";
+import type { COMMANDS, EVENT_ACTIONS, SYSTEM_ACTIONS } from "./game/commands.js";
 
 /**
  * Equipment and Inventory Types
@@ -70,23 +70,16 @@ type EventActionsConfig = typeof EVENT_ACTIONS;
 export type ItemCommand = EventActionsConfig["item"][number];
 export type MonsterCommand = EventActionsConfig["monster"][number];
 export type PotionCommand = EventActionsConfig["potion"][number];
-export type InventoryCommand = EventActionsConfig["inventory"][number];
 
 /**
- * Game Actions Types
+ * System Actions Types
  */
-export type PlayCommand = (typeof GAME_ACTIONS)[number];
+export type SystemCommand = (typeof SYSTEM_ACTIONS)[number];
 
 /**
  * Command Unions
  */
-export type Command =
-  | Direction
-  | ItemCommand
-  | MonsterCommand
-  | PotionCommand
-  | InventoryCommand
-  | PlayCommand;
+export type Command = Direction | ItemCommand | MonsterCommand | PotionCommand | SystemCommand;
 
 /**
  * Location Types

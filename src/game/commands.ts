@@ -3,9 +3,8 @@ import type {
   ItemCommand,
   MonsterCommand,
   PotionCommand,
-  InventoryCommand,
   Command,
-  PlayCommand,
+  SystemCommand,
   LocationActions,
 } from "../types.js";
 
@@ -21,6 +20,7 @@ export const COMMANDS = {
   RUN: "r",
   USE: "u",
   PLAY: "play",
+  HELP: "help",
 } as const;
 
 export const MOVEMENT_COMMANDS = [
@@ -30,21 +30,20 @@ export const MOVEMENT_COMMANDS = [
   COMMANDS.MOVE_WEST,
 ];
 
-export const GAME_ACTIONS = [COMMANDS.PLAY];
+export const SYSTEM_ACTIONS = [COMMANDS.PLAY, COMMANDS.HELP, COMMANDS.INVENTORY];
 
 export const EVENT_ACTIONS = {
   item: [COMMANDS.TAKE, COMMANDS.DISCARD],
   monster: [COMMANDS.FIGHT, COMMANDS.RUN],
   potion: [COMMANDS.USE, COMMANDS.DISCARD],
-  inventory: [COMMANDS.INVENTORY],
 };
 
 export function isMovementCommand(command: string): command is Direction {
   return MOVEMENT_COMMANDS.includes(command as Direction);
 }
 
-export function isGameCommand(command: string): command is PlayCommand {
-  return (GAME_ACTIONS as readonly string[]).includes(command);
+export function isSystemCommand(command: string): command is SystemCommand {
+  return (SYSTEM_ACTIONS as readonly string[]).includes(command);
 }
 
 export function isItemCommand(command: string): command is ItemCommand {
@@ -59,18 +58,13 @@ export function isPotionCommand(command: string): command is PotionCommand {
   return (EVENT_ACTIONS.potion as readonly string[]).includes(command);
 }
 
-export function isInventoryCommand(command: string): command is InventoryCommand {
-  return (EVENT_ACTIONS.inventory as readonly string[]).includes(command);
-}
-
 export function isCommand(command: string): command is Command {
   return (
-    isGameCommand(command) ||
+    isSystemCommand(command) ||
     isMovementCommand(command) ||
     isItemCommand(command) ||
     isMonsterCommand(command) ||
-    isPotionCommand(command) ||
-    isInventoryCommand(command)
+    isPotionCommand(command)
   );
 }
 

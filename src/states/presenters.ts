@@ -1,9 +1,9 @@
 import worldMap from "../world/map.js";
 import { EVENT_ACTIONS, getCommandLabels, getDisplayActions } from "../game/commands.js";
-import { gameMessage } from "../game/results.js";
+import { gameMessage, plainMessage } from "../game/results.js";
 import { itemPrompt, monsterPrompt, potionPrompt, TEXT } from "../game/text.js";
 import type { Player } from "../game/player.js";
-import type { Location, Encounter } from "../types.js";
+import type { Location, Encounter, Equipment } from "../types.js";
 import { getStartLocationKey } from "../world/utils.js";
 
 export function getLocation(player: Player): Location {
@@ -40,4 +40,53 @@ export function unknownCommandMessage(player: Player) {
     : getDisplayActions(location.actions);
 
   return gameMessage(TEXT.UNKNOWN_COMMAND, actions);
+}
+
+export function helpMessage() {
+  return plainMessage(`Available commands:
+/play - start a new game (does not restart if already playing)
+/i - show inventory
+/retry - repeat last message
+/help - show this message`);
+}
+
+export function playMessage(player: Player) {
+  return plainMessage(`Welcome, you are in a player with level ${player.level} Let's play!`);
+}
+
+export function inventoryMessage(player: Player) {
+  const message = ["Inventory:"];
+
+  if (player.weapon) {
+    message.push(`Weapon: ${formatInventoryItem(player.weapon)}`);
+  }
+
+  if (player.armor) {
+    message.push(`Armor: ${formatInventoryItem(player.armor)}`);
+  }
+
+  if (player.items.length > 0) {
+    message.push("Items:");
+    player.items.forEach((item) => {
+      message.push(`- ${formatInventoryItem(item)}`);
+    });
+  }
+
+  return plainMessage(message.join("\n"));
+}
+
+function formatInventoryItem(item: Equipment): string {
+  if (item.attack !== undefined) {
+    return `${item.name} (${item.attack} ATK)`;
+  }
+
+  if (item.hp !== undefined) {
+    return `${item.name} (${item.hp} HP)`;
+  }
+
+  if (item.type !== undefined) {
+    return `${item.name} (${item.type})`;
+  }
+
+  return item.name;
 }

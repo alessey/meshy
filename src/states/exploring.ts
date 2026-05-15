@@ -1,13 +1,7 @@
-import {
-  getDisplayActions,
-  isGameCommand,
-  isInventoryCommand,
-  isMovementCommand,
-} from "../game/commands.js";
+import { getDisplayActions, isSystemCommand, isMovementCommand } from "../game/commands.js";
 import { resolveLocationEvent } from "../game/encounters.js";
-import { formatInventory } from "../game/inventory.js";
 import { gameMessage, result } from "../game/results.js";
-import { inventoryText, requirementText } from "../game/text.js";
+import { requirementText } from "../game/text.js";
 import {
   eventPromptMessage,
   getLocation,
@@ -19,19 +13,12 @@ import type { Command, Direction, GameOutcome } from "../types.js";
 import worldMap from "../world/map.js";
 
 export function handleExploring(player: Player, command: Command): GameOutcome {
-  if (!command || isGameCommand(command)) {
+  if (!command || isSystemCommand(command)) {
     return result([locationSummaryMessage(getLocation(player))]);
   }
 
   if (isMovementCommand(command)) {
     return handleMovement(player, command);
-  }
-
-  if (isInventoryCommand(command)) {
-    const inventory = formatInventory(player.inventory);
-    const actions = getDisplayActions(getLocation(player).actions);
-
-    return result([gameMessage(inventoryText(inventory), actions)]);
   }
 
   return result([unknownCommandMessage(player)]);

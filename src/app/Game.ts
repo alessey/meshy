@@ -1,4 +1,4 @@
-import { COMMANDS, isCommand } from "../game/commands.js";
+import { COMMANDS, isCommand, isSystemCommand } from "../game/commands.js";
 import { type Destination } from "../network/types.js";
 import { Player } from "../game/player.js";
 import { getStartLocationKey } from "../world/utils.js";
@@ -8,8 +8,9 @@ import { unknownCommandMessage } from "../states/presenters.js";
 import { result } from "../game/results.js";
 import { save } from "../storage/playerStore.js";
 import worldMap from "../world/map.js";
-import type { Message } from "../types.js";
-import { formatMessage } from "./messageFormatter.js";
+import type { GameOutcome, Message } from "../types.js";
+import { formatMessage } from "../utils/messageFormatter.js";
+import { handleSystem } from "../states/system.js";
 
 const GAME_PREFIX = "/";
 
@@ -40,18 +41,36 @@ export class Game {
   handleGameLogic(senderId: Destination, input: string | number | Uint8Array): Message[] {
     const rawInput = input.toString().trim();
 
-    if (!rawInput || !rawInput.startsWith(GAME_PREFIX)) {
+    if (!rawInput) {
       return [];
+    }
+
+    if (!rawInput.startsWith(GAME_PREFIX)) {
+      return [
+        {
+          type: "plain",
+          text: "Commands should start with a slash (e.g. /play). Type /help for more info.",
+        },
+      ];
     }
 
     const command = rawInput.slice(GAME_PREFIX.length).toLowerCase().trim() || COMMANDS.PLAY;
     const player = this.getPlayer(senderId);
 
-    let outcome;
+    let outcome: GameOutcome = { messages: [], shouldSave: false };
     if (isCommand(command)) {
-      outcome = player.encounter
+      if (isSystemCommand(command)) {
+        outcome.messages.push(handleSystem(player, command));
+      }
+
+      const result = player.encounter
         ? handleEncounter(player, command)
         : handleExploring(player, command);
+
+      outcome = {
+        messages: outcome.messages.concat(result.messages),
+        shouldSave: result.shouldSave,
+      };
     } else {
       outcome = result([unknownCommandMessage(player)]);
     }
