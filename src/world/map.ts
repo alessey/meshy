@@ -100,7 +100,7 @@ const worldMap: Record<string, Location> = {
     cellType: "forest",
   },
   "3-3": {
-    desc: "You slowly regain consciousness wondering where you are.",
+    desc: "You are in a clearing in the middle of the woods.",
     actions: { n: "2-3", w: "3-2", s: "4-3", e: "3-4" },
     potionChance: 0.5,
     potionHeal: 10,
