@@ -4,6 +4,7 @@ import type { Encounter, Armor, Weapon, Item, Equipment } from "../types.js";
 export const MAX_HP = 20;
 
 export class Player {
+  id: string;
   location: string;
   _hp: number;
   private _armor: Armor;
@@ -12,7 +13,8 @@ export class Player {
   xp: number;
   encounter: Encounter | null;
 
-  constructor() {
+  constructor(id: string) {
+    this.id = id;
     this.location = "";
     this.weapon = { name: "Fists", attack: 2 };
     this._armor = { name: "Cloth", hp: 0 };
@@ -86,8 +88,8 @@ export class Player {
   }
 }
 
-export function hydratePlayer(savedPlayer: Partial<Player> = {}) {
-  const player = new Player();
+export function hydratePlayer(id: string, savedPlayer: Partial<Player> = {}) {
+  const player = new Player(id);
 
   player.location = savedPlayer.location ?? player.location;
   player.armor = savedPlayer.armor ?? player.armor;

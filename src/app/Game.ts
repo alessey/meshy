@@ -26,7 +26,7 @@ export class Game {
     let player = this.playerStates.get(idString);
 
     if (!player) {
-      player = new Player();
+      player = new Player(idString);
       this.playerStates.set(idString, player);
     }
 

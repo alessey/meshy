@@ -53,7 +53,7 @@ function resolveCombatRound(player: Player, event: MonsterEncounter): GameOutcom
   const combatMessage = combatRoundText(monster, playerDamage, monsterDamage);
 
   if (player.hp <= 0) {
-    Object.assign(player, new Player());
+    Object.assign(player, new Player(player.id));
     return result([plainMessage(TEXT.YOU_DIED), locationSummaryMessage(getLocation(player))], {
       shouldSave: true,
     });

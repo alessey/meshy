@@ -3,11 +3,10 @@ import express from "express";
 import { log } from "../logging.js";
 import worldMap from "../world/map.js";
 import type { Player } from "../game/player.js";
-import { USE_MOCK } from "../config/constants.js";
 
 export function startWebServer(playerStates: Map<string, Player>) {
   const app = express();
-  const WEB_PORT = (process.env.WEB_PORT ?? USE_MOCK) ? 5173 : 3000;
+  const WEB_PORT = process.env.WEB_PORT ?? 3000;
 
   app.use(express.json());
   const distPath = path.resolve(process.cwd(), "frontend", "dist");
@@ -37,7 +36,7 @@ export function startWebServer(playerStates: Map<string, Player>) {
   });
 
   app.listen(WEB_PORT, () => {
-    log(`Web dashboard available at http://localhost:${WEB_PORT}`);
+    log(`Web dashboard loaded...`);
   });
 
   return app;
