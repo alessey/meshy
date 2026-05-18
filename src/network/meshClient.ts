@@ -70,7 +70,7 @@ export class MeshClient {
       }
     });
 
-    log("Device status handler set up.");
+    log("Device status handler set up");
   }
 
   setupMessageHandler() {
@@ -101,7 +101,7 @@ export class MeshClient {
       this.onMessageWithContext({ senderId, text, reply: replyFunction });
     });
 
-    log("Message handler set up.");
+    log("Message handler set up");
   }
 
   async sendMessage(recipientId: number | "self" | "broadcast", text: string): Promise<void> {
