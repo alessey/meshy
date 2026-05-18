@@ -27,6 +27,8 @@ A modern React application built with:
 *   **Pico.css**: For a lightweight, semantic UI.
 *   **SVG Map**: Dynamically renders the world grid and player paths using Bezier curves.
 
+![Frontend](admin-screenshot.png)
+
 ## 🛠 Tech Stack
 
 | Layer | Technologies |
