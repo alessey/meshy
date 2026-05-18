@@ -32,12 +32,11 @@ export class MeshClient {
       log("Transport connection established");
 
       this.device = new MeshDevice(this.transport);
-      log("Configuring MeshDevice...");
+      this.setupListeners();
 
+      log("Configuring MeshDevice...");
       await this.device.configure();
       log(`Successfully connected to Meshtastic device at ${this.host}.`);
-
-      this.setupListeners();
 
       this.connecting = false;
     } catch (err) {
