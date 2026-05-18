@@ -25,6 +25,7 @@ export class MeshClient {
 
   async connect() {
     try {
+      log("Connecting to Meshtastic device...");
       this.connecting = true;
 
       this.transport = await TransportNode.create(this.host);
