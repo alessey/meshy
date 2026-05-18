@@ -5,12 +5,12 @@ import { DeviceStatusEnum, type MeshMessageContext } from "./types.js";
 import { type Message } from "../types.js";
 
 const MAX_RETRY_ATTEMPTS = 3;
+const RECONNECT_TIMEOUT = 5_000;
 
 export class MeshClient {
   private host: string;
   private transport?: TransportNode;
   private device?: MeshDevice;
-  private reconnectTimeout: number = 5000;
   private connecting: boolean = false;
   private onMessageWithContext: (ctx: MeshMessageContext) => void;
 
@@ -24,10 +24,14 @@ export class MeshClient {
   }
 
   async connect() {
+    if (this.connecting) {
+      return;
+    }
+
+    this.connecting = true;
+
     try {
       log("Connecting to Meshtastic device...");
-      this.connecting = true;
-
       this.transport = await TransportNode.create(this.host);
       log("Transport connection established");
 
@@ -36,15 +40,15 @@ export class MeshClient {
 
       log("Configuring MeshDevice...");
       await this.device.configure();
-      log(`Successfully connected to Meshtastic device at ${this.host}.`);
 
-      this.connecting = false;
+      log(`Successfully connected to Meshtastic device at ${this.host}.`);
     } catch (err) {
       const error = err instanceof Error ? err.message : err;
-      log("Connection failed, retrying in 5s...", error);
+      logError(`Connection failed: ${error}`);
 
+      this.handleReconnect();
+    } finally {
       this.connecting = false;
-      setTimeout(() => this.handleReconnect(), this.reconnectTimeout);
     }
   }
 
@@ -65,7 +69,7 @@ export class MeshClient {
       log("Status changed:", DeviceStatusEnum[status]);
 
       if (status === DeviceStatusEnum.DeviceDisconnected) {
-        logError("Socket timed out or lost. Reconnecting...");
+        logError("Device disconnected. Reconnecting...");
         this.handleReconnect();
       }
     });
@@ -130,9 +134,9 @@ export class MeshClient {
   }
 
   async handleReconnect() {
-    if (this.connecting) {
-      return;
-    }
+    log(`Recommecting in ${RECONNECT_TIMEOUT / 1000}s...`);
+    await new Promise((resolve) => setTimeout(resolve, RECONNECT_TIMEOUT));
+
     return await this.connect();
   }
 }
