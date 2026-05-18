@@ -25,6 +25,8 @@ export class MeshClient {
 
   async connect() {
     try {
+      this.connecting = true;
+
       this.transport = await TransportNode.create(this.host);
       log("Transport connection established");
 
@@ -41,6 +43,7 @@ export class MeshClient {
       const error = err instanceof Error ? err.message : err;
       log("Connection failed, retrying in 5s...", error);
 
+      this.connecting = false;
       setTimeout(() => this.handleReconnect(), this.reconnectTimeout);
     }
   }
@@ -130,7 +133,6 @@ export class MeshClient {
     if (this.connecting) {
       return;
     }
-    this.connecting = true;
     return await this.connect();
   }
 }
