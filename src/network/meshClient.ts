@@ -35,7 +35,7 @@ export class MeshClient {
     log("Configuring MeshDevice...");
     await this.device.configure();
 
-    log(`Successfully connected to Meshtastic device at ${this.host}.`);
+    log(`Successfully connected to Meshtastic device at ${this.host}`);
   }
 
   async connect() {
@@ -74,7 +74,7 @@ export class MeshClient {
       }
     });
 
-    log("Device status handler set up.");
+    log("Device status handler set up");
   }
 
   setupMessageHandler() {
@@ -93,7 +93,7 @@ export class MeshClient {
 
       const replyFunction = async (messages: Message[]) => {
         if (!this.device) {
-          log("Attempted to reply but device is not connected.");
+          log("Attempted to reply but device is not connected");
           return;
         }
         for (const message of messages) {
@@ -105,7 +105,7 @@ export class MeshClient {
       this.onMessageWithContext({ senderId, text, reply: replyFunction });
     });
 
-    log("Message handler set up.");
+    log("Message handler set up");
   }
 
   async sendMessage(recipientId: number | "self" | "broadcast", text: string): Promise<void> {
