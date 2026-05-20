@@ -6,12 +6,13 @@ import { type Message } from "../types.js";
 
 const MAX_RETRY_ATTEMPTS = 3;
 const RECONNECT_TIMEOUT = 5_000;
+const RESEND_DELAY = 1_000;
 
 export class MeshClient {
   private host: string;
   private transport?: TransportNode;
   private device?: MeshDevice;
-  private connecting: boolean = false;
+  private connectionPromise: Promise<void> | undefined;
   private onMessageWithContext: (ctx: MeshMessageContext) => void;
 
   constructor(host: string, onMessageWithContext: (ctx: MeshMessageContext) => void) {
@@ -23,33 +24,32 @@ export class MeshClient {
     return this.device;
   }
 
+  async createConnection() {
+    log("Connecting to Meshtastic device...");
+    this.transport = await TransportNode.create(this.host);
+    log("Transport connection established");
+
+    this.device = new MeshDevice(this.transport);
+    this.setupListeners();
+
+    log("Configuring MeshDevice...");
+    await this.device.configure();
+
+    log(`Successfully connected to Meshtastic device at ${this.host}.`);
+  }
+
   async connect() {
-    if (this.connecting) {
-      return;
+    if (this.connectionPromise) {
+      return this.connectionPromise;
     }
 
-    this.connecting = true;
-
-    try {
-      log("Connecting to Meshtastic device...");
-      this.transport = await TransportNode.create(this.host);
-      log("Transport connection established");
-
-      this.device = new MeshDevice(this.transport);
-      this.setupListeners();
-
-      log("Configuring MeshDevice...");
-      await this.device.configure();
-
-      log(`Successfully connected to Meshtastic device at ${this.host}.`);
-    } catch (err) {
+    this.connectionPromise = this.createConnection().catch((err) => {
       const error = err instanceof Error ? err.message : err;
       logError(`Connection failed: ${error}`);
 
       this.handleReconnect();
-    } finally {
-      this.connecting = false;
-    }
+    });
+    return this.connectionPromise;
   }
 
   setupListeners() {
@@ -74,7 +74,7 @@ export class MeshClient {
       }
     });
 
-    log("Device status handler set up");
+    log("Device status handler set up.");
   }
 
   setupMessageHandler() {
@@ -105,7 +105,7 @@ export class MeshClient {
       this.onMessageWithContext({ senderId, text, reply: replyFunction });
     });
 
-    log("Message handler set up");
+    log("Message handler set up.");
   }
 
   async sendMessage(recipientId: number | "self" | "broadcast", text: string): Promise<void> {
@@ -127,16 +127,17 @@ export class MeshClient {
 
         if (attempt < MAX_RETRY_ATTEMPTS) {
           // wait 1s, try again
-          await new Promise((resolve) => setTimeout(resolve, 1_000));
+          await new Promise((resolve) => setTimeout(resolve, RESEND_DELAY));
         }
       }
     }
   }
 
   async handleReconnect() {
-    log(`Recommecting in ${RECONNECT_TIMEOUT / 1000}s...`);
-    await new Promise((resolve) => setTimeout(resolve, RECONNECT_TIMEOUT));
+    // reset connection
+    this.connectionPromise = undefined;
 
-    return await this.connect();
+    log(`Reconnecting in ${RECONNECT_TIMEOUT / 1000}s...`);
+    await new Promise((resolve) => setTimeout(resolve, RECONNECT_TIMEOUT));
   }
 }
