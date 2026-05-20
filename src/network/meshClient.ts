@@ -138,6 +138,6 @@ export class MeshClient {
     this.connectionPromise = undefined;
 
     log(`Reconnecting in ${RECONNECT_TIMEOUT / 1000}s...`);
-    await new Promise((resolve) => setTimeout(resolve, RECONNECT_TIMEOUT));
+    setTimeout(this.connect, RECONNECT_TIMEOUT);
   }
 }
