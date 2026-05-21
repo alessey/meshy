@@ -45,7 +45,19 @@ const worldMap: Record<string, Location> = {
     desc: "Millbrook Road. Cart tracks lead east toward the market town.",
     actions: { w: "1-1", e: "1-3", s: "2-2" },
     monsterChance: 0.2,
-    monsterPool: [{ name: "Wild Dog", hp: 6, attack: 2, xp: 5 }],
+    monsterPool: [
+      {
+        name: "Wild Dog",
+        hp: 6,
+        attack: 2,
+        xp: 5,
+        lootChance: 0.5,
+        lootPool: [
+          { name: "Fang dagger", attack: 3 },
+          { name: "Claw dagger", attack: 2 },
+        ],
+      },
+    ],
     cellType: "road",
   },
   "1-3": {
