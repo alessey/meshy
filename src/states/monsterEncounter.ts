@@ -54,9 +54,14 @@ function resolveCombatRound(player: Player, event: MonsterEncounter): GameOutcom
 
   if (player.hp <= 0) {
     Object.assign(player, new Player(player.id));
-    return result([plainMessage(TEXT.YOU_DIED), locationSummaryMessage(getLocation(player))], {
-      shouldSave: true,
-    });
+    return result(
+      [
+        plainMessage(`${monster.name} hits for ${monsterDamage} damage.`),
+        plainMessage(TEXT.YOU_DIED),
+        locationSummaryMessage(getLocation(player)),
+      ],
+      { shouldSave: true },
+    );
   }
 
   if (monster.hp <= 0) {
