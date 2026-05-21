@@ -64,7 +64,7 @@ export class Player {
   }
 
   get maxHp() {
-    return Math.ceil((MAX_HP + this._armor.hp) * getLevelMultiplier(this));
+    return Math.ceil((MAX_HP + (this._armor.max ?? 0)) * getLevelMultiplier(this));
   }
 
   get attack() {
