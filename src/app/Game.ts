@@ -62,7 +62,7 @@ export class Game {
       if (isSystemCommand(command)) {
         const systemMessage = handleSystem(player, command);
         if (systemMessage) {
-          outcome.messages.push(systemMessage);
+          outcome.messages = outcome.messages.concat(systemMessage);
         }
       }
 

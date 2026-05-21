@@ -1,14 +1,7 @@
 import { getLevelMultiplier } from "./levels.js";
 import { randomFrom, roll } from "./random.js";
-import type { Monster, Location, MonsterReward, Equipment } from "../types.js";
+import type { Monster, MonsterReward, Equipment, Weapon, Armor } from "../types.js";
 import { type Player } from "./player.js";
-
-export const LOOT_DROP_CHANCE = 0.2;
-const DEFAULT_LOOT_POOL = [
-  { name: "Rusty Dagger", attack: 4 },
-  { name: "Padded Vest", hp: 2 },
-  { name: "Short Sword", attack: 6 },
-];
 
 export function scaleMonster(monster: Monster, player: Player): Monster {
   const multiplier = getLevelMultiplier(player);
@@ -38,14 +31,10 @@ export function grantMonsterXp(player: Player, monster: Monster): MonsterReward 
   };
 }
 
-export function rollLootDrop(location: Location, monster?: Monster): Equipment | null {
-  const lootPool = monster?.itemPool?.length
-    ? monster.itemPool
-    : location.itemPool?.length
-      ? location.itemPool
-      : DEFAULT_LOOT_POOL;
+export function rollLootDrop(monster?: Monster): Equipment | Weapon | Armor | null {
+  const lootPool = monster?.lootPool;
 
-  if (!roll(LOOT_DROP_CHANCE)) {
+  if (!roll(monster?.lootChance) || !lootPool?.length) {
     return null;
   }
 

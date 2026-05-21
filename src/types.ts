@@ -42,7 +42,8 @@ export type Monster = {
   hp: number;
   attack: number;
   xp?: number;
-  itemPool?: Equipment[];
+  lootChance?: number;
+  lootPool?: (Equipment | Weapon | Armor)[];
 };
 
 export type MonsterEncounter = BaseEncounter & {

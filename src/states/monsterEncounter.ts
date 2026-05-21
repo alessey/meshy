@@ -62,7 +62,7 @@ function resolveCombatRound(player: Player, event: MonsterEncounter): GameOutcom
   if (monster.hp <= 0) {
     const location = getLocation(player);
     const reward = grantMonsterXp(player, monster);
-    const loot = rollLootDrop(location, monster);
+    const loot = rollLootDrop(monster);
     player.encounter = null;
 
     if (loot) {

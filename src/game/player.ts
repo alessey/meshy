@@ -16,7 +16,7 @@ export class Player {
   constructor(id: string) {
     this.id = id;
     this.location = "";
-    this.weapon = { name: "Fists", attack: 4 };
+    this.weapon = { name: "Fists", attack: 2 };
     this._armor = { name: "Cloth", hp: 2 };
     this._hp = MAX_HP;
     this.items = [];

@@ -51,7 +51,15 @@ export function helpMessage() {
 }
 
 export function playMessage(player: Player) {
-  return plainMessage(`Welcome, you are in a player with level ${player.level} Let's play!`);
+  return [
+    plainMessage(
+      `You wake up in a forest clearing to find your village in ash. Rumour says Malachar, the God-Eaten King, consumed the Relic of the Sunken God and has been twisting the land ever since.`,
+    ),
+    plainMessage(
+      `You must cross the realm, gather weapons and armour, unlock his citadel, and end his reign.`,
+    ),
+    inventoryMessage(player),
+  ];
 }
 
 export function inventoryMessage(player: Player) {

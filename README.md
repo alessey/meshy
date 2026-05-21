@@ -6,52 +6,59 @@ The project consists of a **Node.js backend** that manages the game state and Me
 
 ## 🌟 Key Features
 
-*   **Mesh-Native Interaction**: Players join and play entirely through Meshtastic text messages. No internet required.
-*   **Persistent World State**: Player progress, inventory, and locations are saved automatically to a flat-file JSON database.
-*   **Visual Admin Dashboard**: A Vite + React frontend provides a bird's-eye view of the game map, player locations, and detailed statistics.
-*   **Dynamic Pathing**: The engine supports a grid-based movement system with defined connections (roads) between locations.
-*   **Hardware Agnostic**: Supports physical Meshtastic nodes via TCP/IP or a "Mock Mode" for rapid local development.
-*   **Bandwidth Optimized**: Built-in character limits and save debouncing to respect the low-bandwidth nature of LoRa.
+- **Mesh-Native Interaction**: Players join and play entirely through Meshtastic text messages. No internet required.
+- **Persistent World State**: Player progress, inventory, and locations are saved automatically to a flat-file JSON database.
+- **Visual Admin Dashboard**: A Vite + React frontend provides a bird's-eye view of the game map, player locations, and detailed statistics.
+- **Dynamic Pathing**: The engine supports a grid-based movement system with defined connections (roads) between locations.
+- **Hardware Agnostic**: Supports physical Meshtastic nodes via TCP/IP or a "Mock Mode" for rapid local development.
+- **Bandwidth Optimized**: Built-in character limits and save debouncing to respect the low-bandwidth nature of LoRa.
 
 ## 🏗 Architecture
 
 ### Backend (`/src`)
+
 The core engine manages the bridge between the physical Mesh and the game logic.
-*   **Game Logic**: Handles encounters, combat, and inventory management.
-*   **World Engine**: Manages the coordinate-based map and valid player transitions.
-*   **API**: Serves endpoints for the frontend to consume player and map data.
+
+- **Game Logic**: Handles encounters, combat, and inventory management.
+- **World Engine**: Manages the coordinate-based map and valid player transitions.
+- **API**: Serves endpoints for the frontend to consume player and map data.
 
 ### Frontend (`/frontend`)
+
 A modern React application built with:
-*   **Vite**: For fast development and optimized builds.
-*   **Pico.css**: For a lightweight, semantic UI.
-*   **SVG Map**: Dynamically renders the world grid and player paths using Bezier curves.
+
+- **Vite**: For fast development and optimized builds.
+- **Pico.css**: For a lightweight, semantic UI.
+- **SVG Map**: Dynamically renders the world grid and player paths using Bezier curves.
 
 ![Frontend](admin-screenshot.png)
 
 ## 🛠 Tech Stack
 
-| Layer | Technologies |
-| :--- | :--- |
-| **Runtime** | Node.js (v18+) |
-| **Language** | TypeScript |
-| **Frontend** | React, Vite, Pico.css |
-| **Hardware** | `@meshtastic/transport-node`, `@meshtastic/core` |
-| **Linting** | oxlint, oxfmt |
-| **Package Manager** | pnpm |
+| Layer               | Technologies                                     |
+| :------------------ | :----------------------------------------------- |
+| **Runtime**         | Node.js (v18+)                                   |
+| **Language**        | TypeScript                                       |
+| **Frontend**        | React, Vite, Pico.css                            |
+| **Hardware**        | `@meshtastic/transport-node`, `@meshtastic/core` |
+| **Linting**         | oxlint, oxfmt                                    |
+| **Package Manager** | pnpm                                             |
 
 ## 📦 Getting Started
 
 ### 1. Prerequisites
-*   A Meshtastic node configured for network access (or use `USE_MOCK=true`).
-*   `pnpm` installed on your machine.
+
+- A Meshtastic node configured for network access (or use `USE_MOCK=true`).
+- `pnpm` installed on your machine.
 
 ### 2. Installation
+
 ```bash
 pnpm install
 ```
 
 ### 3. Configuration
+
 Create a `.env` file in the root directory:
 
 ```bash
