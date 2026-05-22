@@ -6,6 +6,8 @@ export const TEXT = {
   UNKNOWN_COMMAND: "Unknown command, type /help for more info.",
   YOU_DIED: "You died!",
   WAITING_EVENT: "An event is waiting.",
+  YOU_WON: "You have defeated the final boss! Congratulations, you win!",
+  PLAY_AGAIN: "Type /play to start a new game.",
 };
 
 export function inventoryText(inventory: string): string {

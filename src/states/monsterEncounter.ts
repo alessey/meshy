@@ -84,6 +84,20 @@ function resolveCombatRound(player: Player, event: MonsterEncounter): GameOutcom
       );
     }
 
+    if (monster.hasWon) {
+      return result(
+        [
+          gameMessage(
+            `${monsterDefeatedText(combatMessage, monster)} ${monsterRewardText(reward)}`,
+            [],
+          ),
+          plainMessage(TEXT.YOU_WON),
+          plainMessage(TEXT.PLAY_AGAIN),
+        ],
+        { shouldSave: true },
+      );
+    }
+
     return result(
       [
         gameMessage(

@@ -44,7 +44,7 @@ const worldMap: Record<string, Location> = {
   "1-2": {
     desc: "Millbrook Road. Cart tracks lead east toward the market town.",
     actions: { w: "1-1", e: "1-3", s: "2-2" },
-    monsterChance: 0.2,
+    monsterChance: 0.5,
     monsterPool: [
       {
         name: "Wild Dog",
@@ -63,8 +63,6 @@ const worldMap: Record<string, Location> = {
   "1-3": {
     desc: "Greywood Fringe. The forest thins here. You hear birds — a good sign.",
     actions: { w: "1-2", e: "1-4" },
-    potionChance: 0.6,
-    potionHeal: 12,
     isStart: true,
     cellType: "grass",
   },
@@ -111,10 +109,8 @@ const worldMap: Record<string, Location> = {
   "2-1": {
     desc: "Boggy Dead-End. The mud is too deep to continue. A small pack lies half-buried.",
     actions: { e: "2-2" },
-    monsterChance: 0.3,
+    monsterChance: 0.6,
     monsterPool: [{ name: "Bog Toad", hp: 8, attack: 3, xp: 6 }],
-    potionChance: 0.5,
-    potionHeal: 15,
     cellType: "swamp",
   },
   "2-2": {
@@ -143,7 +139,7 @@ const worldMap: Record<string, Location> = {
   "2-4": {
     desc: "Logging Camp. Half-cut logs everywhere. The saws are silent.",
     actions: { n: "1-4", w: "2-3", s: "3-4" },
-    monsterChance: 0.35,
+    monsterChance: 0.65,
     monsterPool: [{ name: "Deserter", hp: 14, attack: 5, xp: 12 }],
     cellType: "forest",
   },
@@ -182,10 +178,20 @@ const worldMap: Record<string, Location> = {
   "3-1": {
     desc: "Mudflat Bog. A path that leads to a dead end. Something shiny is stuck in the silt.",
     actions: { e: "3-2" },
-    monsterChance: 0.5,
-    monsterPool: [{ name: "River Serpent", hp: 20, attack: 7, xp: 22 }],
-    itemChance: 0.5,
-    itemPool: [{ name: "Heavy Boots", hp: 10 }],
+    monsterChance: 0.7,
+    monsterPool: [
+      {
+        name: "River Serpent",
+        hp: 20,
+        attack: 7,
+        xp: 22,
+        lootChance: 1,
+        lootPool: [
+          { name: "Serpent Fang Dagger", attack: 6 },
+          { name: "Heavy Boots", hp: 10 },
+        ],
+      },
+    ],
     cellType: "stone-bridge",
   },
   "3-2": {
@@ -198,10 +204,17 @@ const worldMap: Record<string, Location> = {
   "3-3": {
     desc: "Crossroads Inn. Burnt out. A skeleton slumped over the bar still wears chainmail.",
     actions: { n: "2-3", w: "3-2", e: "3-4", s: "4-3" },
-    itemChance: 0.9,
-    itemPool: [{ name: "Chainmail Vest", hp: 15 }],
-    monsterChance: 0.4,
-    monsterPool: [{ name: "Looter", hp: 18, attack: 7, xp: 20 }],
+    monsterChance: 0.8,
+    monsterPool: [
+      {
+        name: "Looter",
+        hp: 18,
+        attack: 7,
+        xp: 20,
+        lootChance: 0.9,
+        lootPool: [{ name: "Chainmail Vest", hp: 15 }],
+      },
+    ],
     cellType: "forest-camp",
   },
   "3-4": {
@@ -224,12 +237,22 @@ const worldMap: Record<string, Location> = {
     cellType: "forest-camp",
   },
   "3-7": {
-    desc: "Blighted Orchard. A dead end of blackened trees. A soldier's pike is leaned against a stump.",
+    desc: "Blighted Orchard. A dead end of blackened trees. You get the feeling something is watching you.",
     actions: { n: "2-7", w: "3-6", s: "3-8" },
-    monsterChance: 0.45,
-    monsterPool: [{ name: "Plague Shambler", hp: 25, attack: 8, xp: 28 }],
-    itemChance: 1.0,
-    itemPool: [{ name: "Soldier's Pike", attack: 8 }],
+    monsterChance: 0.85,
+    monsterPool: [
+      {
+        name: "Plague Shambler",
+        hp: 25,
+        attack: 8,
+        xp: 28,
+        lootChance: 0.8,
+        lootPool: [
+          { name: "Plague Mask", hp: 20 },
+          { name: "Soldier's Pike", attack: 8 },
+        ],
+      },
+    ],
     cellType: "forest",
   },
   "3-8": {
@@ -246,9 +269,16 @@ const worldMap: Record<string, Location> = {
     desc: "Dragon Cave. A dangerous dead end. A legend says a hero once cached legendary armour inside.",
     actions: { e: "4-2" },
     monsterChance: 0.9,
-    monsterPool: [{ name: "Cave Drake", hp: 35, attack: 12, xp: 50 }],
-    itemChance: 1.0,
-    itemPool: [{ name: "Dragonscale Armour", hp: 35 }],
+    monsterPool: [
+      {
+        name: "Cave Drake",
+        hp: 35,
+        attack: 12,
+        xp: 50,
+        lootChance: 1,
+        lootPool: [{ name: "Dragonscale Armour", hp: 35 }],
+      },
+    ],
     cellType: "mine",
   },
   "4-2": {
@@ -290,18 +320,35 @@ const worldMap: Record<string, Location> = {
     desc: "Witchwood. Trees writhe without wind. A lost grimoire lies open on a stone.",
     actions: { w: "4-6", e: "4-8" },
     monsterChance: 0.7,
-    monsterPool: [{ name: "Wood Witch", hp: 30, attack: 13, xp: 42 }],
-    itemChance: 0.6,
-    itemPool: [{ name: "Grimoire Ward", hp: 25 }],
+    monsterPool: [
+      {
+        name: "Wood Witch",
+        hp: 30,
+        attack: 13,
+        xp: 42,
+        lootChance: 1,
+        lootPool: [
+          { name: "Grimoire Ward", hp: 25 },
+          { name: "Witch's Staff", attack: 15 },
+        ],
+      },
+    ],
     cellType: "forest",
   },
   "4-8": {
     desc: "Cliffside Dead-End. A narrow trail above the abyss. A fine bow was dropped here.",
     actions: { w: "4-7" },
     monsterChance: 0.5,
-    monsterPool: [{ name: "Harpy", hp: 26, attack: 10, xp: 35 }],
-    itemChance: 1.0,
-    itemPool: [{ name: "Wind-Piercer", attack: 16 }],
+    monsterPool: [
+      {
+        name: "Harpy",
+        hp: 26,
+        attack: 10,
+        xp: 35,
+        lootChance: 1,
+        lootPool: [{ name: "Wind-Piercer", attack: 16 }],
+      },
+    ],
     cellType: "mountain-road",
   },
 
@@ -367,12 +414,27 @@ const worldMap: Record<string, Location> = {
     cellType: "forest",
   },
   "5-8": {
-    desc: "Eastern Pinnacles. A dead end in the peaks. A hermit's high-quality boots remain.",
+    desc: "Eastern Pinnacles. A dead end in the peaks, but a beautiful view",
     actions: { w: "5-7" },
-    monsterChance: 0.5,
-    monsterPool: [{ name: "Rock Troll", hp: 38, attack: 13, xp: 52 }],
-    itemChance: 1.0,
-    itemPool: [{ name: "Mountaineer Greaves", hp: 28 }],
+    monsterChance: 1,
+    monsterPool: [
+      {
+        name: "Rock Troll",
+        hp: 38,
+        attack: 13,
+        xp: 52,
+        lootChance: 1,
+        lootPool: [{ name: "Mountaineer Greaves", hp: 28 }],
+      },
+      {
+        name: "Mountain Warg",
+        hp: 36,
+        attack: 12,
+        xp: 50,
+        lootChance: 1,
+        lootPool: [{ name: "Warg Fang Dagger", attack: 14 }],
+      },
+    ],
     cellType: "mountain-peaks",
   },
 
@@ -399,8 +461,6 @@ const worldMap: Record<string, Location> = {
     actions: { w: "6-2", e: "6-4" },
     itemChance: 0.9,
     itemPool: [{ name: "Vara's Blessing", hp: 35 }],
-    potionChance: 0.5,
-    potionHeal: 35,
     cellType: "temple",
   },
   "6-4": {
@@ -443,10 +503,17 @@ const worldMap: Record<string, Location> = {
   "6-8": {
     desc: "Dusk Altar. A dead end with a sacrificial altar. A brutal axe is embedded in the stone.",
     actions: { w: "6-7" },
-    itemChance: 1.0,
-    itemPool: [{ name: "God-Cleaver Axe", attack: 24 }],
     monsterChance: 0.6,
-    monsterPool: [{ name: "Altar Demon", hp: 50, attack: 17, xp: 80 }],
+    monsterPool: [
+      {
+        name: "Altar Demon",
+        hp: 50,
+        attack: 17,
+        xp: 80,
+        lootChance: 1,
+        lootPool: [{ name: "God-Cleaver Axe", attack: 24 }],
+      },
+    ],
     cellType: "pyramid",
   },
 
@@ -458,9 +525,16 @@ const worldMap: Record<string, Location> = {
     desc: "The Dead March. A dead end road of skulls. A set of heavy plate mail is partially buried.",
     actions: { e: "7-2" },
     monsterChance: 0.85,
-    monsterPool: [{ name: "Death Knight", hp: 52, attack: 22, xp: 88 }],
-    itemChance: 1.0,
-    itemPool: [{ name: "Dullahan Plate", hp: 45 }],
+    monsterPool: [
+      {
+        name: "Death Knight",
+        hp: 52,
+        attack: 22,
+        xp: 88,
+        lootChance: 1,
+        lootPool: [{ name: "Dullahan Plate", hp: 45 }],
+      },
+    ],
     cellType: "mountain-road",
   },
   "7-2": {
@@ -514,7 +588,7 @@ const worldMap: Record<string, Location> = {
         hp: 80,
         attack: 24,
         xp: 150,
-        lootChance: 0.9,
+        lootChance: 1,
         lootPool: [{ name: "Dragon Fang Blade", attack: 28 }],
       },
     ],
@@ -565,7 +639,7 @@ const worldMap: Record<string, Location> = {
         hp: 120,
         attack: 28,
         xp: 500,
-        // Defeating Malachar ends the game — handle win condition in game engine
+        hasWon: true,
       },
     ],
     cellType: "pyramid",
@@ -583,9 +657,20 @@ const worldMap: Record<string, Location> = {
     desc: "The Reliquary. Smashed display cases. But one sealed vault holds Malachar's old battle-plate.",
     actions: { w: "8-6", e: "8-8" },
     itemChance: 1.0,
-    itemPool: [{ name: "King's Battle Plate", hp: 50 }],
     monsterChance: 0.7,
-    monsterPool: [{ name: "Reliquary Shade", hp: 55, attack: 24, xp: 95 }],
+    monsterPool: [
+      {
+        name: "Reliquary Shade",
+        hp: 55,
+        attack: 24,
+        xp: 95,
+        lootChance: 1,
+        lootPool: [
+          { name: "Reliquary Ward", hp: 30 },
+          { name: "King's Battle Plate", hp: 50 },
+        ],
+      },
+    ],
     cellType: "mine",
   },
   "8-8": {
