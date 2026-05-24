@@ -38,19 +38,19 @@ export default function MapCell({
           (cell.encounterPool ?? []).map((encounter) => {
             if (encounter.type === "monster") {
               return (
-                <span key={encounter.monster.name} title="Monster">
+                <span key={encounter.monster.name} title={`Monster: ${encounter.monster.name}`}>
                   👾
                 </span>
               );
             } else if (encounter.type === "item") {
               return (
-                <span key={encounter.item.name} title="Item">
+                <span key={encounter.item.name} title={`Item: ${encounter.item.name}`}>
                   ⚔️
                 </span>
               );
             } else if (encounter.type === "potion") {
               return (
-                <span key={encounter.potion.name} title="Potion">
+                <span key={encounter.potion.name} title={`Potion: ${encounter.potion.name}`}>
                   🧪
                 </span>
               );
