@@ -7,7 +7,7 @@ function truncateMessage(text: string): string {
 }
 
 function formatGameMessage(player: Player, message: GameMessage): GameMessage {
-  const status = `[L${player.level} XP:${player.xp} HP:${player.hp}/${player.maxHp} ATK:${player.attack}]`;
+  const status = `[L${player.level} XP:${player.xp} HP:${player.hp}/${player.maxHp} ATK:${player.attack} ARM:${player.armor?.hp ?? "0"}]`;
   const actionList = message.actions.length ? ` [${message.actions.join(", ")}]` : "";
 
   return {

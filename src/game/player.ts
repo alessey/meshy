@@ -40,13 +40,13 @@ export class Player {
   }
 
   get hp() {
-    return Math.ceil((this._hp + this.armor.hp) * getLevelMultiplier(this));
+    return Math.ceil(this._hp * getLevelMultiplier(this));
   }
 
   set hp(value) {
     const multiplier = getLevelMultiplier(this);
     const unscaledNewTotal = Math.ceil(value / multiplier);
-    const currentUnscaledTotal = this._hp + this.armor.hp;
+    const currentUnscaledTotal = this._hp;
     const diff = unscaledNewTotal - currentUnscaledTotal;
 
     if (diff < 0) {
