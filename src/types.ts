@@ -99,12 +99,8 @@ export type LocationActions = {
 export type Location = {
   desc: string;
   actions: LocationActions;
-  itemChance?: number;
-  itemPool?: Equipment[];
-  monsterChance?: number;
-  monsterPool?: Monster[];
-  potionChance?: number;
-  potionHeal?: number;
+  encounterChance?: number;
+  encounterPool?: Encounter[];
   isStart?: boolean;
   requiredItem?: string;
   cellType?:
