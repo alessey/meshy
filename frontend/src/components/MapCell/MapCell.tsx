@@ -34,13 +34,29 @@ export default function MapCell({
       <TileIcon type={cell.cellType} />
       <div className={styles.cellLabel}>{coord}</div>
       <div className={styles.mapIcons}>
-        {((cell.monsterChance ?? 0) > 0 || (cell.monsterPool ?? []).length > 0) && (
-          <span title="Monster">👾</span>
-        )}
-        {((cell.itemChance ?? 0) > 0 || (cell.itemPool ?? []).length > 0) && (
-          <span title="Item">⚔️</span>
-        )}
-        {(cell.potionChance ?? 0) > 0 && <span title="Potion">🧪</span>}
+        {(cell.encounterChance ?? 0) > 0 &&
+          (cell.encounterPool ?? []).map((encounter) => {
+            if (encounter.type === "monster") {
+              return (
+                <span key={encounter.monster.name} title="Monster">
+                  👾
+                </span>
+              );
+            } else if (encounter.type === "item") {
+              return (
+                <span key={encounter.item.name} title="Item">
+                  ⚔️
+                </span>
+              );
+            } else if (encounter.type === "potion") {
+              return (
+                <span key={encounter.potion.name} title="Potion">
+                  🧪
+                </span>
+              );
+            }
+            return null;
+          })}
       </div>
       <div className={styles.markerTray}>
         {playersHere.map((p) => (
