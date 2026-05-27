@@ -43,7 +43,7 @@ export type Monster = {
   attack: number;
   xp?: number;
   lootChance?: number;
-  lootPool?: (Equipment | Weapon | Armor)[];
+  lootPool?: (Item | Weapon | Armor)[];
   hasWon?: boolean;
 };
 

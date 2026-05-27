@@ -53,17 +53,17 @@ export function helpMessage() {
 export function playMessage(player: Player) {
   return [
     plainMessage(
-      `You wake up in a forest clearing to find your village in ash. Rumour says Malachar, the God-Eaten King, consumed the Relic of the Sunken God and has been twisting the land ever since.`,
+      `You are a mercenary who rides into the Kingdom of Meshymoor to find it tearing itself apart. Varek the Ugly, once the realm's sorcerer, shattered the Crown of Binding and seized the throne.`,
     ),
     plainMessage(
-      `You must cross the realm, gather weapons and armour, unlock his citadel, and end his reign.`,
+      `Two fragments of the Crown were scattered as Varek fled. Recover them and you can unlock the Spire Gate and face him at the top of the Ashen Spire.`,
     ),
     inventoryMessage(player),
   ];
 }
 
 export function inventoryMessage(player: Player) {
-  const message = ["Inventory:"];
+  const message = ["Inventory [/i to view]:"];
 
   if (player.weapon) {
     message.push(`Weapon: ${formatInventoryItem(player.weapon)}`);
