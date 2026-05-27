@@ -50,7 +50,7 @@ async function start(): Promise<void> {
           text,
           reply: async (messages) => {
             messages.forEach((msg) => {
-              log(msg.text);
+              console.log(msg.text);
             });
           },
         };
