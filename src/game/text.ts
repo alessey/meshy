@@ -15,7 +15,10 @@ export function inventoryText(inventory: string): string {
 }
 
 export function itemPrompt(item: Loot): string {
-  return `Found ${item.name} (${itemStat(item)}). (T)ake or (D)iscard?`;
+  const stat = itemStat(item);
+  const actions = itemActions(item);
+
+  return `Found ${item.name} ${stat ? `(${stat})` : ""}. ${actions}`;
 }
 
 export function monsterPrompt(monster: Monster): string {
@@ -43,6 +46,7 @@ export function monsterRewardText(reward: MonsterReward): string {
 export function lootDropText(item: Loot): string {
   const stat = itemStat(item);
   const actions = itemActions(item);
+
   return `It dropped ${item.name} ${stat ? `(${stat})` : ""}. ${actions}`;
 }
 
