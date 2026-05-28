@@ -88,7 +88,7 @@ const worldMap: Record<string, Location> = {
   "1-4": {
     desc: "Cobbler's Square. A market square gone to ruin. A child's spinning top rests beside a toppled stall; the child is long gone.",
     actions: { w: "1-3", e: "1-5", s: "2-4" },
-    encounterChance: 0.5,
+    encounterChance: 0.8,
     encounterPool: [{ type: "item", item: { name: "Health Potion", type: "potion", heal: 10 } }],
     cellType: "forest-camp",
   },
@@ -143,7 +143,10 @@ const worldMap: Record<string, Location> = {
     desc: "Shrine of the Old Road. A mossy wayshrine. Pilgrims left offerings — one pouch contains a healing draught.",
     actions: { w: "1-6", e: "1-8", s: "2-7" },
     encounterChance: 0.8,
-    encounterPool: [{ type: "item", item: { name: "Health Potion", type: "potion", heal: 15 } }],
+    encounterPool: [
+      { type: "item", item: { name: "Health Potion", type: "potion", heal: 15 } },
+      { type: "item", item: { name: "Pilgrim Hat", type: "armor", hp: 10 } },
+    ],
     cellType: "temple",
   },
 
@@ -153,6 +156,7 @@ const worldMap: Record<string, Location> = {
     encounterChance: 1.0,
     encounterPool: [
       { type: "item", item: { name: "Ranger's Longbow", type: "weapon", attack: 9 } },
+      { type: "item", item: { name: "Ranger's Cloak", type: "armor", hp: 12 } },
     ],
     cellType: "mountains",
   },
@@ -174,7 +178,11 @@ const worldMap: Record<string, Location> = {
           attack: 6,
           xp: 18,
           lootChance: 0.8,
-          lootPool: [{ name: "Iron Gauntlets", type: "armor", hp: 14 }],
+          lootPool: [
+            { name: "Iron Gauntlets", type: "armor", hp: 14 },
+            { name: "Iron Chestplate", type: "armor", hp: 18 },
+            { name: "Health Potion", type: "potion", heal: 30 },
+          ],
         },
       },
     ],
@@ -184,7 +192,7 @@ const worldMap: Record<string, Location> = {
   "2-2": {
     desc: "Ruined Gatehouse. The portcullis is jammed halfway. You duck under. A leather cap hangs on a hook inside.",
     actions: { n: "1-2", w: "2-1", e: "2-3", s: "3-2" },
-    encounterChance: 0.9,
+    encounterChance: 1.0,
     encounterPool: [{ type: "item", item: { name: "Leather Cap", type: "armor", hp: 8 } }],
     cellType: "forest-camp",
   },
@@ -192,11 +200,18 @@ const worldMap: Record<string, Location> = {
   "2-3": {
     desc: "King's Highway South. Broad and cracked. A regiment of Varek's conscripts passed through recently — bootprints everywhere.",
     actions: { n: "1-3", w: "2-2", e: "2-4", s: "3-3" },
-    encounterChance: 0.55,
+    encounterChance: 0.5,
     encounterPool: [
       {
         type: "monster",
-        monster: { name: "Deserter", hp: 14, attack: 5, xp: 12 },
+        monster: {
+          name: "Deserter",
+          hp: 14,
+          attack: 5,
+          xp: 12,
+          lootChance: 1.0,
+          lootPool: [{ name: "Health Potion", type: "potion", heal: 20 }],
+        },
       },
     ],
     cellType: "road",
@@ -205,7 +220,7 @@ const worldMap: Record<string, Location> = {
   "2-4": {
     desc: "Broken Fountain Square. The town's heart. The fountain runs with something dark. A wooden shield floats in the basin.",
     actions: { n: "1-4", w: "2-3", e: "2-5" },
-    encounterChance: 0.9,
+    encounterChance: 1.0,
     encounterPool: [{ type: "item", item: { name: "Wooden Shield", type: "armor", hp: 12 } }],
     cellType: "forest-camp",
   },
@@ -227,18 +242,33 @@ const worldMap: Record<string, Location> = {
     desc: "Greenhollow Glade. A quiet clearing. A hunter's cache is wedged in a hollow oak: a vial of healing herbs.",
     actions: { w: "2-5", e: "2-7", s: "3-6" },
     encounterChance: 0.8,
-    encounterPool: [{ type: "item", item: { name: "Health Potion", type: "potion", heal: 20 } }],
+    encounterPool: [
+      { type: "item", item: { name: "Health Potion", type: "potion", heal: 20 } },
+      { type: "item", item: { name: "Hunter's Cloak", type: "armor", hp: 12 } },
+      { type: "item", item: { name: "Hunter's Bow", type: "weapon", attack: 10 } },
+    ],
     cellType: "forest",
   },
 
   "2-7": {
     desc: "Thornwood Trail. The undergrowth claws at your legs. Someone scrambled through here in a hurry.",
     actions: { n: "1-7", w: "2-6", e: "2-8", s: "3-7" },
-    encounterChance: 0.65,
+    encounterChance: 0.7,
     encounterPool: [
       {
         type: "monster",
-        monster: { name: "Thornwood Stalker", hp: 18, attack: 7, xp: 20 },
+        monster: {
+          name: "Thornwood Stalker",
+          hp: 18,
+          attack: 5,
+          xp: 20,
+          lootChance: 1.0,
+          lootPool: [
+            { name: "Health Potion", type: "potion", heal: 25 },
+            { name: "Thornwood Dagger", type: "weapon", attack: 10 },
+            { name: "Thornwood Cloak", type: "armor", hp: 14 },
+          ],
+        },
       },
     ],
     cellType: "forest",
@@ -248,7 +278,7 @@ const worldMap: Record<string, Location> = {
     desc: "Cliffside Warren. A dead end: a smuggler's burrow carved into the rock. Inside: a chainmail coif and a note reading 'DO NOT GO SOUTH.'",
     actions: { w: "2-7", s: "3-8" },
     encounterChance: 1.0,
-    encounterPool: [{ type: "item", item: { name: "Chainmail Coif", type: "armor", hp: 16 } }],
+    encounterPool: [{ type: "item", item: { name: "Chainmail Coif", type: "armor", hp: 20 } }],
     cellType: "mountains",
   },
 

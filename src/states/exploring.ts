@@ -9,7 +9,7 @@ import {
   unknownCommandMessage,
 } from "./presenters.js";
 import type { Player } from "../game/player.js";
-import type { Command, Direction, GameOutcome } from "../types.js";
+import type { Command, Direction, Encounter, GameOutcome } from "../types.js";
 import worldMap from "../world/map.js";
 
 export function handleExploring(player: Player, command: Command): GameOutcome {
@@ -54,11 +54,16 @@ function handleMovement(player: Player, command: Direction): GameOutcome {
   return enterLocation(player, true);
 }
 
+function isPotionEventWithFullHealth(player: Player, event: Encounter): boolean {
+  return event?.type === "item" && event.item.type === "potion" && player.hp === player.maxHp;
+}
+
 export function enterLocation(player: Player, shouldSave: boolean = false): GameOutcome {
   const location = getLocation(player);
   const event = resolveLocationEvent(location, player);
 
-  if (event) {
+  // skip potion events if the player is already at full health
+  if (event && !isPotionEventWithFullHealth(player, event)) {
     player.encounter = event;
     return result([eventPromptMessage(event, player)], { shouldSave });
   }
