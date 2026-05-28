@@ -1,5 +1,5 @@
 import { getLevel, getLevelMultiplier } from "./levels.js";
-import type { Encounter, Armor, Weapon, Item, Equipment } from "../types.js";
+import type { Encounter, Armor, Weapon, Item, Loot } from "../types.js";
 
 export const MAX_HP = 20;
 
@@ -16,8 +16,8 @@ export class Player {
   constructor(id: string) {
     this.id = id;
     this.location = "";
-    this.weapon = { name: "Fists", attack: 2 };
-    this._armor = { name: "Cloth", hp: 2 };
+    this.weapon = { name: "Fists", type: "weapon", attack: 2 };
+    this._armor = { name: "Cloth", type: "armor", hp: 2 };
     this._hp = MAX_HP;
     this.items = [];
     this.xp = 0;
@@ -71,7 +71,7 @@ export class Player {
     return Math.ceil(this.weapon.attack * getLevelMultiplier(this));
   }
 
-  get inventory(): Equipment[] {
+  get inventory(): Loot[] {
     return [this.weapon, this._armor, ...this.items];
   }
 

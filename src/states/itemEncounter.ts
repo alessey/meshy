@@ -3,22 +3,29 @@ import { gameMessage, result } from "../game/results.js";
 import { itemPrompt } from "../game/text.js";
 import { getLocation, locationSummaryMessage } from "./presenters.js";
 import type { Player } from "../game/player.js";
-import type { ItemEncounter, GameOutcome, ItemCommand, Weapon, Armor, Item } from "../types.js";
+import type { ItemEncounter, GameOutcome, ItemCommand, PotionCommand } from "../types.js";
 
 export function handleItemEncounter(
   player: Player,
-  command: ItemCommand,
+  command: ItemCommand | PotionCommand,
   event: ItemEncounter,
 ): GameOutcome {
   const location = getLocation(player);
 
-  if (command === COMMANDS.TAKE) {
-    if (event.item.attack !== undefined) {
-      player.weapon = event.item as Weapon;
-    } else if (event.item.hp !== undefined) {
-      player.armor = event.item as Armor;
-    } else if (event.item.type !== undefined) {
-      player.items.push(event.item as Item);
+  if (command === COMMANDS.TAKE || command === COMMANDS.USE) {
+    switch (event.item.type) {
+      case "potion":
+        player.hp += event.item.heal;
+        break;
+      case "weapon":
+        player.weapon = event.item;
+        break;
+      case "armor":
+        player.armor = event.item;
+        break;
+      case "item":
+        player.items.push(event.item);
+        break;
     }
 
     player.encounter = null;
@@ -30,5 +37,7 @@ export function handleItemEncounter(
     return result([locationSummaryMessage(location)], { shouldSave: true });
   }
 
-  return result([gameMessage(itemPrompt(event.item), getCommandLabels(EVENT_ACTIONS.item))]);
+  const actions = event.item.type === "potion" ? EVENT_ACTIONS.potion : EVENT_ACTIONS.item;
+
+  return result([gameMessage(itemPrompt(event.item), getCommandLabels(actions))]);
 }

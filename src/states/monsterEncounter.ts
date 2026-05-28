@@ -77,7 +77,10 @@ function resolveCombatRound(player: Player, event: MonsterEncounter): GameOutcom
             `${monsterDefeatedText(combatMessage, monster)} ${monsterRewardText(reward)}`,
             [],
           ),
-          gameMessage(lootDropText(loot), getCommandLabels(EVENT_ACTIONS.item)),
+          gameMessage(
+            lootDropText(loot),
+            getCommandLabels(loot.type === "potion" ? EVENT_ACTIONS.potion : EVENT_ACTIONS.item),
+          ),
         ],
         { shouldSave: true },
       );

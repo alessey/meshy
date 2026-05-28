@@ -1,4 +1,4 @@
-import type { Equipment, Monster, Potion, MonsterReward } from "../types.js";
+import type { Loot, Monster, MonsterReward } from "../types.js";
 import { type Player } from "./player.js";
 
 export const TEXT = {
@@ -14,16 +14,12 @@ export function inventoryText(inventory: string): string {
   return `${TEXT.INVENTORY_TITLE}\n${inventory}`;
 }
 
-export function itemPrompt(item: Equipment): string {
+export function itemPrompt(item: Loot): string {
   return `Found ${item.name} (${itemStat(item)}). (T)ake or (D)iscard?`;
 }
 
 export function monsterPrompt(monster: Monster): string {
   return `A ${monster.name}, HP: ${monster.hp}, ATK: ${monster.attack}, appears! (F)ight or (R)un?`;
-}
-
-export function potionPrompt(potion: Potion): string {
-  return `You found a ${potion.name}. (U)se or (D)iscard?`;
 }
 
 export function combatRoundText(
@@ -44,24 +40,40 @@ export function monsterRewardText(reward: MonsterReward): string {
   return `+${reward.xp} XP.${levelText}`;
 }
 
-export function lootDropText(item: Equipment): string {
-  return `It dropped ${item.name} (${itemStat(item)}). (T)ake or (D)iscard?`;
+export function lootDropText(item: Loot): string {
+  const stat = itemStat(item);
+  const actions = itemActions(item);
+  return `It dropped ${item.name} ${stat ? `(${stat})` : ""}. ${actions}`;
+}
+
+function itemActions(item: Loot): string {
+  switch (item.type) {
+    case "item":
+    case "weapon":
+    case "armor":
+      return "(T)ake or (D)iscard";
+    case "potion":
+      return "(U)se or (D)iscard";
+    default:
+      return "";
+  }
 }
 
 export function combatStatusText(combatMessage: string, player: Player, monster: Monster): string {
   return `${combatMessage}Your HP: ${player.hp}. Monster HP: ${monster.hp}. (F)ight or (R)un?`;
 }
 
-function itemStat(item: Equipment): string {
-  if (item.attack !== undefined) {
-    return `${item.attack} ATK`;
+function itemStat(item: Loot): string {
+  switch (item.type) {
+    case "weapon":
+      return `${item.attack} ATK`;
+    case "armor":
+      return `${item.hp} HP`;
+    case "potion":
+      return `Heals ${item.heal} HP`;
+    default:
+      return item.type;
   }
-
-  if (item.hp !== undefined) {
-    return `${item.hp} HP`;
-  }
-
-  return item.type ?? ""; // For items like "key"
 }
 
 export function requirementText(itemName: string): string {

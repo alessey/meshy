@@ -1,9 +1,9 @@
 import worldMap from "../world/map.js";
 import { EVENT_ACTIONS, getCommandLabels, getDisplayActions } from "../game/commands.js";
 import { gameMessage, plainMessage } from "../game/results.js";
-import { itemPrompt, monsterPrompt, potionPrompt, TEXT } from "../game/text.js";
+import { itemPrompt, monsterPrompt, TEXT } from "../game/text.js";
 import type { Player } from "../game/player.js";
-import type { Location, Encounter, Equipment } from "../types.js";
+import type { Location, Encounter, Loot } from "../types.js";
 import { getStartLocationKey } from "../world/utils.js";
 
 export function getLocation(player: Player): Location {
@@ -26,8 +26,6 @@ export function eventPromptMessage(event: Encounter, player: Player) {
       return gameMessage(itemPrompt(event.item), actions);
     case "monster":
       return gameMessage(monsterPrompt(event.monster), actions);
-    case "potion":
-      return gameMessage(potionPrompt(event.potion), actions);
     default:
       return gameMessage(TEXT.WAITING_EVENT, getDisplayActions(getLocation(player).actions));
   }
@@ -83,18 +81,17 @@ export function inventoryMessage(player: Player) {
   return plainMessage(message.join("\n"));
 }
 
-function formatInventoryItem(item: Equipment): string {
-  if (item.attack !== undefined) {
-    return `${item.name} (${item.attack} ATK)`;
+function formatInventoryItem(item: Loot): string {
+  switch (item.type) {
+    case "weapon":
+      return `${item.name} (${item.attack} ATK)`;
+    case "armor":
+      return `${item.name} (${item.hp} HP)`;
+    case "potion":
+      return `${item.name} (${item.heal} HEAL)`;
+    case "item":
+      return item.name;
+    default:
+      return "Unknown itemtype";
   }
-
-  if (item.hp !== undefined) {
-    return `${item.name} (${item.hp} HP)`;
-  }
-
-  if (item.type !== undefined) {
-    return `${item.name} (${item.type})`;
-  }
-
-  return item.name;
 }

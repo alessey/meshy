@@ -1,6 +1,6 @@
 import { getLevelMultiplier } from "./levels.js";
 import { randomFrom, roll } from "./random.js";
-import type { Monster, MonsterReward, Weapon, Armor, Item } from "../types.js";
+import type { Monster, MonsterReward, Loot } from "../types.js";
 import { type Player } from "./player.js";
 
 export function scaleMonster(monster: Monster, player: Player): Monster {
@@ -31,7 +31,7 @@ export function grantMonsterXp(player: Player, monster: Monster): MonsterReward 
   };
 }
 
-export function rollLootDrop(monster?: Monster): Item | Weapon | Armor | null {
+export function rollLootDrop(monster?: Monster): Loot | null {
   const lootPool = monster?.lootPool;
 
   if (!roll(monster?.lootChance) || !lootPool?.length) {

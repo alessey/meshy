@@ -3,38 +3,42 @@ import type { COMMANDS, EVENT_ACTIONS, SYSTEM_ACTIONS } from "./game/commands.js
 /**
  * Equipment and Inventory Types
  */
-export type ItemType = "key";
+export type ItemType = "weapon" | "armor" | "potion" | "item";
 
-export type Equipment = {
+export type BaseItem = {
   name: string;
-  attack?: number;
-  hp?: number;
-  type?: ItemType;
+  type: ItemType;
 };
 
-export type Weapon = Equipment & {
+export type Weapon = BaseItem & {
+  type: "weapon";
   attack: number;
 };
 
-export type Armor = Equipment & {
+export type Armor = BaseItem & {
+  type: "armor";
   hp: number;
   max?: number;
 };
 
-export type Item = Equipment & {
-  type: ItemType;
+export type Potion = BaseItem & {
+  type: "potion";
+  heal: number;
 };
 
-/**
- * Encounter Types
- */
+export type Item = BaseItem & {
+  type: "item";
+};
+
+export type Loot = Weapon | Armor | Potion | Item;
+
 export type BaseEncounter = {
   type: string;
 };
 
 export type ItemEncounter = BaseEncounter & {
   type: "item";
-  item: Equipment;
+  item: Loot;
 };
 
 export type Monster = {
@@ -43,7 +47,7 @@ export type Monster = {
   attack: number;
   xp?: number;
   lootChance?: number;
-  lootPool?: (Item | Weapon | Armor)[];
+  lootPool?: Loot[];
   hasWon?: boolean;
 };
 
@@ -52,17 +56,7 @@ export type MonsterEncounter = BaseEncounter & {
   monster: Monster;
 };
 
-export type Potion = {
-  name: string;
-  heal: number;
-};
-
-export type PotionEncounter = BaseEncounter & {
-  type: "potion";
-  potion: Potion;
-};
-
-export type Encounter = ItemEncounter | MonsterEncounter | PotionEncounter;
+export type Encounter = ItemEncounter | MonsterEncounter;
 
 /**
  * Event Types
@@ -70,8 +64,8 @@ export type Encounter = ItemEncounter | MonsterEncounter | PotionEncounter;
 type EventActionsConfig = typeof EVENT_ACTIONS;
 
 export type ItemCommand = EventActionsConfig["item"][number];
-export type MonsterCommand = EventActionsConfig["monster"][number];
 export type PotionCommand = EventActionsConfig["potion"][number];
+export type MonsterCommand = EventActionsConfig["monster"][number];
 
 /**
  * System Actions Types
@@ -164,8 +158,8 @@ export type MonsterReward = {
 export type PlainPlayer = {
   location: string;
   _hp: number;
-  weapon: Equipment;
-  armor: Equipment;
+  weapon: Weapon;
+  armor: Armor;
   items: Item[];
   xp: number;
   encounter: Encounter | null;
