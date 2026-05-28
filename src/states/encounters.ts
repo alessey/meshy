@@ -2,7 +2,12 @@ import { result } from "../game/results.js";
 import { eventPromptMessage, unknownCommandMessage } from "./presenters.js";
 import { handleItemEncounter } from "./itemEncounter.js";
 import { handleMonsterEncounter } from "./monsterEncounter.js";
-import { isItemCommand, isMonsterCommand, isSystemCommand } from "../game/commands.js";
+import {
+  isItemCommand,
+  isMonsterCommand,
+  isPotionCommand,
+  isSystemCommand,
+} from "../game/commands.js";
 import type { Player } from "../game/player.js";
 import type { Command, GameOutcome } from "../types.js";
 
@@ -15,7 +20,7 @@ export function handleEncounter(player: Player, command: Command): GameOutcome {
 
   switch (event?.type) {
     case "item":
-      if (isItemCommand(command)) {
+      if (isItemCommand(command) || isPotionCommand(command)) {
         return handleItemEncounter(player, command, event);
       }
       break;
