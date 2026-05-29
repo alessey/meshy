@@ -718,7 +718,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "6-7": {
-    desc: "Runed Sentinel's Crossing. The Runed Sentinel — Varek's eastern lieutenant — wears the second Crown shard as a medallion. He has been waiting for someone like you.",
+    desc: "Runed Sentinel's Crossing. The Runed Sentinel — Varek's eastern lieutenant — wears the second Crown shard as a medallion. He has been waiting for you.",
     actions: { n: "5-7", w: "6-6", e: "6-8" },
     encounterChance: 1.0,
     encounterPool: [
