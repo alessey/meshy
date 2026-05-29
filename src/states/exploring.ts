@@ -58,12 +58,17 @@ function isPotionEventWithFullHealth(player: Player, event: Encounter): boolean 
   return event?.type === "item" && event.item.type === "potion" && player.hp === player.maxHp;
 }
 
+function isAlreadyKilledMonster(encounter: Encounter): boolean {
+  return encounter?.type === "monster" && encounter.monster.hp <= 0;
+}
+
 export function enterLocation(player: Player, shouldSave: boolean = false): GameOutcome {
   const location = getLocation(player);
   const event = resolveLocationEvent(location, player);
 
   // skip potion events if the player is already at full health
-  if (event && !isPotionEventWithFullHealth(player, event)) {
+  // skip monsters that have already been killed
+  if (event && !isPotionEventWithFullHealth(player, event) && !isAlreadyKilledMonster(event)) {
     player.encounter = event;
     return result([eventPromptMessage(event, player)], { shouldSave });
   }

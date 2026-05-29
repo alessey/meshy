@@ -1,17 +1,6 @@
-import { getLevelMultiplier } from "./levels.js";
 import { randomFrom, roll } from "./random.js";
 import type { Monster, MonsterReward, Loot } from "../types.js";
 import { type Player } from "./player.js";
-
-export function scaleMonster(monster: Monster, player: Player): Monster {
-  const multiplier = getLevelMultiplier(player);
-  return {
-    ...monster,
-    hp: Math.ceil(monster.hp * multiplier),
-    attack: Math.ceil(monster.attack * multiplier),
-    xp: Math.ceil(getMonsterXp(monster) * multiplier),
-  };
-}
 
 export function grantMonsterXp(player: Player, monster: Monster): MonsterReward {
   const previousLevel = player.level;

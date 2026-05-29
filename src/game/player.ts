@@ -68,7 +68,7 @@ export class Player {
   }
 
   get attack() {
-    return Math.ceil(this.weapon.attack * getLevelMultiplier(this));
+    return this.weapon.attack;
   }
 
   get inventory(): Loot[] {
