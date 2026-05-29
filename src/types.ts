@@ -163,6 +163,7 @@ export type PlainPlayer = {
   items: Item[];
   xp: number;
   encounter: Encounter | null;
+  clearedLocations: string[];
 };
 
 /**

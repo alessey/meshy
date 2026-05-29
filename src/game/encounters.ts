@@ -27,12 +27,17 @@ export function resolveLocationEvent(location: Location, player: Player): Encoun
   const chance = location.encounterChance ?? 0;
   if (roll(chance)) {
     const encounter = randomFrom(location.encounterPool ?? []);
-    if (encounter) {
-      if (encounter.type === "item") {
-        encounter.item = scaleLoot(encounter.item, player);
-      }
-      return encounter;
+
+    if (!encounter) {
+      return null;
     }
+
+    if (encounter.type === "item") {
+      return { ...encounter, item: scaleLoot(encounter.item, player) };
+    }
+
+    // clone the monster
+    return { ...encounter, monster: { ...encounter.monster } };
   }
 
   return null;

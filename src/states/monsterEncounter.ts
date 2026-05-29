@@ -67,6 +67,7 @@ function resolveCombatRound(player: Player, event: MonsterEncounter): GameOutcom
   if (monster.hp <= 0) {
     const reward = grantMonsterXp(player, monster);
     const loot = rollLootDrop(monster);
+    player.clearedLocations.push(player.location);
     player.encounter = null;
 
     if (loot) {
@@ -87,7 +88,7 @@ function resolveCombatRound(player: Player, event: MonsterEncounter): GameOutcom
     }
 
     if (monster.hasWon) {
-      return result(
+      const resultMessage = result(
         [
           gameMessage(
             `${monsterDefeatedText(combatMessage, monster)} ${monsterRewardText(reward)}`,
@@ -98,6 +99,9 @@ function resolveCombatRound(player: Player, event: MonsterEncounter): GameOutcom
         ],
         { shouldSave: true },
       );
+      Object.assign(player, new Player(player.id));
+
+      return resultMessage;
     }
 
     return result(

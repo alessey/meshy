@@ -11,6 +11,7 @@ export class Player {
   weapon: Weapon;
   items: Item[];
   xp: number;
+  clearedLocations: string[];
   encounter: Encounter | null;
 
   constructor(id: string) {
@@ -22,6 +23,7 @@ export class Player {
     this.items = [];
     this.xp = 0;
     this.encounter = null;
+    this.clearedLocations = [];
   }
 
   get level() {
@@ -98,6 +100,7 @@ export function hydratePlayer(id: string, savedPlayer: Partial<Player> = {}) {
   player.xp = savedPlayer.xp ?? player.xp;
   player.encounter = savedPlayer.encounter ?? player.encounter;
   player.items = savedPlayer.items ?? player.items;
+  player.clearedLocations = savedPlayer.clearedLocations ?? [];
 
   return player;
 }
