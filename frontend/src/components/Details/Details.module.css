@@ -1,16 +1,35 @@
 .detailsSection {
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
   position: sticky;
   top: 20px;
 }
+
+@media (max-width: 768px) {
+  .detailsSection {
+    position: static;
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
 .equipSection {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 40px;
 }
+
+@media (max-width: 480px) {
+  .equipSection {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
 .section {
   margin-top: 24px;
-  h2, h4 {
+  h2,
+  h4 {
     color: var(--pico-primary);
   }
 }
