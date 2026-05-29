@@ -2,7 +2,7 @@ import path from "path";
 import express from "express";
 import { log } from "../logging.js";
 import worldMap from "../world/map.js";
-import type { Player } from "../game/player.js";
+import { hydratePlayer, type Player } from "../game/player.js";
 
 export function startWebServer(playerStates: Map<string, Player>) {
   const app = express();
@@ -17,6 +17,7 @@ export function startWebServer(playerStates: Map<string, Player>) {
       id,
       location: p.location,
       level: p.level,
+      encounter: Boolean(p.encounter),
     }));
     res.json(players);
   });
@@ -28,8 +29,9 @@ export function startWebServer(playerStates: Map<string, Player>) {
   app.get("/api/player/:id", (req, res) => {
     const playerId = req.params.id;
     const player = playerStates.get(playerId);
-    if (player) {
-      res.json(player);
+    const hydratedPlayer = hydratePlayer(playerId, player);
+    if (hydratedPlayer) {
+      res.json(hydratedPlayer);
     } else {
       res.status(404).send("Player not found");
     }

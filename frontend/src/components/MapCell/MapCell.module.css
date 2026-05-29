@@ -48,7 +48,7 @@
 
 .markerTray {
   position: relative;
-  z-index: 2;
+  z-index: 5;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -69,6 +69,9 @@
   justify-content: center;
   margin: 2px;
   border: 2px solid var(--pico-background-color);
+}
+.playerMarker.encounterPlayer {
+  background: #991b1b;
 }
 .playerMarker.activePlayer {
   background: #facc15;

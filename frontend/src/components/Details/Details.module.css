@@ -1,0 +1,24 @@
+.detailsSection {
+  width: 400px;
+  position: sticky;
+  top: 20px;
+}
+.equipSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+.section {
+  margin-top: 24px;
+  h2, h4 {
+    color: var(--pico-primary);
+  }
+}
+.encounterBanner {
+  background: #991b1b;
+  color: white;
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}

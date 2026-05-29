@@ -1,10 +1,10 @@
 import { useEffect, useState, useMemo } from "react";
 import styles from "./App.module.css";
-import StatBox from "./components/StatBox/StatBox";
 import MapCell from "./components/MapCell/MapCell";
 import type { Location } from "../../src/types";
 import type { Player } from "../../src/game/player";
 import Header from "./components/Header/Header";
+import Details from "./components/Details/Details";
 
 export default function App() {
   const [worldMap, setWorldMap] = useState<Record<string, Location> | null>(null);
@@ -140,13 +140,7 @@ export default function App() {
               viewBox={`0 0 ${gridDims.c * 90} ${gridDims.r * 90}`}
             >
               {roadPaths.map((d, i) => (
-                <path
-                  key={i}
-                  d={d}
-                  fill="none"
-                  stroke="rgba(201, 125, 26, 0.89)" // Light tan/dusty road color
-                  strokeWidth="4"
-                />
+                <path key={i} d={d} fill="none" stroke="rgba(201, 125, 26, 0.89)" strokeWidth="4" />
               ))}
             </svg>
 
@@ -173,44 +167,11 @@ export default function App() {
           </div>
         </div>
 
-        {selectedId && playerDetails && (
-          <article className={styles.detailsSection}>
-            <div className="grid">
-              <StatBox label="Location" value={playerDetails.location} />
-              <StatBox label="Health" value={`${playerDetails.hp} / ${playerDetails.maxHp}`} />
-              <StatBox label="Level" value={`${playerDetails.level} (${playerDetails.xp} XP)`} />
-              <StatBox label="Attack" value={playerDetails.attack} />
-            </div>
-
-            <div className={styles.equipSection}>
-              <section className={styles.section}>
-                <h4 style={{ color: "var(--pico-primary)" }}>Equipment</h4>
-                <p>
-                  Weapon: <strong>{playerDetails.weapon.name}</strong>
-                </p>
-                <p>
-                  Armor: <strong>{playerDetails.armor.name}</strong>
-                </p>
-              </section>
-              <section className={styles.section}>
-                <h4 style={{ color: "var(--pico-primary)" }}>Bag</h4>
-                <ul>
-                  {playerDetails.items.map((item: any, i: number) => (
-                    <li key={i}>
-                      {item.name} ({item.type || "Item"})
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            </div>
-
-            {playerDetails.encounter && (
-              <footer className={styles.encounterBanner}>
-                <strong>Active Encounter: {playerDetails.encounter.type.toUpperCase()}</strong>
-              </footer>
-            )}
-          </article>
-        )}
+        <Details
+          selectedId={selectedId}
+          playerDetails={playerDetails}
+          setSelectedId={setSelectedId}
+        />
       </section>
     </main>
   );

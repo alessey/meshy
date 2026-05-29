@@ -88,6 +88,24 @@ export class Player {
   hasItem(itemName: string): boolean {
     return this.items.some((item) => item.name.toLowerCase() === itemName.toLowerCase());
   }
+
+  toJSON() {
+    return {
+      id: this.id,
+      location: this.location,
+      level: this.level,
+      hp: this.hp,
+      _hp: this._hp,
+      maxHp: this.maxHp,
+      attack: this.attack,
+      armor: this.armor,
+      weapon: this.weapon,
+      items: this.items,
+      xp: this.xp,
+      encounter: this.encounter,
+      clearedLocations: this.clearedLocations,
+    };
+  }
 }
 
 export function hydratePlayer(id: string, savedPlayer: Partial<Player> = {}) {

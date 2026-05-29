@@ -25,25 +25,4 @@
   .mapSection {
     flex: 1;
   }
-  .detailsSection {
-    width: 400px;
-    position: sticky;
-    top: 20px;
-  }
-}
-.equipSection {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-}
-.section {
-  margin-top: 24px;
-}
-.encounterBanner {
-  background: #991b1b;
-  color: white;
-  text-align: center;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-top: 2rem;
 }

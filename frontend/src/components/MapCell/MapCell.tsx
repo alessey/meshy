@@ -20,7 +20,6 @@ export default function MapCell({
   isSelectedCell,
   isStart,
 }: MapCellProps) {
-  // Render an empty, non-active cell if no cell data exists for this coordinate
   if (!cell) {
     return <div key={coord} className={styles.mapCell}></div>;
   }
@@ -48,12 +47,6 @@ export default function MapCell({
                   ⚔️
                 </span>
               );
-            } else if (encounter.type === "potion") {
-              return (
-                <span key={encounter.potion.name} title={`Potion: ${encounter.potion.name}`}>
-                  🧪
-                </span>
-              );
             }
             return null;
           })}
@@ -62,7 +55,10 @@ export default function MapCell({
         {playersHere.map((p) => (
           <div
             key={p.id}
-            className={`${styles.playerMarker} ${p.id === selectedId ? styles.activePlayer : ""}`}
+            className={`
+              ${styles.playerMarker} 
+              ${p.id === selectedId ? styles.activePlayer : ""} 
+              ${p.encounter ? styles.encounterPlayer : ""}`}
             title={`Player ${p.id}`}
           >
             {p.id === "MOCK_USER" ? "M" : p.id.toString().slice(0, 2)}
