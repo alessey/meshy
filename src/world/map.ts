@@ -1,11 +1,8 @@
 import type { Location } from "../types.js";
 
 // ============================================================
-//  THE SHATTERED CROWN  –  8 × 8 World Map
+//  MESHYMOOR  –  8 × 8 World Map
 //
-//
-//  PATH OVERVIEW
-//  ─────────────
 //  The map offers three early branches, each feeding into a
 //  tangled mid-zone before converging on the Spire Approach.
 //
@@ -94,7 +91,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "1-5": {
-    desc: "East Trade Road. Caravans used to line this stretch. Now it is empty save for scattered coin and a dropped short sword.",
+    desc: "East Trade Road. Caravans used to line this stretch. Now it is empty save for scattered coin and some trash.",
     actions: { w: "1-4", e: "1-6", s: "2-5" },
     encounterChance: 1.0,
     encounterPool: [
@@ -140,7 +137,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "1-7": {
-    desc: "Shrine of the Old Road. A mossy wayshrine. Pilgrims left offerings — one pouch contains a healing draught.",
+    desc: "Shrine of the Old Road. A mossy wayshrine. Pilgrims left offerings.",
     actions: { w: "1-6", e: "1-8", s: "2-7" },
     encounterChance: 0.8,
     encounterPool: [
@@ -151,7 +148,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "1-8": {
-    desc: "Eastwatch Overlook. A dead-end clifftop. The view is stunning and meaningless. A ranger's longbow leans against the beacon-post.",
+    desc: "Eastwatch Overlook. A dead-end clifftop. The view is stunning and meaningless, bringing a tear to your eye.",
     actions: { w: "1-7" },
     encounterChance: 1.0,
     encounterPool: [
@@ -166,7 +163,7 @@ const worldMap: Record<string, Location> = {
   // ══════════════════════════════════════════════════════════
 
   "2-1": {
-    desc: "Ironmoor Quarry. A dead-end pit mine. The workers fled mid-shift; a set of heavy work-gauntlets was left behind. Something nests in the shafts.",
+    desc: "Ironmoor Quarry. A dead-end pit mine. The workers fled mid-shift; leaving equipment scattered everywhere. Something nests in the shafts.",
     actions: { e: "2-2", s: "3-1" },
     encounterChance: 0.85,
     encounterPool: [
@@ -190,7 +187,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "2-2": {
-    desc: "Ruined Gatehouse. The portcullis is jammed halfway. You duck under. A leather cap hangs on a hook inside.",
+    desc: "Ruined Gatehouse. The portcullis is jammed halfway. You duck under, clumsily hitting your head.",
     actions: { n: "1-2", w: "2-1", e: "2-3", s: "3-2" },
     encounterChance: 1.0,
     encounterPool: [{ type: "item", item: { name: "Leather Cap", type: "armor", hp: 8 } }],
@@ -218,7 +215,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "2-4": {
-    desc: "Broken Fountain Square. The town's heart. The fountain runs with something dark. A wooden shield floats in the basin.",
+    desc: "Broken Fountain Square. The town's heart. The fountain runs with something dark, a severed head looks at you.",
     actions: { n: "1-4", w: "2-3", e: "2-5" },
     encounterChance: 1.0,
     encounterPool: [{ type: "item", item: { name: "Wooden Shield", type: "armor", hp: 12 } }],
@@ -239,7 +236,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "2-6": {
-    desc: "Greenhollow Glade. A quiet clearing. A hunter's cache is wedged in a hollow oak: a vial of healing herbs.",
+    desc: "Greenhollow Glade. A quiet clearing. Birds chirp, oblivious to your presence.",
     actions: { w: "2-5", e: "2-7", s: "3-6" },
     encounterChance: 0.8,
     encounterPool: [
@@ -275,7 +272,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "2-8": {
-    desc: "Cliffside Warren. A dead end: a smuggler's burrow carved into the rock. Inside: a chainmail coif and a note reading 'DO NOT GO SOUTH.'",
+    desc: "Cliffside Warren. A dead end: a smuggler's burrow carved into the rock. Inside is a note reading 'DO NOT GO SOUTH.'",
     actions: { w: "2-7", s: "3-8" },
     encounterChance: 1.0,
     encounterPool: [{ type: "item", item: { name: "Chainmail Coif", type: "armor", hp: 20 } }],
@@ -287,7 +284,7 @@ const worldMap: Record<string, Location> = {
   // ══════════════════════════════════════════════════════════
 
   "3-1": {
-    desc: "Ironmoor Descent. A steep track down the quarry ridge. The WEST path runs here. Hard going — but a knight's vambrace lies in the ditch.",
+    desc: "Ironmoor Descent. A steep track down the quarry ridge. The WEST path runs here. Hard going.",
     actions: { n: "2-1", e: "3-2", s: "4-1" },
     encounterChance: 0.75,
     encounterPool: [
@@ -307,20 +304,27 @@ const worldMap: Record<string, Location> = {
   },
 
   "3-2": {
-    desc: "Tanner's Row. Hides still soak in vats. The stench is extraordinary. A tanner's apron-armour hangs on a frame.",
+    desc: "Tanner's Row. Hides still soak in vats. The stench is extraordinary. A tanner's apron hangs on a frame.",
     actions: { n: "2-2", w: "3-1", e: "3-3", s: "4-2" },
     encounterChance: 0.6,
     encounterPool: [
       {
         type: "monster",
-        monster: { name: "Scavenger Gang", hp: 20, attack: 7, xp: 22 },
+        monster: {
+          name: "Scavenger Gang",
+          hp: 20,
+          attack: 7,
+          xp: 22,
+          lootChance: 0.8,
+          lootPool: [{ name: "Tanner's Apron", type: "armor", hp: 15 }],
+        },
       },
     ],
     cellType: "forest-camp",
   },
 
   "3-3": {
-    desc: "Crossroads Tavern. Still smoking from a recent fire. The innkeeper's savings were hidden under a loose flagstone: a potion.",
+    desc: "Crossroads Tavern. Still smoking from a recent fire. The innkeeper's savings were hidden under a loose flagstone, worthless now.",
     actions: { n: "2-3", w: "3-2", e: "3-4" },
     encounterChance: 1.0,
     encounterPool: [{ type: "item", item: { name: "Health Potion", type: "potion", heal: 25 } }],
@@ -348,7 +352,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "3-5": {
-    desc: "Rivermoor Bridge. The bridge holds, barely. A sword is jammed in the railing like a trophy.",
+    desc: "Rivermoor Bridge. The bridge holds, barely. A sword is jammed in the railing like a trophy with blood dried on the blade.",
     actions: { n: "2-5", w: "3-4", e: "3-6" },
     encounterChance: 1.0,
     encounterPool: [
@@ -366,7 +370,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "3-7": {
-    desc: "Thornwood Depth. The forest thickens. An old ranger's sword glints from the roots of a black oak.",
+    desc: "Thornwood Depth. The forest thickens. Squirrels scurry from the roots of a black oak.",
     actions: { n: "2-7", w: "3-6", e: "3-8", s: "4-7" },
     encounterChance: 0.7,
     encounterPool: [
@@ -386,7 +390,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "3-8": {
-    desc: "Smuggler's Gorge. A dead end — the gorge is impassable. But the smugglers cached their best stock here: exceptional armour.",
+    desc: "Smuggler's Gorge. A dead end — the gorge is impassable. A smuggler's note is pinned to a tree: 'The WEST path is safer. The EAST path is faster.'",
     actions: { n: "2-8", w: "3-7" },
     encounterChance: 0.85,
     encounterPool: [
@@ -494,7 +498,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "4-7": {
-    desc: "Witchwood Hollow. A coven worked here until recently. Their grimoire lies open. Their weapons remain.",
+    desc: "Witchwood Hollow. A coven worked here until recently. Their grimoire lies open, but you can't read the language it contains.",
     actions: { n: "3-7", w: "4-6", e: "4-8" },
     encounterChance: 0.8,
     encounterPool: [
@@ -517,7 +521,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "4-8": {
-    desc: "Cliffside Cache. A dead end at the cliff's edge. A dead adventurer left behind some remarkable plate armour. He did not leave behind his luck.",
+    desc: "Cliffside Cache. A dead end at the cliff's edge. A dead adventurers body lies bloated and stinky.",
     actions: { w: "4-7", s: "5-8" },
     encounterChance: 0.9,
     encounterPool: [
@@ -541,7 +545,7 @@ const worldMap: Record<string, Location> = {
   // ══════════════════════════════════════════════════════════
 
   "5-1": {
-    desc: "Ruined Watchtower. A dead end. The upper floors have collapsed. A knight's kite shield rests against the rubble.",
+    desc: "Ruined Watchtower. A dead end. The upper floors have collapsed.",
     actions: { e: "5-2", s: "6-1" },
     encounterChance: 0.8,
     encounterPool: [
@@ -584,7 +588,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "5-4": {
-    desc: "Shattered Gate. Two massive stone pillars and a rune-locked portcullis. The Iron Shard Key pulses with cold light — and fits the lock.",
+    desc: "Shattered Gate. Two massive stone pillars and a rune-locked portcullis. Looks like you need a key to open it.",
     actions: { n: "4-4", w: "5-3", e: "5-5", s: "6-4" },
     requiredItem: "Iron Shard Key",
     cellType: "doors",
@@ -627,7 +631,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "5-8": {
-    desc: "Mountain Hermit's Cave. A dead end. The hermit is long gone but left a remarkable set of armour embedded in a prayer-stone.",
+    desc: "Mountain Hermit's Cave. A dead end. The hermit is long gone but left some hair embedded in a prayer-stone.",
     actions: { n: "4-8", w: "5-7" },
     encounterChance: 0.85,
     encounterPool: [
@@ -857,7 +861,7 @@ const worldMap: Record<string, Location> = {
           attack: 25,
           xp: 150,
           lootChance: 1,
-          lootPool: [{ name: "Wyrm-Fang Greatsword", type: "weapon", attack: 26 }],
+          lootPool: [{ name: "Wyrm-Fang Greatsword", type: "weapon", attack: 46 }],
         },
       },
     ],
@@ -895,7 +899,18 @@ const worldMap: Record<string, Location> = {
     encounterPool: [
       {
         type: "monster",
-        monster: { name: "Oathbroken Knight", hp: 56, attack: 24, xp: 96 },
+        monster: {
+          name: "Oathbroken Knight",
+          hp: 56,
+          attack: 24,
+          xp: 96,
+          lootChance: 1.0,
+          lootPool: [
+            { name: "Oathbroken Plate", type: "armor", hp: 48 },
+            { name: "Health Potion", type: "potion", heal: 40 },
+            { name: "Oathbroken Longsword", type: "weapon", attack: 24 },
+          ],
+        },
       },
     ],
     cellType: "mine",
@@ -929,7 +944,7 @@ const worldMap: Record<string, Location> = {
   },
 
   "8-5": {
-    desc: "The Throne of the Ugly. Varek rises — a tower of robes and crackling runes and stolen power. The Crown fragments burn in his chest like a second heart. End him. Restore the Crown. Save what is left of Aethermoor.",
+    desc: "The Throne of the Ugly. Varek rises, a tower of robes, crackling runes and stolen power. The Crown fragments burn in his chest like a second heart. End him. Restore the Crown. Save Meshymoor!",
     actions: { n: "7-5", w: "8-4", e: "8-6" },
     encounterChance: 1.0,
     encounterPool: [
@@ -984,7 +999,7 @@ const worldMap: Record<string, Location> = {
   "8-8": {
     desc: "East Spire Summit. A dead end — the highest point of the Spire. A powerful restorative rests on the parapet. Below you, the whole blighted kingdom waits.",
     actions: { w: "8-7" },
-    encounterChance: 0.8,
+    encounterChance: 1.0,
     encounterPool: [
       { type: "item", item: { name: "Greater Health Potion", type: "potion", heal: 60 } },
     ],
